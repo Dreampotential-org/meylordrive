@@ -1,0 +1,11 @@
+version: '3.3'
+
+services:
+    web:
+        build: .
+        volumes:
+            - ./codes:/home/web/codes
+        ports:
+            - 8000:8000
+        command: bash -c "python3 manage.py runserver 0.0.0.0:8000"
+
