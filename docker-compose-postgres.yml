@@ -1,23 +1,21 @@
-version: '3'
+version: '3.3'
 
 services:
-
     db:
-        hostname: pgbouncer
-        image: raphaelpr/pgbouncer:latest
+        image: postgis/postgis
         ports:
-            - 54321:6432
+            - 5434:5432
+        volumes:
+            - ../postgres-python-base-dev2:/var/lib/postgresql/data
         environment:
-            # - DB_HOST=agentstat.cifks7bf45qg.us-west-2.rds.amazonaws.com
-            - DB_HOST=agentstatzz.cifks7bf45qg.us-west-2.rds.amazonaws.com
-            - DB_USER=postgres
-            - DB_PASSWORD=u6LVCTkIzmh3eW2S
-            - POOL_MODE=session
-            - MAX_CLIENT_CONN=500
-            - DEFAULT_POOL_SIZE=80
-            - QUERY_WAIT_TIMEOUT=1000
-            - RESERVE_POOL_SIZE=20
-            - LISTEN_ADDR=*
-            - AUTH_TYPE=plain
-            - AUTH_FILE=/etc/pgbouncer/userlist.txt
+            POSTGRES_DB: postgres
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: EhB4bINnDFmzI0Bg
+        networks:
+            - backend
+
+networks:
+    backend:
+        external:
+            name: chiroposture_network
 
