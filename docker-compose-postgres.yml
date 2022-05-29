@@ -6,7 +6,7 @@ services:
         ports:
             - 5434:5432
         volumes:
-            - ../postgres-python-base-dev2:/var/lib/postgresql/data
+            - ../postgres-meylorCI:/var/lib/postgresql/data
         environment:
             POSTGRES_DB: postgres
             POSTGRES_USER: postgres
@@ -17,5 +17,5 @@ services:
 networks:
     backend:
         external:
-            name: chiroposture_network
+            name: meylorCI
 
