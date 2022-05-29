@@ -8,6 +8,9 @@ pip install -r requirements.txt
 
 
 
+# runs the tasks we have on servers
+python codes/manage.py  run_tasks
+
 
 ```
 docker-compose build
