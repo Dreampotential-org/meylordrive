@@ -17,7 +17,7 @@ def run_job(server, task):
     task.save()
 
     if task.stderr != "":
-        raise Exception('There was an error pulling the runtime: {}'.format(stderr))
+        raise Exception('There was an error pulling the runtime: {}'.format(task.stderr))
     print(task.stdout)
     client.close()
 
