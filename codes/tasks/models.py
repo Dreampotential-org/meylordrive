@@ -2,9 +2,12 @@ from django.db import models
 
 
 class Task(models.Model):
+    unique = True
     status = models.CharField(max_length=64)
     command = models.CharField(max_length=4096, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    stdout = models.TextField(null=True)
+    stderr = models.TextField(null=True)
 
 
 class Server(models.Model):

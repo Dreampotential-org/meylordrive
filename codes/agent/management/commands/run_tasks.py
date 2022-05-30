@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from paramiko.client import SSHClient
+from paramiko.client import SSHClient, AutoAddPolicy
 
 from tasks.models import Task, Server
 
@@ -8,16 +8,18 @@ def run_job(server, task):
     print("Run job server: %s %s" % (server.username, server.ip_address))
     client = SSHClient()
     client.load_system_host_keys()
+    client.set_missing_host_key_policy(AutoAddPolicy())
     client.connect(server.ip_address, username=server.username)
-    stdin, stdout, stderr = client.exec_command('ls -l')
+    stdin, stdout, stderr = client.exec_command('pwd; ls -alh')
 
-    out = stdout.read().decode().strip()
-    error = stderr.read().decode().strip()
-    if error:
-        raise Exception('There was an error pulling the runtime: {}'.format(error))
-    print(out)
+    task.stdout = stdout.read().decode().strip()
+    task.stderr = stderr.read().decode().strip()
+    task.save()
+
+    if task.stderr != "":
+        raise Exception('There was an error pulling the runtime: {}'.format(stderr))
+    print(task.stdout)
     client.close()
-
 
 
 class Command(BaseCommand):
@@ -38,4 +40,5 @@ class Command(BaseCommand):
             run_job(server, task)
         servers = Server.objects.filter()
         for server in servers:
-            run_job(server, None)
+            task = Task()
+            run_job(server, task)
