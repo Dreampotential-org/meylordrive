@@ -18,7 +18,7 @@ def run_job(server, task):
 
     if task.stderr != "":
         raise Exception('There was an error pulling the runtime: {}'.format(task.stderr))
-    print(task.stdout)
+    print("HERE is program output: %s" % task.stdout)
     client.close()
 
 class Command(BaseCommand):
