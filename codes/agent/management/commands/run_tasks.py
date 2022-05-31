@@ -1,8 +1,8 @@
 from django.core.management.base import BaseCommand
 from paramiko.client import SSHClient, AutoAddPolicy
+import threading
 
 from tasks.models import Task, Server
-
 
 def run_job(server, task):
     print("Run job server: %s %s" % (server.username, server.ip_address))
@@ -21,7 +21,6 @@ def run_job(server, task):
     print(task.stdout)
     client.close()
 
-
 class Command(BaseCommand):
     help = 'run the tasks'
 
@@ -34,11 +33,19 @@ class Command(BaseCommand):
         tasks = Task.objects.filter(status='not-active')
         print("Number of tasks to run: %s" % len(tasks))
 
+        threads = []
+
         for task in tasks:
             print(task)
             server = Server.objects.filter().first()
-            run_job(server, task)
+            t = threading.Thread(target=run_job, args=(server, task))
+            t.start()
+            threads.append(t)
         servers = Server.objects.filter()
         for server in servers:
             task = Task()
-            run_job(server, task)
+            t = threading.Thread(target=run_job, args=(server, task))
+            t.start()
+            threads.append(t)
+        for t in threads:
+            t.join()
