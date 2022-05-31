@@ -10,7 +10,7 @@ def run_job(server, task):
     client.load_system_host_keys()
     client.set_missing_host_key_policy(AutoAddPolicy())
     client.connect(server.ip_address, username=server.username)
-    stdin, stdout, stderr = client.exec_command('pwd; ls -alh')
+    stdin, stdout, stderr = client.exec_command('git clone git@github.com:aaronorosen/django-zillow.git')
 
     task.stdout = stdout.read().decode().strip()
     task.stderr = stderr.read().decode().strip()
