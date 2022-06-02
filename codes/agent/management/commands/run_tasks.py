@@ -14,6 +14,7 @@ from tasks.models import Task, Server
 
 def run_job(server, task):
     print("Run job server: %s %s" % (server.username, server.ip_address))
+    configure_node(server)
     client = SSHClient()
     client.load_system_host_keys()
     client.set_missing_host_key_policy(AutoAddPolicy())
@@ -81,8 +82,7 @@ class Command(BaseCommand):
         hosts = []
         host_config = []
         servers = Server.objects.filter()
-        for server in servers:
-            configure_node(server)
+        # for server in servers:
         #    print(server.ip_address)
         #    hosts.append(server.ip_address)
         #    host_config.append(
