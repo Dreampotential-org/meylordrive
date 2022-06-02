@@ -35,10 +35,18 @@ def configure_node(server):
     ssh = paramiko.SSHClient()
     ssh.load_host_keys(os.path.expanduser(os.path.join("~", ".ssh", "known_hosts")))
     ssh.connect(server.ip_address, username=server.username)
+
+    stdin, stdout, stderr = ssh.exec_command('rm -fr ~/.ssh/id_rsa')
+
     sftp = ssh.open_sftp()
     FILE = "/home/arosen/meylorCI/server-key"
     p = subprocess.Popen(["scp", FILE, "%s@%s:~/.ssh/id_rsa" % (
         server.username, server.ip_address)])
+
+    stdin, stdout, stderr = ssh.exec_command('rm -fr ~/django-zillow')
+
+    output = ssh.run_command(
+        'git clone git@github.com:aaronorosen/django-zillow.git')
 
     sftp.close()
     ssh.close()
