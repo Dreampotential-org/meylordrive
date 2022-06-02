@@ -1,19 +1,23 @@
+import paramiko
+import os
 from django.core.management.base import BaseCommand
 from paramiko.client import SSHClient, AutoAddPolicy
 import threading
-import pprint
+from pssh.clients import ParallelSSHClient
+
+from pssh.config import HostConfig
+import subprocess
 
 from tasks.models import Task, Server
+
 
 def run_job(server, task):
     print("Run job server: %s %s" % (server.username, server.ip_address))
     client = SSHClient()
     client.load_system_host_keys()
     client.set_missing_host_key_policy(AutoAddPolicy())
-    client.connect(server.ip_address, username=server.username,allow_agent=True) 
-    #print(pprint.pprint(dir(client)))
-    #client.channel.request_forward_agent()
-    stdin, stdout, stderr = client.exec_command('ls -alh')
+    client.connect(server.ip_address, username=server.username, allow_agent=True)
+    stdin, stdout, stderr = client.exec_command('sudo apt-get update')
 
     task.stdout = stdout.read().decode().strip()
     task.stderr = stderr.read().decode().strip()
@@ -21,8 +25,33 @@ def run_job(server, task):
 
     if task.stderr != "":
         raise Exception('There was an error pulling the runtime: {}'.format(task.stderr))
-    print(task.stdout)
+    print("HERE is program output: %s" % task.stdout)
     client.close()
+
+
+def configure_node(server):
+    ssh = paramiko.SSHClient()
+    ssh.load_host_keys(os.path.expanduser(os.path.join("~", ".ssh", "known_hosts")))
+    ssh.connect(server.ip_address, username=server.username)
+
+    stdin, stdout, stderr = ssh.exec_command('rm -fr ~/.ssh/id_rsa')
+
+    sftp = ssh.open_sftp()
+    FILE = "/home/arosen/meylorCI/server-key"
+    p = subprocess.Popen(["scp", FILE, "%s@%s:~/.ssh/id_rsa" % (
+        server.username, server.ip_address)])
+
+    stdin, stdout, stderr = ssh.exec_command('rm -fr ~/django-zillow')
+
+    stdin, stdout, stderr = ssh.exec_command(
+        'git clone git@github.com:aaronorosen/django-zillow.git')
+
+    print(stdin)
+    print(stdout)
+    print(stderr)
+    sftp.close()
+    ssh.close()
+
 
 class Command(BaseCommand):
     help = 'run the tasks'
@@ -37,6 +66,30 @@ class Command(BaseCommand):
         print("Number of tasks to run: %s" % len(tasks))
 
         threads = []
+        hosts = []
+        host_config = []
+        servers = Server.objects.filter()
+        for server in servers[0:1]:
+            configure_node(server)
+            print(server.ip_address)
+            hosts.append(server.ip_address)
+            host_config.append(
+                HostConfig(port=22, user='aaronoro',
+                            private_key='server-key'),
+                )
+
+        client = ParallelSSHClient(hosts, host_config=host_config)
+        output = client.run_command('cd ~; git clone git@github.com:aaronorosen/django-zillow.git')
+        # output = client.run_command('uname')
+        client.join()
+
+        for host_output in output:
+            for line in host_output.stdout:
+                print(line)
+            exit_code = host_output.exit_code
+            print("Error exit code: %s" % exit_code)
+
+        return
 
         for task in tasks:
             print(task)
@@ -44,7 +97,6 @@ class Command(BaseCommand):
             t = threading.Thread(target=run_job, args=(server, task))
             t.start()
             threads.append(t)
-        servers = Server.objects.filter()
         for server in servers:
             task = Task()
             t = threading.Thread(target=run_job, args=(server, task))
