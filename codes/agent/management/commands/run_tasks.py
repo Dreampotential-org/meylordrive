@@ -8,7 +8,6 @@ from pssh.clients import ParallelSSHClient
 from pssh.config import HostConfig
 import subprocess
 
-
 from tasks.models import Task, Server
 
 
@@ -17,8 +16,7 @@ def run_job(server, task):
     client = SSHClient()
     client.load_system_host_keys()
     client.set_missing_host_key_policy(AutoAddPolicy())
-    client.connect(server.ip_address, username=server.username)
-    # stdin, stdout, stderr = client.exec_command('git clone git@github.com:aaronorosen/django-zillow.git')
+    client.connect(server.ip_address, username=server.username, allow_agent=True)
     stdin, stdout, stderr = client.exec_command('sudo apt-get update')
 
     task.stdout = stdout.read().decode().strip()
