@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from paramiko.client import SSHClient, AutoAddPolicy
 import threading
+import pprint
 
 from tasks.models import Task, Server
 
@@ -9,8 +10,10 @@ def run_job(server, task):
     client = SSHClient()
     client.load_system_host_keys()
     client.set_missing_host_key_policy(AutoAddPolicy())
-    client.connect(server.ip_address, username=server.username)
-    stdin, stdout, stderr = client.exec_command('pwd; ls -alh')
+    client.connect(server.ip_address, username=server.username,allow_agent=True) 
+    #print(pprint.pprint(dir(client)))
+    #client.channel.request_forward_agent()
+    stdin, stdout, stderr = client.exec_command('ls -alh')
 
     task.stdout = stdout.read().decode().strip()
     task.stderr = stderr.read().decode().strip()
