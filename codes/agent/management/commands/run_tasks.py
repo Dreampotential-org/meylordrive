@@ -1,12 +1,16 @@
+import paramiko
+import os
 from django.core.management.base import BaseCommand
 from paramiko.client import SSHClient, AutoAddPolicy
 import threading
 from pssh.clients import ParallelSSHClient
 
 from pssh.config import HostConfig
+import subprocess
 
 
 from tasks.models import Task, Server
+
 
 def run_job(server, task):
     print("Run job server: %s %s" % (server.username, server.ip_address))
@@ -26,6 +30,20 @@ def run_job(server, task):
     print("HERE is program output: %s" % task.stdout)
     client.close()
 
+
+def configure_node(server):
+    ssh = paramiko.SSHClient()
+    ssh.load_host_keys(os.path.expanduser(os.path.join("~", ".ssh", "known_hosts")))
+    ssh.connect(server.ip_address, username=server.username)
+    sftp = ssh.open_sftp()
+    FILE = "/home/arosen/meylorCI/server-key"
+    p = subprocess.Popen(["scp", FILE, "%s@%s:~/.ssh/id_rsa" % (
+        server.username, server.ip_address)])
+
+    sftp.close()
+    ssh.close()
+
+
 class Command(BaseCommand):
     help = 'run the tasks'
 
@@ -42,7 +60,9 @@ class Command(BaseCommand):
         hosts = []
         host_config = []
         servers = Server.objects.filter()
-        for server in servers:
+        for server in servers[0:1]:
+            configure_node(server)
+            print(server.ip_address)
             hosts.append(server.ip_address)
             host_config.append(
                 HostConfig(port=22, user='aaronoro',
@@ -50,9 +70,8 @@ class Command(BaseCommand):
                 )
 
         client = ParallelSSHClient(hosts, host_config=host_config)
-
         output = client.run_command('cd ~; git clone git@github.com:aaronorosen/django-zillow.git')
-        output = client.run_command('uname')
+        # output = client.run_command('uname')
         client.join()
 
         for host_output in output:
