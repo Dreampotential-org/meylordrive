@@ -45,9 +45,12 @@ def configure_node(server):
 
     stdin, stdout, stderr = ssh.exec_command('rm -fr ~/django-zillow')
 
-    output = ssh.run_command(
+    stdin, stdout, stderr = ssh.exec_command(
         'git clone git@github.com:aaronorosen/django-zillow.git')
 
+    print(stdin)
+    print(stdout)
+    print(stderr)
     sftp.close()
     ssh.close()
 
