@@ -39,6 +39,7 @@ def configure_node(server):
     stdin, stdout, stderr = ssh.exec_command(
         'git clone git@github.com:aaronorosen/django-zillow.git')
 
+    # XXX why do we have to do this to make things work
     time.sleep(200)
     stdin, stdout, stderr = ssh.exec_command(
         'sudo touch /var/lib/dpkg/status')
