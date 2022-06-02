@@ -18,7 +18,7 @@ def run_job(server, task):
     client.load_system_host_keys()
     client.set_missing_host_key_policy(AutoAddPolicy())
     client.connect(server.ip_address, username=server.username, allow_agent=True)
-    stdin, stdout, stderr = client.exec_command('sudo apt-get update')
+    stdin, stdout, stderr = client.exec_command('sudo apt-get update -y')
 
     task.stdout = stdout.read().decode().strip()
     task.stderr = stderr.read().decode().strip()
@@ -49,6 +49,12 @@ def configure_node(server):
     stdin, stdout, stderr = ssh.exec_command(
         'git clone git@github.com:aaronorosen/django-zillow.git')
 
+
+    time.sleep(2)
+    stdin, stdout, stderr = ssh.exec_command(
+        'sudo rm -fr "rm -f /etc/apt/sources.list.d/buildkite-agent.list"')
+    time.sleep(2)
+
     print(stdin)
     print(stdout)
     print(stderr)
@@ -75,7 +81,7 @@ class Command(BaseCommand):
         hosts = []
         host_config = []
         servers = Server.objects.filter()
-        for server in servers[0:1]:
+        for server in servers:
             configure_node(server)
         #    print(server.ip_address)
         #    hosts.append(server.ip_address)
