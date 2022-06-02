@@ -19,17 +19,6 @@ def run_job(server, task):
     client.load_system_host_keys()
     client.set_missing_host_key_policy(AutoAddPolicy())
     client.connect(server.ip_address, username=server.username, allow_agent=True)
-    stdin, stdout, stderr = client.exec_command('sudo apt-get update -y')
-
-    task.stdout = stdout.read().decode().strip()
-    task.stderr = stderr.read().decode().strip()
-    # task.save()
-    print(task.stdout)
-
-    if task.stderr != "":
-        raise Exception('There was an error pulling the runtime: {}'.format(task.stderr))
-    print("HERE is program output: %s" % task.stdout)
-    client.close()
 
 
 def configure_node(server):
@@ -49,6 +38,18 @@ def configure_node(server):
     time.sleep(2)
     stdin, stdout, stderr = ssh.exec_command(
         'git clone git@github.com:aaronorosen/django-zillow.git')
+
+
+    time.sleep(2)
+    stdin, stdout, stderr = ssh.exec_command(
+        'sudo touch /var/lib/dpkg/status')
+    time.sleep(2)
+
+    time.sleep(2)
+    stdin, stdout, stderr = ssh.exec_command(
+        'sudo apt-get update && apt-get upgrade -y')
+    time.sleep(2)
+
 
 
     time.sleep(2)
