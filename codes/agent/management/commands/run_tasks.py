@@ -1,3 +1,4 @@
+import time
 import paramiko
 import os
 from django.core.management.base import BaseCommand
@@ -42,13 +43,17 @@ def configure_node(server):
         server.username, server.ip_address)])
 
     stdin, stdout, stderr = ssh.exec_command('rm -fr ~/django-zillow')
-
+    # not sure we need to do this sleep here it is looking like
+    time.sleep(2)
     stdin, stdout, stderr = ssh.exec_command(
         'git clone git@github.com:aaronorosen/django-zillow.git')
 
     print(stdin)
     print(stdout)
     print(stderr)
+    print(stdout.read().decode().strip())
+    print(stderr.read().decode().strip())
+
     sftp.close()
     ssh.close()
 
