@@ -23,7 +23,7 @@ def run_job(server, task):
 
     task.stdout = stdout.read().decode().strip()
     task.stderr = stderr.read().decode().strip()
-    task.save()
+    # task.save()
     print(task.stdout)
 
     if task.stderr != "":
