@@ -23,6 +23,7 @@ def run_job(server, task):
     task.stdout = stdout.read().decode().strip()
     task.stderr = stderr.read().decode().strip()
     task.save()
+    print(task.stdout)
 
     if task.stderr != "":
         raise Exception('There was an error pulling the runtime: {}'.format(task.stderr))
@@ -76,25 +77,23 @@ class Command(BaseCommand):
         servers = Server.objects.filter()
         for server in servers[0:1]:
             configure_node(server)
-            print(server.ip_address)
-            hosts.append(server.ip_address)
-            host_config.append(
-                HostConfig(port=22, user='aaronoro',
-                            private_key='server-key'),
-                )
+        #    print(server.ip_address)
+        #    hosts.append(server.ip_address)
+        #    host_config.append(
+        #        HostConfig(port=22, user='aaronoro',
+        #                    private_key='server-key'),
+        #        )
 
-        client = ParallelSSHClient(hosts, host_config=host_config)
-        output = client.run_command('cd ~; git clone git@github.com:aaronorosen/django-zillow.git')
+        # client = ParallelSSHClient(hosts, host_config=host_config)
+        # output = client.run_command('cd ~; git clone git@github.com:aaronorosen/django-zillow.git')
         # output = client.run_command('uname')
-        client.join()
+        # client.join()
 
-        for host_output in output:
-            for line in host_output.stdout:
-                print(line)
-            exit_code = host_output.exit_code
-            print("Error exit code: %s" % exit_code)
-
-        return
+        # for host_output in output:
+        #    for line in host_output.stdout:
+        #        print(line)
+        #    exit_code = host_output.exit_code
+        #    print("Error exit code: %s" % exit_code)
 
         for task in tasks:
             print(task)
