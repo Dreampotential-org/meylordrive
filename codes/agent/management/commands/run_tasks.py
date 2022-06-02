@@ -39,8 +39,7 @@ def configure_node(server):
     stdin, stdout, stderr = ssh.exec_command(
         'git clone git@github.com:aaronorosen/django-zillow.git')
 
-
-    time.sleep(2)
+    time.sleep(200)
     stdin, stdout, stderr = ssh.exec_command(
         'sudo touch /var/lib/dpkg/status')
     time.sleep(2)
@@ -57,6 +56,12 @@ def configure_node(server):
         'sudo rm -fr "rm -f /etc/apt/sources.list.d/buildkite-agent.list"')
     time.sleep(2)
 
+
+    time.sleep(2)
+    stdin, stdout, stderr = ssh.exec_command(
+        'cd ~/django-zillow; COMMAND="kingtax"; DOWN_SCRIPT="./scripts/batch-down2.sh"; SCRIPT="./scripts/batch2.sh"; STATE="WA" bash scripts/batch2.sh')
+    time.sleep(2)
+
     print(stdin)
     print(stdout)
     print(stderr)
@@ -71,7 +76,6 @@ class Command(BaseCommand):
     help = 'run the tasks'
 
     def add_arguments(self, parser):
-        # parser.add_argument('is_local', type=str)
         pass
 
     def handle(self, *args, **options):
@@ -83,25 +87,6 @@ class Command(BaseCommand):
         hosts = []
         host_config = []
         servers = Server.objects.filter()
-        # for server in servers:
-        #    print(server.ip_address)
-        #    hosts.append(server.ip_address)
-        #    host_config.append(
-        #        HostConfig(port=22, user='aaronoro',
-        #                    private_key='server-key'),
-        #        )
-
-        # client = ParallelSSHClient(hosts, host_config=host_config)
-        # output = client.run_command('cd ~; git clone git@github.com:aaronorosen/django-zillow.git')
-        # output = client.run_command('uname')
-        # client.join()
-
-        # for host_output in output:
-        #    for line in host_output.stdout:
-        #        print(line)
-        #    exit_code = host_output.exit_code
-        #    print("Error exit code: %s" % exit_code)
-
         for task in tasks:
             print(task)
             server = Server.objects.filter().first()
