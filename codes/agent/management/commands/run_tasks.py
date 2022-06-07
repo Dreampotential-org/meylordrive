@@ -33,14 +33,15 @@ def configure_node(server):
     p = subprocess.Popen(["scp", FILE, "%s@%s:~/.ssh/id_rsa" % (
         server.username, server.ip_address)])
 
+    print("Doing rm...")
     stdin, stdout, stderr = ssh.exec_command('rm -fr ~/django-zillow')
     # not sure we need to do this sleep here it is looking like
     time.sleep(2)
+    print("Doing git clone...")
     stdin, stdout, stderr = ssh.exec_command(
         'git clone git@github.com:aaronorosen/django-zillow.git')
 
     # XXX why do we have to do this to make things work
-    time.sleep(200)
     stdin, stdout, stderr = ssh.exec_command(
         'sudo touch /var/lib/dpkg/status')
     time.sleep(2)
@@ -87,7 +88,7 @@ class Command(BaseCommand):
         threads = []
         hosts = []
         host_config = []
-        servers = Server.objects.filter()
+        servers = Server.objects.filter()[1:2]
         for task in tasks:
             print(task)
             server = Server.objects.filter().first()
