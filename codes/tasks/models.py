@@ -10,7 +10,37 @@ class Task(models.Model):
     stderr = models.TextField(null=True)
 
 
+class SystemSpecs(models.Model):
+    architecture = models.CharField(max_length=100)
+    cpu_op_modes = models.CharField(max_length=100)
+    byte_order = models.CharField(max_length=100)
+    address_sizes = models.CharField(max_length=100)
+    cpu_s = models.CharField(max_length=100)
+    on_line_cpu_s_list = models.CharField(max_length=100)
+    threads_per_core = models.CharField(max_length=100)
+    cores_per_socket = models.CharField(max_length=100)
+    sockets = models.CharField(max_length=100)
+    numa_codes = models.CharField(max_length=100)
+    authentic_amd = models.CharField(max_length=100)
+    cpu_family = models.CharField(max_length=100)
+    model = models.CharField(max_length=100)
+    model_name = models.CharField(max_length=100)
+    stepping = models.CharField(max_length=100)
+    frequesncy_boost = models.CharField(max_length=100)
+    cpu_mhz = models.CharField(max_length=100)
+    cpu_max_mhz = models.CharField(max_length=100)
+    cpu_min_mhz = models.CharField(max_length=100)
+    bogo_mips = models.CharField(max_length=100)
+    virtualization = models.CharField(max_length=100)
+    l1d_cache = models.CharField(max_length=100)
+    l1i_cache = models.CharField(max_length=100)
+    l2_cache = models.CharField(max_length=100)
+    l3_cache = models.CharField(max_length=100)
+
+
 class Server(models.Model):
+    system_specs = models.ForeignKey(SystemSpecs, on_delete=models.CASCADE,
+                                     blank=True, null=True)
     ip_address = models.CharField(max_length=64)
     username = models.CharField(max_length=4096, blank=True, null=True)
     password = models.CharField(max_length=4096, blank=True, null=True)
