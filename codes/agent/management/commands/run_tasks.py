@@ -29,6 +29,7 @@ def configure_node(server):
     stdin, stdout, stderr = ssh.exec_command('rm -fr ~/.ssh/id_rsa')
 
     sftp = ssh.open_sftp()
+    # XXX fix hard code path
     FILE = "/home/arosen/meylorCI/server-key"
     p = subprocess.Popen(["scp", FILE, "%s@%s:~/.ssh/id_rsa" % (
         server.username, server.ip_address)])
