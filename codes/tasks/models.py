@@ -32,7 +32,8 @@ class SystemSpecs(models.Model):
     # cpu_min_mhz = models.CharField(max_length=100)
     bogo_mips = models.CharField(max_length=100)
     hypervisor_vendor = models.CharField(max_length=100)
-    virtualization_type = models.CharField(max_length=100)
+    virtualization_type = models.CharField(max_length=100,
+                                           blank=True, null=True)
     l1d_cache = models.CharField(max_length=100)
     l1i_cache = models.CharField(max_length=100)
     l2_cache = models.CharField(max_length=100)

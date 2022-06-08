@@ -103,7 +103,8 @@ def populate_system_specs(server, system_spec):
     # server.system_specs.cpu_min_mhz = system_spec['CPU min MHz']
     server.system_specs.bogo_mips = system_spec['BogoMIPS']
     server.system_specs.hypervisor_vendor = system_spec['Hypervisor vendor']
-    server.system_specs.virtualization_type = system_spec['Virtualization Type']
+    server.system_specs.virtualization_type = system_spec.get(
+        'Virtualization Type')
     server.system_specs.l1d_cache = system_spec['L1d cache']
     server.system_specs.l1i_cache = system_spec['L1i cache']
     server.system_specs.l2_cache = system_spec['L2 cache']
