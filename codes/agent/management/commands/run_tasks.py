@@ -1,11 +1,12 @@
+from tasks.models import Task, Server
 import time
 import paramiko
 import os
 from django.core.management.base import BaseCommand
 from paramiko.client import SSHClient, AutoAddPolicy
 import threading
-
-from tasks.models import Task, Server
+import subprocess
+temp = subprocess.Popen(["lscpu"], stdout=subprocess.PIPE)
 
 file1 = open("serverLogs.txt", "a")
 
@@ -28,13 +29,26 @@ def run_log_ssh_command(ssh, server, command):
     print("STDERROR[%s]" % stderr.read())
 
 
+def fingerprint_node(ssh, server):
+    output = str(temp.communicate())
+    dic = {}
+    x = output.split("\n")[0].split("\\")
+    for c, i in enumerate(x):
+        if c < 25:
+            if c == 0:
+                dic[i[3:].split(":")[0]] = i[3:].split(":")[1].strip()
+            if c != 0:
+                dic[i[1:].split(":")[0]] = i[1:].split(":")[1].strip()
+    print(dic)
+
+
 def configure_node(server):
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.load_host_keys(os.path.expanduser(
         os.path.join("~", ".ssh", "known_hosts")))
     ssh.connect(server.ip_address, username=server.username)
-
+    fingerprint_node(ssh, server)
     command = ("scp server-key %s@%s:~/"
                % (server.username, server.ip_address))
     output = os.system(command)
