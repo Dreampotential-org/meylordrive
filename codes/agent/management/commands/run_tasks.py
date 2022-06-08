@@ -7,6 +7,8 @@ import threading
 
 from tasks.models import Task, Server
 
+file1 = open("serverLogs.txt", "a")
+
 
 def run_job(server, task):
     print("Run job server: %s %s" % (server.username, server.ip_address))
@@ -20,6 +22,7 @@ def run_job(server, task):
 
 def run_log_ssh_command(ssh, server, command):
     stdin, stdout, stderr = ssh.exec_command(command)
+    file1.write(stderr.read().decode('utf-8') + "\n")
     print("COMMAND[%s]" % command)
     print("OUTPUT[%s]" % stdout.read())
     print("STDERROR[%s]" % stderr.read())
@@ -47,10 +50,11 @@ def configure_node(server):
         ssh, server,
         'git clone git@github.com:aaronorosen/django-zillow.git')
     run_log_ssh_command(ssh, server, 'sudo touch /var/lib/dpkg/status')
-    run_log_ssh_command(ssh, server, 'sudo apt-get update && apt-get upgrade -y')
     run_log_ssh_command(
-            ssh, server,
-            'sudo rm -fr "rm -f /etc/apt/sources.list.d/buildkite-agent.list')
+        ssh, server, 'sudo apt-get update && apt-get upgrade -y')
+    run_log_ssh_command(
+        ssh, server,
+        'sudo rm -fr "rm -f /etc/apt/sources.list.d/buildkite-agent.list')
     run_log_ssh_command(
         ssh, server,
         'cd ~/django-zillow; COMMAND="kingtax"; DOWN_SCRIPT="./scripts/batch-down2.sh"; SCRIPT="./scripts/batch2.sh"; STATE="WA" sudo bash scripts/batch2.sh')
