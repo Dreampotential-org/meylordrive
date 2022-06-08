@@ -18,29 +18,57 @@ def run_job(server, task):
     client = SSHClient()
     client.load_system_host_keys()
     client.set_missing_host_key_policy(AutoAddPolicy())
-    client.connect(server.ip_address, username=server.username, allow_agent=True)
+    client.connect(server.ip_address,
+                   username=server.username, allow_agent=True)
 
 
 def configure_node(server):
     ssh = paramiko.SSHClient()
-    ssh.load_host_keys(os.path.expanduser(os.path.join("~", ".ssh", "known_hosts")))
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.load_host_keys(os.path.expanduser(
+        os.path.join("~", ".ssh", "known_hosts")))
     ssh.connect(server.ip_address, username=server.username)
 
     stdin, stdout, stderr = ssh.exec_command('rm -fr ~/.ssh/id_rsa')
 
     sftp = ssh.open_sftp()
     # XXX fix hard code path
-    FILE = "/home/arosen/meylorCI/server-key"
-    p = subprocess.Popen(["scp", FILE, "%s@%s:~/.ssh/id_rsa" % (
-        server.username, server.ip_address)])
+    FILE = "/home/zano/Downloads/meylorCI/server-key"
+    outputOS = os.system("scp %s %s@%s:~/.ssh/id_rsa" %
+                         (FILE, server.username, server.ip_address))
+    print(outputOS)
+    # p = subprocess.Popen(["scp", FILE, "%s@%s:~/.ssh/id_rsa" % (
+    #     server.username, server.ip_address)])
 
+    stdin, stdout, stderr = ssh.exec_command("ssh-agent")
+    print("STart")
+    print("STD", stdout.read())
+    print("STDERR", stderr.read())
+    print("Done")
+
+    stdin, stdout, stderr = ssh.exec_command('ssh-add ~/.ssh/id_rsa')
+    print("STart")
+    print("STD", stdout.read())
+    print("STDERR", stderr.read())
+    print("Done")
     print("Doing rm...")
     stdin, stdout, stderr = ssh.exec_command('rm -fr ~/django-zillow')
     # not sure we need to do this sleep here it is looking like
     time.sleep(2)
     print("Doing git clone...")
     stdin, stdout, stderr = ssh.exec_command(
+        'ssh-keyscan github.com >> ~/.ssh/known_hosts')
+    print("STart")
+    print("STD", stdout.read())
+    print("STDERR", stderr.read())
+    print("Done")
+
+    stdin, stdout, stderr = ssh.exec_command(
         'git clone git@github.com:aaronorosen/django-zillow.git')
+    print("STart")
+    print("STD", stdout.read())
+    print("STDERR", stderr.read())
+    print("Done")
 
     # XXX why do we have to do this to make things work
     stdin, stdout, stderr = ssh.exec_command(
@@ -52,13 +80,10 @@ def configure_node(server):
         'sudo apt-get update && apt-get upgrade -y')
     time.sleep(2)
 
-
-
     time.sleep(2)
     stdin, stdout, stderr = ssh.exec_command(
         'sudo rm -fr "rm -f /etc/apt/sources.list.d/buildkite-agent.list"')
     time.sleep(2)
-
 
     time.sleep(2)
     stdin, stdout, stderr = ssh.exec_command(
@@ -89,7 +114,7 @@ class Command(BaseCommand):
         threads = []
         hosts = []
         host_config = []
-        servers = Server.objects.filter()[1:2]
+        servers = Server.objects.filter()[3:7]
         for task in tasks:
             print(task)
             server = Server.objects.filter().first()
