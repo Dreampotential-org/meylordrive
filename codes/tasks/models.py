@@ -38,6 +38,7 @@ class SystemSpecs(models.Model):
     l1i_cache = models.CharField(max_length=100)
     l2_cache = models.CharField(max_length=100)
     l3_cache = models.CharField(max_length=100)
+    total_memory = models.CharField(max_length=100, null=True, blank=True)
 
 
 class Server(models.Model):
