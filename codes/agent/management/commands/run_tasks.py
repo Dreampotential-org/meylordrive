@@ -4,10 +4,6 @@ import os
 from django.core.management.base import BaseCommand
 # from paramiko.client import SSHClient, AutoAddPolicy
 import threading
-import subprocess
-temp = subprocess.Popen(["lscpu"], stdout=subprocess.PIPE)
-
-
 server_prints = {}
 
 
@@ -32,12 +28,17 @@ def run_log_ssh_command(ssh, server, command):
 def fingerprint_node(ssh, server):
     # output = str(temp.communicate())
     stdin, stdout, stderr = ssh.exec_command("lscpu")
+    memin, memout, memerr = ssh.exec_command("free -m")
+
     output = str(stdout.read())
-    dic = {}
+    memoutput = str(memout.read())
+    # print("OUTPUT", memoutput)
+    memoutput = memoutput.split("\n")[0].split("\\n")
+    totalMemory = memoutput[1].split(":")[1].strip()[0:5].strip()
+    dic = {"total_memory": totalMemory}
     x = output.split("\n")[0].split("\\n")
     # print(x)
     for c, i in enumerate(x):
-        # print(i)
         if c < 22:
             if c == 0:
                 dic[i[2:].split(":")[0]] = i[3:].split(":")[1].strip()
@@ -45,11 +46,14 @@ def fingerprint_node(ssh, server):
                 dic[i.split(":")[0]] = i[1:].split(":")[1].strip()
     # print(dic)
     server_prints[server.id] = dic
+    print(dic)
 
 
 def configure_node(server):
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())
+
     # ssh.load_host_keys(os.path.expanduser(
     #    os.path.join("~", ".ssh", "known_hosts")))
     ssh.connect(server.ip_address, username=server.username)
@@ -111,6 +115,7 @@ def populate_system_specs(server, system_spec):
     server.system_specs.l1i_cache = system_spec['L1i cache']
     server.system_specs.l2_cache = system_spec['L2 cache']
     server.system_specs.l3_cache = system_spec['L3 cache']
+    server.system_specs.total_memory = system_spec['total_memory']
     server.system_specs.save()
     server.save()
 
