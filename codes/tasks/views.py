@@ -14,3 +14,8 @@ class TaskDetails(APIView):
             serializeobj.save()
             return Response(serializeobj.data, status=status.HTTP_201_CREATED)
         return Response({"message": json.dumps(serializeobj.errors)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request):
+        detailsObj = Task.objects.all()
+        dlSerializeObj = TaskSerializer(detailsObj, many=True)
+        return Response(dlSerializeObj.data, status=status.HTTP_200_OK)
