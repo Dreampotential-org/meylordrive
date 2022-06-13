@@ -16,11 +16,14 @@ def run_job(server, task):
 
 def run_log_ssh_command(ssh, server, command):
     stdin, stdout, stderr = ssh.exec_command(command)
-    file1 = open("%s.txt" % server.ip, "a")
+
+    # XXX put in logs directory.
+    file1 = open("./logs/%s.txt" % server.ip_address, "a")
     file1.write(stderr.read().decode('utf-8') + "\n")
     print("COMMAND[%s]" % command)
     print("OUTPUT[%s]" % stdout.read())
     print("STDERROR[%s]" % stderr.read())
+    file1.close()
 
 
 def fingerprint_node(ssh, server):
@@ -77,9 +80,9 @@ def configure_node(server):
 #    run_log_ssh_command(
 #        ssh, server,
 #        'sudo rm -fr "rm -f /etc/apt/sources.list.d/buildkite-agent.list')
-#    run_log_ssh_command(
-#        ssh, server,
-#        'cd ~/django-zillow; COMMAND="kingtax"; DOWN_SCRIPT="./scripts/batch-down2.sh"; SCRIPT="./scripts/batch2.sh"; STATE="WA" sudo bash scripts/batch2.sh')
+    run_log_ssh_command(
+        ssh, server,
+        'cd ~/django-zillow; COMMAND="kingtax"; DOWN_SCRIPT="./scripts/batch-down2.sh"; SCRIPT="./scripts/batch2.sh"; STATE="WA" sudo bash scripts/batch2.sh')
     ssh.close()
 
 
@@ -157,6 +160,7 @@ class Command(BaseCommand):
         hosts = []
         host_config = []
         servers = Server.objects.filter()
+
         # for task in tasks:
         #    server = Server.objects.filter().first()
         #    t = threading.Thread(target=run_job, args=(server, task))
