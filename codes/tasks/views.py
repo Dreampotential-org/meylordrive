@@ -17,7 +17,7 @@ def run_job(server_pipeline, task_log):
           (server_pipeline.server.username, server_pipeline.server.ip_address))
     run_tasks.get_repo(ssh, server_pipeline.pipeline.repo, task_log)
     run_tasks.run_log_ssh_task(ssh,
-                               server_pipeline.server, server_pipeline.pipeline.task, task_log)
+                               server_pipeline.server, server_pipeline.pipeline.task, task_log, server_pipeline.pipeline.repo)
 
 
 class TaskDetails(APIView):

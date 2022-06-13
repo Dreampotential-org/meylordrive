@@ -29,8 +29,8 @@ def run_log_ssh_command(ssh, task, task_log):
     file1.close()
 
 
-def run_log_ssh_task(ssh, server, task, task_log):
-    stdin, stdout, stderr = ssh.exec_command("cd %s" % task.pipeline.repo)
+def run_log_ssh_task(ssh, server, task, task_log, repo):
+    stdin, stdout, stderr = ssh.exec_command("cd %s" % repo)
     file1 = open("./logs/%s.txt" % task_log.id, "a")
     file1.write(stderr.read().decode('utf-8') + "\n")
     print("COMMAND[%s]" % task.command)
