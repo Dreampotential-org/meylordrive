@@ -13,13 +13,33 @@ def run_job(server, task):
     return finger_print
 
 
-def run_log_ssh_command(ssh, server, command):
-    stdin, stdout, stderr = ssh.exec_command(command)
+def get_repo(ssh, repo, task_log):
+    run_log_ssh_command(ssh, "git clone %s" % repo, task_log)
+
+
+def run_log_ssh_command(ssh, task, task_log):
+    stdin, stdout, stderr = ssh.exec_command(task)
 
     # XXX put in logs directory.
-    file1 = open("./logs/%s.txt" % server.ip_address, "a")
+    file1 = open("./logs/%s.txt" % task_log.id, "a")
     file1.write(stderr.read().decode('utf-8') + "\n")
-    print("COMMAND[%s]" % command)
+    print("COMMAND[%s]" % task)
+    print("OUTPUT[%s]" % stdout.read())
+    print("STDERROR[%s]" % stderr.read())
+    file1.close()
+
+
+def run_log_ssh_task(ssh, server, task, task_log):
+    stdin, stdout, stderr = ssh.exec_command("cd %s" % task.pipeline.repo)
+    file1 = open("./logs/%s.txt" % task_log.id, "a")
+    file1.write(stderr.read().decode('utf-8') + "\n")
+    print("COMMAND[%s]" % task.command)
+    print("OUTPUT[%s]" % stdout.read())
+    print("STDERROR[%s]" % stderr.read())
+    stdin, stdout, stderr = ssh.exec_command(task.command)
+
+    file1.write(stderr.read().decode('utf-8') + "\n")
+    print("COMMAND[%s]" % task.command)
     print("OUTPUT[%s]" % stdout.read())
     print("STDERROR[%s]" % stderr.read())
     file1.close()
@@ -47,6 +67,14 @@ def fingerprint_node(ssh, server):
     # print(dic)
     server_prints[server.id] = dic
     print(dic)
+
+
+def make_ssh(server):
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())
+    ssh.connect(server.ip_address, username=server.username)
+    return ssh
 
 
 def configure_node(server):

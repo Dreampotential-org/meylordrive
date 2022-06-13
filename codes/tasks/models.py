@@ -6,8 +6,13 @@ class Task(models.Model):
     status = models.CharField(max_length=64)
     command = models.CharField(max_length=4096, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    stdout = models.TextField(null=True)
-    stderr = models.TextField(null=True)
+
+
+class TaskLog(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE,)
+    stdout = models.TextField(blank=True, null=True)
+    file_log = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class SystemSpecs(models.Model):
@@ -58,8 +63,20 @@ class Pipeline(models.Model):
                              blank=True, null=True)
 
 
+class PipelineServer(models.Model):
+    pipeline = models.ForeignKey(Pipeline, on_delete=models.CASCADE,
+                                 blank=True, null=True)
+    server = models.ForeignKey(Server, on_delete=models.CASCADE,
+                               blank=True, null=True)
+
+    class Meta:
+        unique_together = ('pipeline', 'server')
+
+
 class GithubHook(models.Model):
-    repo = models.CharField(max_length=4096)
     error = models.BooleanField(default=False)
     pipeline = models.ForeignKey(Pipeline, on_delete=models.CASCADE,
                                  blank=True, null=True)
+
+    def __str__(self):
+        return self.repo or ''
