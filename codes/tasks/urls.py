@@ -4,5 +4,6 @@ from . import views
 urlpatterns = [
     # path('admin/', admin.site.urls),
     path('tasks/', views.TaskDetails.as_view()),
+    path('api/', views.GithubHookDetails.as_view()),
 
 ]
