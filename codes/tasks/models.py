@@ -56,6 +56,7 @@ class Server(models.Model):
     error = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     alive = models.BooleanField(default=False)
+    in_use = models.BooleanField(default=False)
 
 
 class Pipeline(models.Model):
