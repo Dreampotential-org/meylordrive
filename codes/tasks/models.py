@@ -52,6 +52,7 @@ class Server(models.Model):
     ip_address = models.CharField(max_length=64)
     username = models.CharField(max_length=4096, blank=True, null=True)
     password = models.CharField(max_length=4096, blank=True, null=True)
+    name = models.CharField(max_length=4096, blank=True, null=True)
     error = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     alive = models.BooleanField(default=False)

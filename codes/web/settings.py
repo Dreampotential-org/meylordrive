@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'agent',
     'rest_framework',
     'corsheaders',
+    'usersystem',
 
 ]
 
