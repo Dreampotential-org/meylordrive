@@ -63,6 +63,9 @@ class Pipeline(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE,
                              blank=True, null=True)
 
+    def __str__(self):
+        return str(self.repo) or ''
+
 
 class PipelineServer(models.Model):
     pipeline = models.ForeignKey(Pipeline, on_delete=models.CASCADE,

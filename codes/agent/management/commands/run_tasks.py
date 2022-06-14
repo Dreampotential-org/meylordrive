@@ -14,16 +14,21 @@ def run_job(server, task):
 
 
 def get_repo(ssh, repo, task_log):
-    run_log_ssh_command(ssh, "git clone %s" % repo, task_log)
+    run_log_ssh_command(ssh, "sudo npm cache clean -f", task_log)
+    run_log_ssh_command(ssh, "sudo npm install -g n", task_log)
+    run_log_ssh_command(ssh, "sudo n stable", task_log)
+    run_log_ssh_command(ssh, "sudo npm i -g yarn", task_log)
+    run_log_ssh_command(ssh, "sudo apt install npm -y", task_log)
+    run_log_ssh_command(
+        ssh, f'cd {repo.rsplit("/", 1)[1].split(".git")[0]}', task_log)
 
 
 def run_log_ssh_command(ssh, task, task_log):
+    print("COMMAND[%s]" % task)
     stdin, stdout, stderr = ssh.exec_command(task)
-
     # XXX put in logs directory.
     file1 = open("./logs/%s.txt" % task_log.id, "a")
     file1.write(stderr.read().decode('utf-8') + "\n")
-    print("COMMAND[%s]" % task)
     print("OUTPUT[%s]" % stdout.read())
     print("STDERROR[%s]" % stderr.read())
     file1.close()
