@@ -19,8 +19,6 @@ def get_repo(ssh, repo, task_log):
     run_log_ssh_command(ssh, "sudo n stable", task_log)
     run_log_ssh_command(ssh, "sudo npm i -g yarn", task_log)
     run_log_ssh_command(ssh, "sudo apt install npm -y", task_log)
-    run_log_ssh_command(
-        ssh, f'cd {repo.rsplit("/", 1)[1].split(".git")[0]}', task_log)
 
 
 def run_log_ssh_command(ssh, task, task_log):
@@ -35,16 +33,14 @@ def run_log_ssh_command(ssh, task, task_log):
 
 
 def run_log_ssh_task(ssh, server, task, task_log, repo):
-    stdin, stdout, stderr = ssh.exec_command("cd %s" % repo)
-    file1 = open("./logs/%s.txt" % task_log.id, "a")
-    file1.write(stderr.read().decode('utf-8') + "\n")
     print("COMMAND[%s]" % task.command)
-    print("OUTPUT[%s]" % stdout.read())
-    print("STDERROR[%s]" % stderr.read())
-    stdin, stdout, stderr = ssh.exec_command(task.command)
+    file1 = open("./logs/%s.txt" % task_log.id, "a")
+
+    repo_dir = repo.rsplit("/", 1)[1].split(".git")[0]
+    stdin, stdout, stderr = ssh.exec_command(
+        "cd %s && %s" % (repo_dir, task.command))
 
     file1.write(stderr.read().decode('utf-8') + "\n")
-    print("COMMAND[%s]" % task.command)
     print("OUTPUT[%s]" % stdout.read())
     print("STDERROR[%s]" % stderr.read())
     file1.close()

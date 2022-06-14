@@ -4,4 +4,4 @@ psycopg2-binary==2.8.6
 parallel-ssh
 djangorestframework
 django-cors-headers
-
+requests
