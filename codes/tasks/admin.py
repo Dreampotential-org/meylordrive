@@ -13,11 +13,13 @@ class GitHubAdmin(admin.ModelAdmin):
 
 
 class TaskAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in Task._meta.get_fields()]
+    pass
+    #list_display = [field.name for field in Task._meta.get_fields()]
 
 
 class PipelineAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in Pipeline._meta.get_fields()]
+    #list_display = [field.name for field in Pipeline._meta.get_fields()]
+    pass
 
 
 class TaskLogAdmin(admin.ModelAdmin):
@@ -29,11 +31,13 @@ class PipelineServerAdmin(admin.ModelAdmin):
 
 
 class SystemSpecsAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in SystemSpecs._meta.get_fields()]
+    # list_display = [field.name for field in SystemSpecs._meta.get_fields()]
+    pass
 
 
 class ServerAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in Server._meta.get_fields()]
+    #list_display = [field.name for field in Server._meta.get_fields()]
+    pass
 
 
 admin.site.register(PipelineServer, PipelineServerAdmin)
