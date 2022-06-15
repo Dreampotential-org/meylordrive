@@ -13,26 +13,17 @@ def run_job(server, task):
     return finger_print
 
 
-def run_task(server, task, task_log):
-    print("Run job server: %s %s" % (server.username, server.ip_address))
-    get_repo(make_ssh(server), task.repo, task)
-    run_log_ssh_task(make_ssh(server), server,
-                     task, task_log, task.repo)
-
-
 def get_repo(ssh, repo, task_log):
-    run_log_ssh_command(ssh, "git clone %s" % repo, task_log)
-    return
-    # run_log_ssh_command(ssh, "sudo npm cache clean -f", task_log)
-    # run_log_ssh_command(ssh, "sudo npm install -g n", task_log)
-    # run_log_ssh_command(ssh, "sudo n stable", task_log)
-    # run_log_ssh_command(ssh, "sudo npm i -g yarn", task_log)
-    # run_log_ssh_command(ssh, "sudo apt install npm -y", task_log)
+    run_log_ssh_command(ssh, "sudo npm cache clean -f", task_log)
+    run_log_ssh_command(ssh, "sudo npm install -g n", task_log)
+    run_log_ssh_command(ssh, "sudo n stable", task_log)
+    run_log_ssh_command(ssh, "sudo npm i -g yarn", task_log)
+    run_log_ssh_command(ssh, "sudo apt install npm -y", task_log)
 
 
-def run_log_ssh_command(ssh, command, task_log):
-    print("COMMAND[%s]" % command)
-    stdin, stdout, stderr = ssh.exec_command(command)
+def run_log_ssh_command(ssh, task, task_log):
+    print("COMMAND[%s]" % task)
+    stdin, stdout, stderr = ssh.exec_command(task)
     # XXX put in logs directory.
     file1 = open("./logs/%s.txt" % task_log.id, "a")
     file1.write(stderr.read().decode('utf-8') + "\n")
@@ -100,9 +91,26 @@ def configure_node(server):
                % (server.username, server.ip_address))
     os.system(command)
 
-    # run_log_ssh_command(
-    #    ssh, server,
-    #    'cd ~/django-zillow; COMMAND="kingtax"; DOWN_SCRIPT="./scripts/batch-down2.sh"; SCRIPT="./scripts/batch2.sh"; STATE="WA" sudo bash scripts/batch2.sh')
+#    run_log_ssh_command(ssh, server, "ssh-agent")
+#    run_log_ssh_command(ssh, server, "ssh-add server-key")
+#    run_log_ssh_command(ssh, server, "rm -fr ~/django-zillow")
+#    run_log_ssh_command(
+#        ssh, server, "ssh-keyscan github.com >> ~/.ssh/known_hosts")
+
+
+#    run_log_ssh_command(
+#        ssh, server,
+#        'git clone git@github.com:aaronorosen/django-zillow.git')
+#    run_log_ssh_command(ssh, server, 'sudo touch /var/lib/dpkg/status')
+
+#    run_log_ssh_command(
+#        ssh, server, 'sudo apt-get update && apt-get upgrade -y')
+#    run_log_ssh_command(
+#        ssh, server,
+#        'sudo rm -fr "rm -f /etc/apt/sources.list.d/buildkite-agent.list')
+    run_log_ssh_command(
+        ssh, server,
+        'cd ~/django-zillow; COMMAND="kingtax"; DOWN_SCRIPT="./scripts/batch-down2.sh"; SCRIPT="./scripts/batch2.sh"; STATE="WA" sudo bash scripts/batch2.sh')
     ssh.close()
 
 
@@ -151,54 +159,33 @@ class Command(BaseCommand):
         print("Start...")
 
         threads = []
+        hosts = []
+        host_config = []
+        servers = Server.objects.filter()
 
-        # get all servers and configure them
-        servers = Server.objects.filter()[:3]
         for server in servers:
             task = Task()
             t = threading.Thread(target=run_job, args=(server, task))
             t.start()
             threads.append(t)
 
-        # wait for all threads
         for t in threads:
             t.join()
 
-        # populate server fingerprint in db
         for server_print in server_prints.keys():
             populate_system_specs(server, server_prints[server_print])
 
-        # now we can progress tasks
         print("Running the tasks")
-        # find list of status which do not have a status
-
-        tasks = Task.objects.filter()
+        tasks = Task.objects.filter(status=None)
         print("Number of tasks to run: %s" % len(tasks))
         for task in tasks:
-            # set task status to pending
             task.status = 'pending'
             task.save()
-
-            # find available server
             # XXX sort by system specs most cpus
             server = Server.objects.filter(in_use=False).first()
-            server.in_use = True
-            server.save()
-
-            task_log = Task()
-            task_log.task = task
-            task_log.file_log = f"./logs/{task_log.id}.txt"
-            task_log.save()
-
-            # run the task
-            t = threading.Thread(
-                target=run_task, args=(server, task, task_log))
+            t = threading.Thread(target=run_job, args=(server, task))
             t.start()
             threads.append(t)
 
-        # wait for complete
         for t in threads:
             t.join()
-
-        # XXX should keep looping find more tasks that
-        # have been created since...

@@ -3,9 +3,10 @@ from django.db import models
 
 class Task(models.Model):
     unique = True
-    status = models.CharField(max_length=64)
+    status = models.CharField(max_length=64, blank=True, null=True)
     command = models.CharField(max_length=4096, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    repo = models.CharField(max_length=4096, null=True, blank=True)
 
 
 class TaskLog(models.Model):
@@ -56,12 +57,16 @@ class Server(models.Model):
     error = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     alive = models.BooleanField(default=False)
+    in_use = models.BooleanField(default=False)
 
 
 class Pipeline(models.Model):
     repo = models.CharField(max_length=4096)
     task = models.ForeignKey(Task, on_delete=models.CASCADE,
                              blank=True, null=True)
+
+    def __str__(self):
+        return str(self.repo) or ''
 
 
 class PipelineServer(models.Model):
