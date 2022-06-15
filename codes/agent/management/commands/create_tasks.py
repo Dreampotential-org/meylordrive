@@ -10,7 +10,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         params = {
-            'command': "python codes/manage.py gmaps",
+            'command': "sudo su -c 'export COMMAND=\"king_tax\";  bash scripts/batch.sh'",
             'repo': "git@github.com:aaronorosen/django-zillow.git",
 
         }
