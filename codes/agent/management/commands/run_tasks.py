@@ -23,7 +23,7 @@ def get_repo(ssh, repo, task_log):
 
 def run_log_ssh_command(ssh, task, task_log):
     print("COMMAND[%s]" % task)
-    stdin, stdout, stderr = ssh.exec_command(task)
+    stdin, stdout, stderr = ssh.exec_command(task.command)
     # XXX put in logs directory.
     file1 = open("./logs/%s.txt" % task_log.id, "a")
     file1.write(stderr.read().decode('utf-8') + "\n")
@@ -91,26 +91,9 @@ def configure_node(server):
                % (server.username, server.ip_address))
     os.system(command)
 
-#    run_log_ssh_command(ssh, server, "ssh-agent")
-#    run_log_ssh_command(ssh, server, "ssh-add server-key")
-#    run_log_ssh_command(ssh, server, "rm -fr ~/django-zillow")
-#    run_log_ssh_command(
-#        ssh, server, "ssh-keyscan github.com >> ~/.ssh/known_hosts")
-
-
-#    run_log_ssh_command(
-#        ssh, server,
-#        'git clone git@github.com:aaronorosen/django-zillow.git')
-#    run_log_ssh_command(ssh, server, 'sudo touch /var/lib/dpkg/status')
-
-#    run_log_ssh_command(
-#        ssh, server, 'sudo apt-get update && apt-get upgrade -y')
-#    run_log_ssh_command(
-#        ssh, server,
-#        'sudo rm -fr "rm -f /etc/apt/sources.list.d/buildkite-agent.list')
-    run_log_ssh_command(
-        ssh, server,
-        'cd ~/django-zillow; COMMAND="kingtax"; DOWN_SCRIPT="./scripts/batch-down2.sh"; SCRIPT="./scripts/batch2.sh"; STATE="WA" sudo bash scripts/batch2.sh')
+    # run_log_ssh_command(
+    #    ssh, server,
+    #    'cd ~/django-zillow; COMMAND="kingtax"; DOWN_SCRIPT="./scripts/batch-down2.sh"; SCRIPT="./scripts/batch2.sh"; STATE="WA" sudo bash scripts/batch2.sh')
     ssh.close()
 
 
