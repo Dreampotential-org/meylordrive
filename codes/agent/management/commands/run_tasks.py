@@ -173,9 +173,6 @@ class Command(BaseCommand):
             t.join()
 
         for server_print in server_prints.keys():
-<<<<<<< HEAD
-            populate_system_specs(server, server_prints[server_print])
-=======
             populate_system_specs(server, server_prints[server_print])
 
         print("Running the tasks")
@@ -194,4 +191,3 @@ class Command(BaseCommand):
 
         for t in threads:
             t.join()
->>>>>>> 94b3c50f30595d71a1cf3135c3cdb1a60e3b999e
