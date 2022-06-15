@@ -13,17 +13,26 @@ def run_job(server, task):
     return finger_print
 
 
+def run_task(server, task, task_log):
+    print("Run job server: %s %s" % (server.username, server.ip_address))
+    get_repo(make_ssh(server), task.repo, task)
+    run_log_ssh_task(make_ssh(server), server,
+                     task, task_log, task.repo)
+
+
 def get_repo(ssh, repo, task_log):
-    run_log_ssh_command(ssh, "sudo npm cache clean -f", task_log)
-    run_log_ssh_command(ssh, "sudo npm install -g n", task_log)
-    run_log_ssh_command(ssh, "sudo n stable", task_log)
-    run_log_ssh_command(ssh, "sudo npm i -g yarn", task_log)
-    run_log_ssh_command(ssh, "sudo apt install npm -y", task_log)
+    run_log_ssh_command(ssh, "git clone %s" % repo, task_log)
+    return
+    # run_log_ssh_command(ssh, "sudo npm cache clean -f", task_log)
+    # run_log_ssh_command(ssh, "sudo npm install -g n", task_log)
+    # run_log_ssh_command(ssh, "sudo n stable", task_log)
+    # run_log_ssh_command(ssh, "sudo npm i -g yarn", task_log)
+    # run_log_ssh_command(ssh, "sudo apt install npm -y", task_log)
 
 
-def run_log_ssh_command(ssh, task, task_log):
-    print("COMMAND[%s]" % task)
-    stdin, stdout, stderr = ssh.exec_command(task.command)
+def run_log_ssh_command(ssh, command, task_log):
+    print("COMMAND[%s]" % command)
+    stdin, stdout, stderr = ssh.exec_command(command)
     # XXX put in logs directory.
     file1 = open("./logs/%s.txt" % task_log.id, "a")
     file1.write(stderr.read().decode('utf-8') + "\n")
@@ -144,7 +153,7 @@ class Command(BaseCommand):
         threads = []
 
         # get all servers and configure them
-        servers = Server.objects.filter()
+        servers = Server.objects.filter()[:3]
         for server in servers:
             task = Task()
             t = threading.Thread(target=run_job, args=(server, task))
@@ -163,7 +172,7 @@ class Command(BaseCommand):
         print("Running the tasks")
         # find list of status which do not have a status
 
-        tasks = Task.objects.filter(status=None)
+        tasks = Task.objects.filter()
         print("Number of tasks to run: %s" % len(tasks))
         for task in tasks:
             # set task status to pending
@@ -176,8 +185,14 @@ class Command(BaseCommand):
             server.in_use = True
             server.save()
 
+            task_log = Task()
+            task_log.task = task
+            task_log.file_log = f"./logs/{task_log.id}.txt"
+            task_log.save()
+
             # run the task
-            t = threading.Thread(target=run_job, args=(server, task))
+            t = threading.Thread(
+                target=run_task, args=(server, task, task_log))
             t.start()
             threads.append(t)
 
