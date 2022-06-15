@@ -9,7 +9,6 @@ server_prints = {}
 
 def run_job(server, task):
     print("Run job server: %s %s" % (server.username, server.ip_address))
-<<<<<<< HEAD
     finger_print = configure_node(server)
     return finger_print
 
@@ -149,30 +148,6 @@ def populate_system_specs(server, system_spec):
     server.system_specs.save()
     server.save()
 
-=======
-    client = SSHClient()
-    client.load_system_host_keys()
-    client.set_missing_host_key_policy(AutoAddPolicy())
-    client.connect(server.ip_address, username=server.username,allow_agent=True) 
-    #print(pprint.pprint(dir(client)))
-    #client.channel.request_forward_agent()
-    #stdin, stdout, stderr = client.exec_command('ls -alh /etc/apt/sources.list.d/')
-    #stdin, stdout, stderr = client.exec_command('sudo rm -f /etc/apt/sources.list.d/buildkite-agent.list.save ; sudo cp /var/lib/dpkg/status-old /var/lib/dpkg/status ; sudo apt-get update -y')
-    #stdin, stdout, stderr = client.exec_command('sudo cp /var/lib/dpkg/status-old /var/lib/dpkg/status')
-    #stdin, stdout, stderr = client.exec_command('sudo mkdir /var/lib/dpkg ; sudo touch /var/lib/dpkg/status ; sudo apt-get update -y')
-    stdin, stdout, stderr = client.exec_command('sudo apt-get update -y')
-
-    task.stdout = stdout.read().decode().strip()
-    task.stderr = stderr.read().decode().strip()
-    task.save()
-
-    if task.stderr != "":
-        print("%s@%s" % (server.username, server.ip_address))
-        print(task.stderr)
-        #raise Exception('There was an error pulling the runtime: {}'.format(task.stderr))
-    print(task.stdout)
-    client.close()
->>>>>>> cfd6fd60fc3594919fcda060a5c383c6e9a52999
 
 class Command(BaseCommand):
     help = 'run the tasks'
@@ -208,8 +183,6 @@ class Command(BaseCommand):
             task.save()
             # XXX sort by system specs most cpus
             server = Server.objects.filter(in_use=False).first()
-            server.in_use = True
-            server.save()
             t = threading.Thread(target=run_job, args=(server, task))
             t.start()
             threads.append(t)
