@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'tasks',
     'agent',
     'rest_framework',
+    'django_rest_passwordreset',
+    'knox',
     'corsheaders',
     'usersystem',
 
@@ -132,7 +134,48 @@ USE_L10N = True
 USE_TZ = True
 
 
+# Make knox’s Token Authentication default
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication', ),
+}
+
+# KNOX
+REST_KNOX = {
+  'USER_SERIALIZER': 'usersystem.serializer.UserSerializer',
+}
+
+from datetime import timedelta
+from rest_framework.settings import api_settings
+
+REST_KNOX = {
+  'SECURE_HASH_ALGORITHM': 'cryptography.hazmat.primitives.hashes.SHA512',
+  'AUTH_TOKEN_CHARACTER_LENGTH': 64,
+  'TOKEN_TTL': timedelta(hours=10),
+  'USER_SERIALIZER': 'knox.serializers.UserSerializer',
+  'TOKEN_LIMIT_PER_USER': None,
+  'AUTO_REFRESH': False,
+#   'EXPIRY_DATETIME_FORMAT': api_settings.DATETME_FORMAT,
+}
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_ACCESS_KEY_ID = 'AKIARWLPGYIKRQXN5VXR'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'sfappv2'
+
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+
+CORS_ALLOW_ALL_ORIGINS = True
+ALLOWED_HOSTS=['*']
+
+# Email
+EMAIL_BACKEND = 'django_ses.SESBackend'
+EMAIL_AWS_ACCESS_KEY_ID = 'AKIARWLPGYIKWTF4OEPZ'
+EMAIL_AWS_SECRET_ACCESS_KEY = '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'
+DEFAULT_FROM_EMAIL = 'mail-api@dreampotential.org'
+
 STATIC_URL = '/static/'
+APPEND_SLASH=False
