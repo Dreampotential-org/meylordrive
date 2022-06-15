@@ -2,21 +2,15 @@
 from django.conf import settings
 from django.core.mail import send_mail
 from django.dispatch import receiver
-from django.urls import reverse
 from django_rest_passwordreset.signals import reset_password_token_created
-import uuid
-import os
-from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
-from django.contrib.auth.models import BaseUserManager, PermissionsMixin
 from  . import email_utils
 
 
 @receiver(reset_password_token_created)
 def password_reset_token_created(sender, instance, reset_password_token, *args, **kwargs):
     # Link to password reset page
-    SERVER_URL = "https://teacher.dreampotential.org"
-    # SERVER_URL = "http://localhost:8084"
+    #SERVER_URL = "https://teacher.dreampotential.org"
+    SERVER_URL = "http://localhost:8000"
 
     reset_url = "{}/index.html?token={}".format(SERVER_URL, reset_password_token.key)
 
@@ -36,7 +30,7 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
         # message:
         email_plaintext_message,
         # from:
-        settings.DEFAULT_FROM_EMAIL,
+        "mail-api@dreampotential.org",
         # to:
         [reset_password_token.user.email]
     )

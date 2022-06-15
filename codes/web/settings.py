@@ -157,6 +157,14 @@ REST_KNOX = {
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_ACCESS_KEY_ID = 'AKIARWLPGYIKRQXN5VXR'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'sfappv2'
+
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+
 CORS_ALLOW_ALL_ORIGINS = True
 ALLOWED_HOSTS=['*']
 
