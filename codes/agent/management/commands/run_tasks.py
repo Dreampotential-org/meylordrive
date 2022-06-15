@@ -159,35 +159,48 @@ class Command(BaseCommand):
         print("Start...")
 
         threads = []
-        hosts = []
-        host_config = []
-        servers = Server.objects.filter()
 
+        # get all servers and configure them
+        servers = Server.objects.filter()
         for server in servers:
             task = Task()
             t = threading.Thread(target=run_job, args=(server, task))
             t.start()
             threads.append(t)
 
+        # wait for all threads
         for t in threads:
             t.join()
 
+        # populate server fingerprint in db
         for server_print in server_prints.keys():
             populate_system_specs(server, server_prints[server_print])
 
+        # now we can progress tasks
         print("Running the tasks")
+        # find list of status which do not have a status
+
         tasks = Task.objects.filter(status=None)
         print("Number of tasks to run: %s" % len(tasks))
         for task in tasks:
+            # set task status to pending
             task.status = 'pending'
             task.save()
+
+            # find available server
             # XXX sort by system specs most cpus
             server = Server.objects.filter(in_use=False).first()
             server.in_use = True
             server.save()
+
+            # run the task
             t = threading.Thread(target=run_job, args=(server, task))
             t.start()
             threads.append(t)
 
+        # wait for complete
         for t in threads:
             t.join()
+
+        # XXX should keep looping find more tasks that
+        # have been created since...
