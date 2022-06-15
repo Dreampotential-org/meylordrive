@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'tasks',
     'agent',
     'rest_framework',
+    'django_rest_passwordreset',
+    'knox',
     'corsheaders',
     'usersystem',
 
@@ -127,6 +129,11 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',),
+}
 
 
 # Static files (CSS, JavaScript, Images)
