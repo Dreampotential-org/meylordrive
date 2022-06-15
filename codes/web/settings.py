@@ -131,12 +131,40 @@ USE_L10N = True
 USE_TZ = True
 
 
+# Make knox’s Token Authentication default
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',),
+    'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication', ),
 }
 
+# KNOX
+REST_KNOX = {
+  'USER_SERIALIZER': 'usersystem.serializer.UserSerializer',
+}
+
+from datetime import timedelta
+from rest_framework.settings import api_settings
+
+REST_KNOX = {
+  'SECURE_HASH_ALGORITHM': 'cryptography.hazmat.primitives.hashes.SHA512',
+  'AUTH_TOKEN_CHARACTER_LENGTH': 64,
+  'TOKEN_TTL': timedelta(hours=10),
+  'USER_SERIALIZER': 'knox.serializers.UserSerializer',
+  'TOKEN_LIMIT_PER_USER': None,
+  'AUTO_REFRESH': False,
+#   'EXPIRY_DATETIME_FORMAT': api_settings.DATETME_FORMAT,
+}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+CORS_ALLOW_ALL_ORIGINS = True
+ALLOWED_HOSTS=['*']
+
+# Email
+EMAIL_BACKEND = 'django_ses.SESBackend'
+EMAIL_AWS_ACCESS_KEY_ID = 'AKIARWLPGYIKWTF4OEPZ'
+EMAIL_AWS_SECRET_ACCESS_KEY = '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'
+DEFAULT_FROM_EMAIL = 'mail-api@dreampotential.org'
+
 STATIC_URL = '/static/'
+APPEND_SLASH=False

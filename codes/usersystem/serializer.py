@@ -1,6 +1,16 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
+
+class ChangePasswordSerializer(serializers.Serializer):
+    model = User
+
+    """
+    Serializer for password change endpoint.
+    """
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
 class RegisterSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='first_name')
      
