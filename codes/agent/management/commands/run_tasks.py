@@ -21,7 +21,10 @@ def run_task(server, task, task_log):
 
 
 def get_repo(ssh, repo, task_log):
+    if repo == None:
+        return
     run_log_ssh_command(ssh, "git clone %s" % repo, task_log)
+    run_log_ssh_command
     return
     # run_log_ssh_command(ssh, "sudo npm cache clean -f", task_log)
     # run_log_ssh_command(ssh, "sudo npm install -g n", task_log)
@@ -33,6 +36,13 @@ def get_repo(ssh, repo, task_log):
 def run_log_ssh_command(ssh, command, task_log):
     print("COMMAND[%s]" % command)
     stdin, stdout, stderr = ssh.exec_command(command)
+    while True:
+        if stdout.channel.exit_status_ready():
+            break
+        line = stdout.readline()
+        if len(line) == 0:
+            break
+        print(line)
     # XXX put in logs directory.
     file1 = open("./logs/%s.txt" % task_log.id, "a")
     file1.write(stderr.read().decode('utf-8') + "\n")
@@ -42,6 +52,8 @@ def run_log_ssh_command(ssh, command, task_log):
 
 
 def run_log_ssh_task(ssh, server, task, task_log, repo):
+    if repo == None:
+        return
     print("COMMAND[%s]" % task.command)
     file1 = open("./logs/%s.txt" % task_log.id, "a")
 
@@ -181,7 +193,32 @@ class Command(BaseCommand):
 
             # find available server
             # XXX sort by system specs most cpus
-            server = Server.objects.filter(in_use=False).first()
+            server = Server.objects.filter(in_use=False)
+            if len(server) == 0:
+                print("No server available")
+                continue
+            print("Number of servers: %s" % len(server))
+            if server == None:
+                continue
+            dic = {}
+            for i in server.values():
+                dic[i['id']] = i
+            powerful_server = {}
+            for i in server.values():
+                if(i["system_specs_id"] != None):
+                    powerful_server[i["id"]] = SystemSpecs.objects.get(
+                        id=i["system_specs_id"]).__dict__["cpu_s"]
+            sortedData = {k: v for k, v in sorted(
+                powerful_server.items(), key=lambda item: item[1], reverse=True)}
+            listData = list(sortedData.keys())
+            powerful_server = []
+            for i in listData:
+                powerful_server.append(dic[i])
+            print(listData)
+            server = Server.objects.get(id=listData[0])
+            return
+            if server == None:
+                continue
             server.in_use = True
             server.save()
 
