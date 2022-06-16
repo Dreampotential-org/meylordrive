@@ -153,6 +153,13 @@ def populate_system_specs(server, system_spec):
     server.save()
 
 
+def get_available_servers():
+    servers = Server.objects.filter(in_use=False)
+    if len(servers) == 0:
+        return False
+    return servers
+
+
 class Command(BaseCommand):
     help = 'run the tasks'
 
@@ -193,12 +200,7 @@ class Command(BaseCommand):
 
             # find available server
             # XXX sort by system specs most cpus
-            server = Server.objects.filter(in_use=False)
-            if len(server) == 0:
-                print("No server available")
-                continue
-            print("Number of servers: %s" % len(server))
-            if server == None:
+            if get_available_servers() == False:
                 continue
             dic = {}
             for i in server.values():
