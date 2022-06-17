@@ -24,6 +24,10 @@ def run_task(server, task, task_log):
 def get_repo(ssh, repo, task_log):
     if repo is None:
         return
+    print(repo)
+    # run_log_ssh_command(ssh, "rm -fr %s" % repo., task_log)
+    run_log_ssh_command(
+        ssh, "rm -fr %s" % repo.rsplit("/", 1)[1].split(".git")[0], task_log)
     run_log_ssh_command(ssh, "git clone %s" % repo, task_log)
 
 
