@@ -88,16 +88,18 @@ def myexec(timeout, want_exitcode, stdin, stdout, stderr):
 def run_log_ssh_command(ssh, command, task_log):
     print("COMMAND[%s]" % command)
     stdin, stdout, stderr = ssh.exec_command(command)
+    file1 = open("./logs/%s.txt" % task_log.id, "a")
     while True:
         if stdout.channel.recv_exit_status():
             break
         ot = myexec(10, True, stdin, stdout, stderr)
-        print("OUTPUT[%s]" % ot)
 
-    file1 = open("./logs/%s.txt" % task_log.id, "a")
-    for line in ot:
-        print(line)
-        file1.write(str(line) + "\n")
+        print(ot)
+        print("OUTPUT[%s] ResponseCode[%s]" % (ot[0], ot[1]))
+
+        for line in ot[0]:
+            print(line)
+            file1.write(str(line) + "\n")
     file1.close()
 
 
