@@ -20,8 +20,7 @@ class SystemSpecs(models.Model):
     architecture = models.CharField(max_length=100)
     cpu_op_modes = models.CharField(max_length=100)
     byte_order = models.CharField(max_length=100)
-    # address_sizes = models.CharField(max_length=100)
-    cpu_s = models.CharField(max_length=100)
+    cpu_s = models.IntegerField()
     on_line_cpu_s_list = models.CharField(max_length=100)
     threads_per_core = models.CharField(max_length=100)
     cores_per_socket = models.CharField(max_length=100)
@@ -32,10 +31,7 @@ class SystemSpecs(models.Model):
     model = models.CharField(max_length=100)
     model_name = models.CharField(max_length=100)
     stepping = models.CharField(max_length=100)
-    # frequesncy_boost = models.CharField(max_length=100)
     cpu_mhz = models.CharField(max_length=100)
-    # cpu_max_mhz = models.CharField(max_length=100)
-    # cpu_min_mhz = models.CharField(max_length=100)
     bogo_mips = models.CharField(max_length=100)
     hypervisor_vendor = models.CharField(max_length=100)
     virtualization_type = models.CharField(max_length=100,
@@ -44,7 +40,7 @@ class SystemSpecs(models.Model):
     l1i_cache = models.CharField(max_length=100)
     l2_cache = models.CharField(max_length=100)
     l3_cache = models.CharField(max_length=100)
-    total_memory = models.CharField(max_length=100, null=True, blank=True)
+    total_memory = models.IntegerField(blank=True, null=True)
 
 
 class Server(models.Model):

@@ -21,16 +21,9 @@ def run_task(server, task, task_log):
 
 
 def get_repo(ssh, repo, task_log):
-    if repo == None:
+    if repo is None:
         return
     run_log_ssh_command(ssh, "git clone %s" % repo, task_log)
-    run_log_ssh_command
-    return
-    # run_log_ssh_command(ssh, "sudo npm cache clean -f", task_log)
-    # run_log_ssh_command(ssh, "sudo npm install -g n", task_log)
-    # run_log_ssh_command(ssh, "sudo n stable", task_log)
-    # run_log_ssh_command(ssh, "sudo npm i -g yarn", task_log)
-    # run_log_ssh_command(ssh, "sudo apt install npm -y", task_log)
 
 
 def run_log_ssh_command(ssh, command, task_log):
@@ -52,7 +45,7 @@ def run_log_ssh_command(ssh, command, task_log):
 
 
 def run_log_ssh_task(ssh, server, task, task_log, repo):
-    if repo == None:
+    if repo is None:
         return
     print("COMMAND[%s]" % task.command)
     file1 = open("./logs/%s.txt" % task_log.id, "a")
@@ -104,17 +97,11 @@ def configure_node(server):
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())
 
-    # ssh.load_host_keys(os.path.expanduser(
-    #    os.path.join("~", ".ssh", "known_hosts")))
     ssh.connect(server.ip_address, username=server.username)
     fingerprint_node(ssh, server)
     command = ("scp server-key %s@%s:~/"
                % (server.username, server.ip_address))
     os.system(command)
-
-    # run_log_ssh_command(
-    #    ssh, server,
-    #    'cd ~/django-zillow; COMMAND="kingtax"; DOWN_SCRIPT="./scripts/batch-down2.sh"; SCRIPT="./scripts/batch2.sh"; STATE="WA" sudo bash scripts/batch2.sh')
     ssh.close()
 
 
@@ -124,8 +111,8 @@ def populate_system_specs(server, system_spec):
     server.system_specs.architecture = system_spec['Architecture']
     server.system_specs.cpu_op_modes = system_spec['CPU op-mode(s)']
     server.system_specs.byte_order = system_spec['Byte Order']
-    # server.system_specs.address_sizes = system_spec['Address sizes']
-    server.system_specs.cpu_s = system_spec['CPU(s)']
+    server.system_specs.cpu_s = int(system_spec['CPU(s)'])
+
     server.system_specs.on_line_cpu_s_list = system_spec['On-line CPU(s) list']
     server.system_specs.threads_per_core = system_spec['Thread(s) per core']
     server.system_specs.cores_per_socket = system_spec['Core(s) per socket']
@@ -136,10 +123,7 @@ def populate_system_specs(server, system_spec):
     server.system_specs.model = system_spec['Model']
     server.system_specs.model_name = system_spec['Model name']
     server.system_specs.stepping = system_spec['Stepping']
-    # server.system_specs.frequency_boost = system_spec['CPU max MHz']
     server.system_specs.cpu_mhz = system_spec['CPU MHz']
-    # server.system_specs.cpu_max_mhz = system_spec['CPU max MHz']
-    # server.system_specs.cpu_min_mhz = system_spec['CPU min MHz']
     server.system_specs.bogo_mips = system_spec['BogoMIPS']
     server.system_specs.hypervisor_vendor = system_spec['Hypervisor vendor']
     server.system_specs.virtualization_type = system_spec.get(
@@ -153,11 +137,19 @@ def populate_system_specs(server, system_spec):
     server.save()
 
 
-def get_available_servers():
-    servers = Server.objects.filter(in_use=False)
+def get_server():
+    servers = Server.objects.filter().exclude(system_specs=None)
     if len(servers) == 0:
-        return False
-    return servers
+        print("No servers available")
+        return
+
+    server_stats = {}
+    for server in servers:
+        print(server.system_specs)
+        print(server.system_specs.cpu_s)
+        server_stats[server.id] = {'cpu_s': server.system_specs.cpu_s}
+
+    print(server_stats)
 
 
 class Command(BaseCommand):
@@ -168,11 +160,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         print("Start...")
-
         threads = []
 
         # get all servers and configure them
-        servers = Server.objects.filter()[:3]
+        servers = Server.objects.filter()
         for server in servers:
             task = Task()
             t = threading.Thread(target=run_job, args=(server, task))
@@ -198,28 +189,9 @@ class Command(BaseCommand):
             task.status = 'pending'
             task.save()
 
-            # find available server
-            # XXX sort by system specs most cpus
-            if get_available_servers() == False:
-                continue
-            dic = {}
-            for i in server.values():
-                dic[i['id']] = i
-            powerful_server = {}
-            for i in server.values():
-                if(i["system_specs_id"] != None):
-                    powerful_server[i["id"]] = SystemSpecs.objects.get(
-                        id=i["system_specs_id"]).__dict__["cpu_s"]
-            sortedData = {k: v for k, v in sorted(
-                powerful_server.items(), key=lambda item: item[1], reverse=True)}
-            listData = list(sortedData.keys())
-            powerful_server = []
-            for i in listData:
-                powerful_server.append(dic[i])
-            print(listData)
-            server = Server.objects.get(id=listData[0])
-            return
-            if server == None:
+            server = get_server()
+            continue
+            if server is None:
                 continue
             server.in_use = True
             server.save()
