@@ -94,6 +94,11 @@ def run_log_ssh_command(ssh, command, task_log):
             break
         ot = myexec(10, True, stdin, stdout, stderr)
 
+        print("print")
+        print(str(ot[0]))
+        if not len(ot[0]):
+            continue
+
         print(ot)
         print("OUTPUT[%s] ResponseCode[%s]" % (ot[0], ot[1]))
 
