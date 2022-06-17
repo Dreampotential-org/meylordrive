@@ -1,4 +1,4 @@
-from tasks.models import Task, Server, SystemSpecs
+from tasks.models import Task, Server, SystemSpecs, TaskLog
 import paramiko
 import os
 from django.core.management.base import BaseCommand
@@ -8,6 +8,7 @@ server_prints = {}
 
 
 def run_job(server, task):
+    return
     print("Run job server: %s %s" % (server.username, server.ip_address))
     finger_print = configure_node(server)
     return finger_print
@@ -29,16 +30,16 @@ def get_repo(ssh, repo, task_log):
 def run_log_ssh_command(ssh, command, task_log):
     print("COMMAND[%s]" % command)
     stdin, stdout, stderr = ssh.exec_command(command)
+    file1 = open("./logs/%s.txt" % task_log.id, "a")
+
     while True:
         if stdout.channel.exit_status_ready():
             break
         line = stdout.readline()
         if len(line) == 0:
             break
-        print(line)
+        file1.write(line + "\n")
     # XXX put in logs directory.
-    file1 = open("./logs/%s.txt" % task_log.id, "a")
-    file1.write(stderr.read().decode('utf-8') + "\n")
     print("OUTPUT[%s]" % stdout.read())
     print("STDERROR[%s]" % stderr.read())
     file1.close()
@@ -141,19 +142,14 @@ def get_server():
     servers = Server.objects.filter().exclude(system_specs=None)
     if len(servers) == 0:
         print("No servers available")
-        return
-
+        return False
     server_stats = {}
     for server in servers:
-        print(server.system_specs)
-        print(server.system_specs.total_memory)
-        server_stats[server.id] = {
-            'total_memory': server.system_specs.total_memory
-        }
-
-    print(server_stats)
-    print(sorted(list(server_stats.items()), reverse=True))
-
+        server_stats[server.id] = server.system_specs.total_memory
+    sortedData = {k: v for k, v in sorted(
+        server_stats.items(), key=lambda item: item[1], reverse=True)}
+    listData = list(sortedData.keys())
+    return Server.objects.get(id=listData[0])
 
 
 class Command(BaseCommand):
@@ -194,6 +190,9 @@ class Command(BaseCommand):
             task.save()
 
             server = get_server()
+            if server == False:
+                print("No servers available")
+                os.exit(1)
             server.in_use = True
             server.save()
 
