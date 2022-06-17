@@ -9,10 +9,26 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
-        params = {
-            'command': "sudo su -c 'export COMMAND=\"king_tax\";  bash scripts/batch.sh'",
-            'repo': "git@github.com:aaronorosen/django-zillow.git",
+        commands = [
+            "king_tax",
+            "sonoma_tax",
+            "miami_dade_tax",
+            "charleston_tax",
+            "harris_tax",
+            "orange_tax",
+            "dallas_tax",
+            "lake_tax",
+            "san_barnardino_tax",
+            "santa_barbara_tax",
+            "maricopa_tax",
+            "palm_beach_tax",
+            "san_francisco_tax",
+        ]
+        for command in commands:
+            params = {
+                'command': "sudo su -c 'export COMMAND=\"%s\";  bash scripts/batch.sh'" % command,
+                'repo': "git@github.com:aaronorosen/django-zillow.git",
 
-        }
-        req = requests.post("http://localhost:8000/tasks/", json=params)
-        print(req.json())
+            }
+            req = requests.post("http://localhost:8000/tasks/", json=params)
+            print(req.json())
