@@ -146,10 +146,14 @@ def get_server():
     server_stats = {}
     for server in servers:
         print(server.system_specs)
-        print(server.system_specs.cpu_s)
-        server_stats[server.id] = {'cpu_s': server.system_specs.cpu_s}
+        print(server.system_specs.total_memory)
+        server_stats[server.id] = {
+            'total_memory': server.system_specs.total_memory
+        }
 
     print(server_stats)
+    print(sorted(list(server_stats.items()), reverse=True))
+
 
 
 class Command(BaseCommand):
@@ -190,13 +194,10 @@ class Command(BaseCommand):
             task.save()
 
             server = get_server()
-            continue
-            if server is None:
-                continue
             server.in_use = True
             server.save()
 
-            task_log = Task()
+            task_log = TaskLog()
             task_log.task = task
             task_log.file_log = f"./logs/{task_log.id}.txt"
             task_log.save()
