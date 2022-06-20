@@ -104,15 +104,16 @@ def run_log_ssh_task(ssh, server, task, task_log, repo):
         for l in stderr.splitlines():
             print(l)
             fileErr.write(str(l), "\n")
-    except:
-        pass
+    except Exception as e:
+        print("Error: %s" % e)
+
     fileErr.close()
     try:
         if len(stderr.readlines()) > 0:
             task.status = "FAILED"
-    except:
+    except Exception as e:
+        print("ERROR: %s" % e)
         task.status = "FAILED"
-        pass
     else:
         task.status = "COMPLETED"
     task.finished_at = datetime.now()
@@ -201,7 +202,7 @@ def populate_system_specs(server, system_spec):
 
 
 def get_server():
-    servers = Server.objects.filter().exclude(system_specs=None)
+    servers = Server.objects.filter(in_use=False).exclude(system_specs=None)
     if len(servers) == 0:
         print("No servers available")
         return False
@@ -222,6 +223,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         print("Start...")
+
+        # at the start we clear all severs that are in use.
+        servers = Server.objects.filter().exclude(system_specs=None)
+        for server in servers:
+            server.in_use = False
+            server.save()
+
         threads = []
 
         # get all servers and configure them
@@ -252,9 +260,10 @@ class Command(BaseCommand):
             task.save()
 
             server = get_server()
-            if server == False:
+            if server is False:
                 print("No servers available")
                 os.exit(1)
+
             server.in_use = True
             server.save()
 
