@@ -100,12 +100,19 @@ def run_log_ssh_task(ssh, server, task, task_log, repo):
             print(server.ip_address, "==>", l)
             fileOut.write(str(l) + "\n")
     fileOut.close()
-    for l in stderr.splitlines():
-        print(l)
-        fileErr.write(str(l), "\n")
+    try:
+        for l in stderr.splitlines():
+            print(l)
+            fileErr.write(str(l), "\n")
+    except:
+        pass
     fileErr.close()
-    if len(stderr.readlines()) > 0:
+    try:
+        if len(stderr.readlines()) > 0:
+            task.status = "FAILED"
+    except:
         task.status = "FAILED"
+        pass
     else:
         task.status = "COMPLETED"
     task.finished_at = datetime.now()
