@@ -7,5 +7,4 @@ services:
             - ./codes:/home/web/codes
         ports:
             - 8100:8000
-        command: bash -c "python3 manage.py runserver 0.0.0.0:8000"
-
+        command: bash -c "/usr/local/bin/gunicorn --bind :8000 --timeout 999 --workers 8 --env DJANGO_SETTINGS_MODULE=zillow.settings  web.wsgi:application"
