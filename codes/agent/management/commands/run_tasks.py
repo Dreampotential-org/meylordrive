@@ -1,5 +1,5 @@
 from subprocess import Popen, PIPE
-from tasks.models import Task, Server, SystemSpecs, TaskLog
+from tasks.models import Task, Server, SystemSpecs, TaskLog, Pipeline
 import paramiko
 import os
 from django.core.management.base import BaseCommand
@@ -82,6 +82,7 @@ def line_buffered(f):
 def run_log_ssh_task(ssh, server, task, task_log, repo):
     if repo is None:
         return
+    task.status = "RUNNING"
     print("COMMAND[%s]" % task.command)
     fileOut = open(f"./logs/{'out_'+str(task_log.id)}.txt", "a")
     fileErr = open(f"./logs/{'err_'+str(task_log.id)}.txt", "a")
@@ -94,13 +95,18 @@ def run_log_ssh_task(ssh, server, task, task_log, repo):
         if not v:
             break
         for l in v.splitlines():
-            print(l)
+            print(server.ip_address, "==>", l)
             fileOut.write(str(l) + "\n")
     fileOut.close()
-    for l in stderr.readlines():
+    for l in stderr.splitlines():
         print(l)
         fileErr.write(str(l), "\n")
     fileErr.close()
+    if len(stderr.readlines()) > 0:
+        task.status = "FAILED"
+    else:
+        task.status = "COMPLETED"
+    task.save()
 
 
 def fingerprint_node(ssh, server):

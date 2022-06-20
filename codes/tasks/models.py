@@ -60,6 +60,7 @@ class Pipeline(models.Model):
     repo = models.CharField(max_length=4096)
     task = models.ForeignKey(Task, on_delete=models.CASCADE,
                              blank=True, null=True)
+    status = models.CharField(max_length=64, blank=True, null=True)
 
     def __str__(self):
         return str(self.repo) or ''
