@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
+from rest_framework.settings import api_settings
+from datetime import timedelta
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -142,20 +144,18 @@ REST_FRAMEWORK = {
 
 # KNOX
 REST_KNOX = {
-  'USER_SERIALIZER': 'usersystem.serializer.UserSerializer',
+    'USER_SERIALIZER': 'usersystem.serializer.UserSerializer',
 }
 
-from datetime import timedelta
-from rest_framework.settings import api_settings
 
 REST_KNOX = {
-  'SECURE_HASH_ALGORITHM': 'cryptography.hazmat.primitives.hashes.SHA512',
-  'AUTH_TOKEN_CHARACTER_LENGTH': 64,
-  'TOKEN_TTL': timedelta(hours=10),
-  'USER_SERIALIZER': 'knox.serializers.UserSerializer',
-  'TOKEN_LIMIT_PER_USER': None,
-  'AUTO_REFRESH': False,
-#   'EXPIRY_DATETIME_FORMAT': api_settings.DATETME_FORMAT,
+    'SECURE_HASH_ALGORITHM': 'cryptography.hazmat.primitives.hashes.SHA512',
+    'AUTH_TOKEN_CHARACTER_LENGTH': 64,
+    'TOKEN_TTL': timedelta(hours=10),
+    'USER_SERIALIZER': 'knox.serializers.UserSerializer',
+    'TOKEN_LIMIT_PER_USER': None,
+    'AUTO_REFRESH': False,
+    #   'EXPIRY_DATETIME_FORMAT': api_settings.DATETME_FORMAT,
 }
 
 # Static files (CSS, JavaScript, Images)
@@ -170,7 +170,7 @@ AWS_STORAGE_BUCKET_NAME = 'sfappv2'
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 
 CORS_ALLOW_ALL_ORIGINS = True
-ALLOWED_HOSTS=['*']
+ALLOWED_HOSTS = ['*']
 
 # Email
 EMAIL_BACKEND = 'django_ses.SESBackend'
@@ -179,4 +179,6 @@ EMAIL_AWS_SECRET_ACCESS_KEY = 'L56V83br9eFCvPcNaydRPqLVujbZsM0PCkxQvjx0'
 DEFAULT_FROM_EMAIL = 'mail-api@dreampotential.org'
 
 STATIC_URL = '/static/'
-APPEND_SLASH=False
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+
+APPEND_SLASH = False
