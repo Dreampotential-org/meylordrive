@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand
 # from paramiko.client import SSHClient, AutoAddPolicy
 import threading
 import select
+import datetime
 server_prints = {}
 
 
@@ -83,6 +84,7 @@ def run_log_ssh_task(ssh, server, task, task_log, repo):
     if repo is None:
         return
     task.status = "RUNNING"
+    task.started_at = datetime.now()
     print("COMMAND[%s]" % task.command)
     fileOut = open(f"./logs/{'out_'+str(task_log.id)}.txt", "a")
     fileErr = open(f"./logs/{'err_'+str(task_log.id)}.txt", "a")
@@ -106,6 +108,7 @@ def run_log_ssh_task(ssh, server, task, task_log, repo):
         task.status = "FAILED"
     else:
         task.status = "COMPLETED"
+    task.finished_at = datetime.now()
     task.save()
 
 
