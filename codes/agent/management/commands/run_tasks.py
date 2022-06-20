@@ -1,3 +1,4 @@
+from subprocess import Popen, PIPE
 from tasks.models import Task, Server, SystemSpecs, TaskLog
 import paramiko
 import os
@@ -27,101 +28,79 @@ def get_repo(ssh, repo, task_log):
         return
     print(repo)
     # run_log_ssh_command(ssh, "rm -fr %s" % repo., task_log)
-    run_log_ssh_command(
-        ssh, "rm -fr %s" % repo.rsplit("/", 1)[1].split(".git")[0], task_log)
-    run_log_ssh_command(ssh, "git clone %s" % repo, task_log)
+    parsed_repo = repo.rsplit("/", 1)[1].split(".git")[0]
+    response = run_log_ssh_command(
+        ssh, f"cd {parsed_repo} && git pull", task_log)
+    if response == 0:
+        # run_log_ssh_command(ssh, "git pull", task_log)
+        pass
+    else:
+        run_log_ssh_command(ssh, "git clone %s" % repo, task_log)
+    # run_log_ssh_command(
+    #     ssh, "rm -fr %s" % parsed_repo, task_log)
 
 
-def myexec(timeout, want_exitcode, stdin, stdout, stderr):
-    # one channel per command
-    #   stdin, stdout, stderr = ssh.exec_command(cmd)
-    # get the shared channel for stdout/stderr/stdin
-    channel = stdout.channel
-
-    # we do not need stdin.
-    stdin.close()
-    # indicate that we're not going to write to that channel anymore
-    channel.shutdown_write()
-
-    # read stdout/stderr in order to prevent read block hangs
-    stdout_chunks = []
-    stdout_chunks.append(stdout.channel.recv(len(stdout.channel.in_buffer)))
-    # chunked read to prevent stalls
-    while not channel.closed or channel.recv_ready() or channel.recv_stderr_ready():
-        # stop if channel was closed prematurely, and there is no data in the buffers.
-        got_chunk = False
-        readq, _, _ = select.select([stdout.channel], [], [], timeout)
-        for c in readq:
-            if c.recv_ready():
-                stdout_chunks.append(stdout.channel.recv(len(c.in_buffer)))
-                got_chunk = True
-            if c.recv_stderr_ready():
-                # make sure to read stderr to prevent stall
-                stderr.channel.recv_stderr(len(c.in_stderr_buffer))
-                got_chunk = True
-        '''
-      1) make sure that there are at least 2 cycles with no data in the input buffers in order to not exit too early (i.e. cat on a >200k file).
-      2) if no data arrived in the last loop, check if we already received the exit code
-      3) check if input buffers are empty
-      4) exit the loop
-      '''
-        if not got_chunk \
-                and stdout.channel.exit_status_ready() \
-                and not stderr.channel.recv_stderr_ready() \
-                and not stdout.channel.recv_ready():
-            # indicate that we're not going to read from this channel anymore
-            stdout.channel.shutdown_read()
-            # close the channel
-            stdout.channel.close()
-            break    # exit as remote side is finished and our bufferes are empty
-
-    # close all the pseudofiles
-    stdout.close()
-    stderr.close()
-
-    if want_exitcode:
-        # exit code is always ready at this point
-        return (''.join(str(stdout_chunks)), stdout.channel.recv_exit_status())
-    return ''.join(str(stdout_chunks))
+# def line_buffered(f):
+#     line_buf = ""
+#     while not f.channel.exit_status_ready():
+#         line_buf += str(f.read(1))
+#         if line_buf.endswith('n'):
+#             yield line_buf
+#             line_buf = ''
 
 
 def run_log_ssh_command(ssh, command, task_log):
     print("COMMAND[%s]" % command)
     stdin, stdout, stderr = ssh.exec_command(command)
-    file1 = open("./logs/%s.txt" % task_log.id, "a")
-    while True:
-        if stdout.channel.recv_exit_status():
-            break
-        ot = myexec(10, True, stdin, stdout, stderr)
+    exit_status = stdout.channel.recv_exit_status()          # Blocking call
+    print("Exit status: %s" % exit_status)
+    fileOut = open(f"./logs/{'out_'+str(task_log.id)}.txt", "a")
+    fileErr = open(f"./logs/{'err_'+str(task_log.id)}.txt", "a")
+    print("STARTING OF LOOP")
+    for l in stdout.readlines():
+        print(l)
+        fileOut.write(str(l))
+    print("STDERR")
+    for l in stderr.readlines():
+        print(l)
+        fileErr.write(str(l))
+    # file1.write(str(l) + "\n")
+    # file1.close()
+    print("ENDING OF LOOP")
+    return int(exit_status)
 
-        print("print")
-        print(str(ot[0]))
-        if not len(ot[0]):
-            continue
 
-        print(ot)
-        print("OUTPUT[%s] ResponseCode[%s]" % (ot[0], ot[1]))
-
-        for line in ot[0]:
-            print(line)
-            file1.write(str(line) + "\n")
-    file1.close()
+def line_buffered(f):
+    line_buf = ""
+    while not f.channel.exit_status_ready():
+        line_buf += str(f.read(1))
+        if line_buf.endswith('\n'):
+            yield line_buf
+            line_buf = ''
 
 
 def run_log_ssh_task(ssh, server, task, task_log, repo):
     if repo is None:
         return
     print("COMMAND[%s]" % task.command)
-    file1 = open("./logs/%s.txt" % task_log.id, "a")
-
+    fileOut = open(f"./logs/{'out_'+str(task_log.id)}.txt", "a")
+    fileErr = open(f"./logs/{'err_'+str(task_log.id)}.txt", "a")
     repo_dir = repo.rsplit("/", 1)[1].split(".git")[0]
     stdin, stdout, stderr = ssh.exec_command(
-        "cd %s && %s" % (repo_dir, task.command))
-
-    file1.write(stderr.read().decode('utf-8') + "\n")
-    print("OUTPUT[%s]" % stdout.read())
-    print("STDERROR[%s]" % stderr.read())
-    file1.close()
+        "cd %s && %s" % (repo_dir, task.command), get_pty=True)
+    # ssh.exec_command("sudo reboot")
+    while True:
+        v = stdout.channel.recv(1024)
+        if not v:
+            break
+        for l in v.splitlines():
+            print(l)
+            fileOut.write(str(l) + "\n")
+    fileOut.close()
+    for l in stderr.readlines():
+        print(l)
+        fileErr.write(str(l), "\n")
+    fileErr.close()
 
 
 def fingerprint_node(ssh, server):
