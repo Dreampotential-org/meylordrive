@@ -27,4 +27,7 @@ ssh2-python==0.27.0
 urllib3==1.26.9
 zope.event==4.5.0
 zope.interface==5.4.0
-tzdata==2022.1
+psycopg2-binary==2.8.6
+gunicorn
+tzdata
+
