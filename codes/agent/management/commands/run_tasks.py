@@ -8,9 +8,9 @@ server_prints = {}
 
 
 def run_job(server, task):
-    return
     print("Run job server: %s %s" % (server.username, server.ip_address))
     finger_print = configure_node(server)
+    run_log_ssh_command(make_ssh(server), "sudo bash kill-docker.sh")
     return finger_print
 
 
@@ -22,7 +22,6 @@ def run_task(server, task, task_log):
 
 
 def get_repo(ssh, repo, task_log):
-    run_log_ssh_command(ssh, "sudo bash kill-docker.sh", task_log)
     if repo is None:
         return
     print(repo)
@@ -39,24 +38,27 @@ def get_repo(ssh, repo, task_log):
     #     ssh, "rm -fr %s" % parsed_repo, task_log)
 
 
-def run_log_ssh_command(ssh, command, task_log):
+def run_log_ssh_command(ssh, command, task_log=None):
     print("COMMAND[%s]" % command)
     stdin, stdout, stderr = ssh.exec_command(command)
     exit_status = stdout.channel.recv_exit_status()          # Blocking call
     stderr.channel.recv_exit_status()
     print("Exit status: %s" % exit_status)
-    fileOut = open(f"./logs/{'out_'+str(task_log.id)}.txt", "a")
-    fileErr = open(f"./logs/{'err_'+str(task_log.id)}.txt", "a")
+    if task_log:
+        fileOut = open(f"./logs/{'out_'+str(task_log.id)}.txt", "a")
+        fileErr = open(f"./logs/{'err_'+str(task_log.id)}.txt", "a")
     print("STARTING OF LOOP")
     if len(stdout.read()) > 0:
         for l in stdout.read().splitlines():
             print(l)
-            fileOut.write(str(l))
+            if task_log:
+                fileOut.write(str(l))
     print("STDERR")
     if len(stderr.read()) > 0:
         for l in stderr.read().splitlines():
             print(l)
-            fileErr.write(str(l))
+            if task_log:
+                fileErr.write(str(l))
     # file1.write(str(l) + "\n")
     # file1.close()
     print("ENDING OF LOOP")
