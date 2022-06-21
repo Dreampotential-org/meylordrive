@@ -19,6 +19,7 @@ def run_task(server, task, task_log):
     get_repo(make_ssh(server), task.repo, task)
     run_log_ssh_task(make_ssh(server), server,
                      task, task_log, task.repo)
+    return
 
 
 def get_repo(ssh, repo, task_log):
