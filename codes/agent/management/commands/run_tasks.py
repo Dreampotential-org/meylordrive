@@ -11,6 +11,7 @@ server_prints = {}
 
 
 def run_job(server, task):
+    return
     print("Run job server: %s %s" % (server.username, server.ip_address))
     finger_print = configure_node(server)
     return finger_print
@@ -116,7 +117,7 @@ def run_log_ssh_task(ssh, server, task, task_log, repo):
         task.status = "FAILED"
     else:
         task.status = "COMPLETED"
-    task.finished_at = datetime.now()
+    # task.finished_at = datetime.now()
     task.save()
 
 
