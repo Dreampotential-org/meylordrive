@@ -48,13 +48,13 @@ def run_log_ssh_command(ssh, command, task_log):
     fileOut = open(f"./logs/{'out_'+str(task_log.id)}.txt", "a")
     fileErr = open(f"./logs/{'err_'+str(task_log.id)}.txt", "a")
     print("STARTING OF LOOP")
-    if stdout:
-        for l in stdout.readlines():
+    if len(stdout.read()) > 0:
+        for l in stdout.read().splitlines():
             print(l)
             fileOut.write(str(l))
     print("STDERR")
-    if stderr:
-        for l in stderr.readlines():
+    if len(stderr.read()) > 0:
+        for l in stderr.read().splitlines():
             print(l)
             fileErr.write(str(l))
     # file1.write(str(l) + "\n")
@@ -92,9 +92,9 @@ def run_log_ssh_task(ssh, server, task, task_log, repo):
             fileOut.write(str(l) + "\n")
     fileOut.close()
     stderr.channel.recv_exit_status()
-    if stderr:
+    if len(stderr.read()) > 0:
         task.status = "FAILED"
-        for l in stderr.splitlines():
+        for l in stderr.read().splitlines():
             print(l)
             fileErr.write(str(l), "\n")
     else:
