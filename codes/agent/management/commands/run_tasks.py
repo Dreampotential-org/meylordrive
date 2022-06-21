@@ -1,19 +1,16 @@
-from tasks.models import Task, Server, SystemSpecs, TaskLog, Pipeline
+from tasks.models import Task, Server, SystemSpecs, TaskLog
 import paramiko
 import os
 from django.core.management.base import BaseCommand
-
 import threading
-import datetime
-
-
+from datetime import datetime
 server_prints = {}
 
 
 def run_job(server, task):
-    return
     print("Run job server: %s %s" % (server.username, server.ip_address))
     finger_print = configure_node(server)
+    run_log_ssh_command(make_ssh(server), "sudo bash kill-docker.sh")
     return finger_print
 
 
@@ -25,7 +22,6 @@ def run_task(server, task, task_log):
 
 
 def get_repo(ssh, repo, task_log):
-    run_log_ssh_command(ssh, "sudo bash kill-docker.sh", task_log)
     if repo is None:
         return
     print(repo)
@@ -42,30 +38,27 @@ def get_repo(ssh, repo, task_log):
     #     ssh, "rm -fr %s" % parsed_repo, task_log)
 
 
-# def line_buffered(f):
-#     line_buf = ""
-#     while not f.channel.exit_status_ready():
-#         line_buf += str(f.read(1))
-#         if line_buf.endswith('n'):
-#             yield line_buf
-#             line_buf = ''
-
-
-def run_log_ssh_command(ssh, command, task_log):
+def run_log_ssh_command(ssh, command, task_log=None):
     print("COMMAND[%s]" % command)
     stdin, stdout, stderr = ssh.exec_command(command)
     exit_status = stdout.channel.recv_exit_status()          # Blocking call
+    stderr.channel.recv_exit_status()
     print("Exit status: %s" % exit_status)
-    fileOut = open(f"./logs/{'out_'+str(task_log.id)}.txt", "a")
-    fileErr = open(f"./logs/{'err_'+str(task_log.id)}.txt", "a")
+    if task_log:
+        fileOut = open(f"./logs/{'out_'+str(task_log.id)}.txt", "a")
+        fileErr = open(f"./logs/{'err_'+str(task_log.id)}.txt", "a")
     print("STARTING OF LOOP")
-    for l in stdout.readlines():
-        print(l)
-        fileOut.write(str(l))
+    if len(stdout.read()) > 0:
+        for l in stdout.read().splitlines():
+            print(l)
+            if task_log:
+                fileOut.write(str(l))
     print("STDERR")
-    for l in stderr.readlines():
-        print(l)
-        fileErr.write(str(l))
+    if len(stderr.read()) > 0:
+        for l in stderr.read().splitlines():
+            print(l)
+            if task_log:
+                fileErr.write(str(l))
     # file1.write(str(l) + "\n")
     # file1.close()
     print("ENDING OF LOOP")
@@ -85,39 +78,31 @@ def run_log_ssh_task(ssh, server, task, task_log, repo):
     if repo is None:
         return
     task.status = "RUNNING"
-    # task.started_at = datetime.now()
+    task.started_at = datetime.now()
     print("COMMAND[%s]" % task.command)
     fileOut = open(f"./logs/{'out_'+str(task_log.id)}.txt", "a")
     fileErr = open(f"./logs/{'err_'+str(task_log.id)}.txt", "a")
     repo_dir = repo.rsplit("/", 1)[1].split(".git")[0]
     stdin, stdout, stderr = ssh.exec_command(
         "cd %s && %s" % (repo_dir, task.command), get_pty=True)
-    # ssh.exec_command("sudo reboot")
     while True:
         v = stdout.channel.recv(1024)
         if not v:
             break
         for l in v.splitlines():
-            print(server.ip_address, "==>", l)
+            print(task.command, "==>", l)
             fileOut.write(str(l) + "\n")
     fileOut.close()
-    try:
-        for l in stderr.splitlines():
+    stderr.channel.recv_exit_status()
+    if len(stderr.read()) > 0:
+        task.status = "FAILED"
+        for l in stderr.read().splitlines():
             print(l)
             fileErr.write(str(l), "\n")
-    except Exception as e:
-        print("Error: %s" % e)
-
-    fileErr.close()
-    try:
-        if len(stderr.readlines()) > 0:
-            task.status = "FAILED"
-    except Exception as e:
-        print("ERROR: %s" % e)
-        task.status = "FAILED"
     else:
         task.status = "COMPLETED"
-    # task.finished_at = datetime.now()
+    task.finished_at = datetime.now()
+    fileErr.close()
     task.save()
 
 
