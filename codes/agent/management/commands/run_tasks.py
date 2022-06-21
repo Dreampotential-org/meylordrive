@@ -3,7 +3,7 @@ import paramiko
 import os
 from django.core.management.base import BaseCommand
 import threading
-import datetime
+from datetime import datetime
 server_prints = {}
 
 
@@ -88,7 +88,7 @@ def run_log_ssh_task(ssh, server, task, task_log, repo):
         if not v:
             break
         for l in v.splitlines():
-            print(server.ip_address, "==>", l)
+            print(task.command, "==>", l)
             fileOut.write(str(l) + "\n")
     fileOut.close()
     stderr.channel.recv_exit_status()
