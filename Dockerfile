@@ -6,6 +6,7 @@ RUN apt-get update --fix-missing && \
     apt-get install -y python3 libpq-dev && \
     apt-get install -y python3-pip
 
+COPY server-key /opt/server-key
 
 COPY ./requirements.txt /tmp/requirements.txt
 

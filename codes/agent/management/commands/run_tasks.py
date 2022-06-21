@@ -149,7 +149,11 @@ def make_ssh(server):
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())
-    ssh.connect(server.ip_address, username=server.username)
+    sshkey = "/opt/server-key"
+    if os.path.exists(sshkey):
+        ssh.connect(server.ip_address, username=server.username, key_filename=sshkey)
+    else:
+        ssh.connect(server.ip_address, username=server.username)
     return ssh
 
 
