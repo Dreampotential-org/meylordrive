@@ -10,6 +10,7 @@ class Task(models.Model):
     finished_at = models.DateTimeField(blank=True, null=True)
     repo = models.CharField(max_length=4096, null=True, blank=True)
     name = models.CharField(max_length=4096, null=True, blank=True)
+    meta = models.TextField(null=True, blank=True)
 
 
 class TaskLog(models.Model):

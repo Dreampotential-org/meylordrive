@@ -8,6 +8,7 @@ server_prints = {}
 
 
 def run_job(server, task):
+    return
     print("Run job server: %s %s" % (server.username, server.ip_address))
     finger_print = configure_node(server)
     run_log_ssh_command(make_ssh(server), "sudo bash kill-docker.sh")
@@ -137,7 +138,8 @@ def make_ssh(server):
     ssh.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())
     sshkey = "/opt/server-key"
     if os.path.exists(sshkey):
-        ssh.connect(server.ip_address, username=server.username, key_filename=sshkey)
+        ssh.connect(server.ip_address, username=server.username,
+                    key_filename=sshkey)
     else:
         ssh.connect(server.ip_address, username=server.username)
     return ssh

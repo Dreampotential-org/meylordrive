@@ -22,6 +22,7 @@ def run_job(server_pipeline, task_log):
 
 class TaskDetails(APIView):
     def post(self, request):
+
         serializeobj = TaskSerializer(data=request.data)
         if serializeobj.is_valid():
             serializeobj.save()
