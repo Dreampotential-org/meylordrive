@@ -30,5 +30,5 @@ class Command(BaseCommand):
                 'repo': "git@github.com:aaronorosen/django-zillow.git",
 
             }
-            req = requests.post("http://localhost:8000/tasks/", json=params)
+            req = requests.post("https://meylorci-api.dreampotential.org/tasks/", json=params)
             print(req.json())
