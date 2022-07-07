@@ -17,6 +17,11 @@ def run_job(server, task):
 
 def run_task(server, task, task_log):
     print("Run job server: %s %s" % (server.username, server.ip_address))
+
+    # how to run automatic
+    # os.system("eval `ssh-agent -s`")
+    # os.system("ssh-add")
+    # os.system("ssh-add server-key")
     get_repo(make_ssh(server), task.repo, task)
     run_log_ssh_task(make_ssh(server), server,
                      task, task_log, task.repo)
@@ -152,6 +157,8 @@ def configure_node(server):
 
     ssh.connect(server.ip_address, username=server.username)
     fingerprint_node(ssh, server)
+
+    # XXX make configurable for customer account or remove just for us.
     command = ("scp server-key %s@%s:~/"
                % (server.username, server.ip_address))
     os.system(command)

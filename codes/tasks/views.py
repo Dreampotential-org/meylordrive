@@ -22,7 +22,10 @@ def run_job(server_pipeline, task_log):
 
 class TaskDetails(APIView):
     def post(self, request):
-        request.data["meta"] = json.dumps(request.data["meta"])
+        try:
+            request.data["meta"] = json.dumps(request.data["meta"])
+        except KeyError:
+            pass
         serializeobj = TaskSerializer(data=request.data)
         if serializeobj.is_valid():
             serializeobj.save()

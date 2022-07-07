@@ -9,6 +9,20 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
+        command = 'gmaps'
+        params = {
+            'command': "sudo su -c 'export COMMAND=\"%s\";  bash scripts/batch.sh'" % command,
+            'repo': "git@github.com:aaronorosen/django-zillow.git",
+
+        }
+        print(params)
+        req = requests.post(
+            "https://meylorci-api.dreampotential.org/tasks/", json=params)
+        print(req.json())
+
+        return
+
+
         commands = [
             "king_tax",
             "sonoma_tax",
@@ -25,6 +39,7 @@ class Command(BaseCommand):
             "san_francisco_tax",
         ]
         for command in commands:
+            # todo add meta input here to params
             params = {
                 'command': "sudo su -c 'export COMMAND=\"%s\";  bash scripts/batch.sh'" % command,
                 'repo': "git@github.com:aaronorosen/django-zillow.git",
