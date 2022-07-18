@@ -53,6 +53,7 @@ class GithubHookDetails(APIView):
                 task_log.task = pipeline.task
                 task_log.file_log = f"./logs/{task_log.id}.txt"
                 task_log.save()
+                # do this in the background
                 t = threading.Thread(
                     target=run_job, args=(pipeline_server, task_log))
                 t.start()
@@ -60,4 +61,8 @@ class GithubHookDetails(APIView):
             for t in threads:
                 t.join()
             return Response(serializeobj.data, status=status.HTTP_201_CREATED)
-        return Response({"message": json.dumps(serializeobj.errors)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": json.dumps(serializeobj.errors)},
+                         status=status.HTTP_400_BAD_REQUEST)
+
+
+# XXX How to add new SErver trigger server import fingerprint
