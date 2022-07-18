@@ -51,7 +51,12 @@ def run_log_ssh_command(ssh, command, task_log=None):
     exit_status = stdout.channel.recv_exit_status()          # Blocking call
     stderr.channel.recv_exit_status()
     print("Exit status: %s" % exit_status)
+
+    # How to implement and interface
+    #  XXX https://github.com/mthenw/frontail
+
     if task_log:
+        # XXX someone needs to autocreate logs dir if not here..
         fileOut = open(f"./logs/{'out_'+str(task_log.id)}.txt", "a")
         fileErr = open(f"./logs/{'err_'+str(task_log.id)}.txt", "a")
     print("STARTING OF LOOP")
