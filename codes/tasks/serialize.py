@@ -1,7 +1,5 @@
-from django.db.models import fields
 from rest_framework import serializers
-from tasks.models import Task
-from tasks.models import GithubHook
+from tasks.models import (Task, TaskLog, GithubHook, Server, Pipeline, PipelineServer)
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -10,7 +8,31 @@ class TaskSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class TaskLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TaskLog
+        fields = "__all__"
+
+
 class GithubHookSerializer(serializers.ModelSerializer):
     class Meta:
         model = GithubHook
         fields = "__all__"
+
+
+class ServerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Server
+        fields = "__all__"
+
+
+class PipelineSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pipeline
+        fields = '__all__'
+
+
+class PipelineServerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PipelineServer
+        fields = '__all__'

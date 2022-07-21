@@ -65,7 +65,6 @@ MIDDLEWARE = [
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = False
-ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'web.urls'
@@ -183,3 +182,5 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 APPEND_SLASH = False
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
