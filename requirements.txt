@@ -30,3 +30,5 @@ zope.interface==5.4.0
 gunicorn==20.1.0
 tzdata==2022.1
 requests
+django-jsonfield-1.4.1
+

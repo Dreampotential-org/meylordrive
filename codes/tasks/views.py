@@ -139,7 +139,7 @@ class PipelineDetailView(generics.GenericAPIView):
 
     def put(self, request, *args, **kwargs):
         if kwargs.get("pk"):
-            pipeline = Pipeline.objects.get("pk")
+            pipeline = Pipeline.objects.get(id=kwargs.get('pk'))
             serialized = self.get_serializer(pipeline, data=request.data)
             if serialized.is_valid():
                 serialized.save()
@@ -193,7 +193,7 @@ class PipelineServerDetailsView(generics.GenericAPIView):
 
     def put(self, request, *args, **kwargs):
         if kwargs.get("pk"):
-            pipeline_server = PipelineServer.objects.get("pk")
+            pipeline_server = PipelineServer.objects.get(id=kwargs.get("pk"))
             serialized = self.get_serializer(pipeline_server, data=request.data)
             if serialized.is_valid():
                 serialized.save()
