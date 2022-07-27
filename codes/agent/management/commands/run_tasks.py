@@ -160,7 +160,15 @@ def configure_node(server):
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())
 
-    ssh.connect(server.ip_address, username=server.username)
+    try:
+        ssh.connect(server.ip_address, username=server.username)
+    except paramiko.ssh_exception.NoValidConnectionsError:
+        server.error = True
+        server.save()
+        return
+
+    server.error = True
+    server.save()
     fingerprint_node(ssh, server)
 
     # XXX make configurable for customer account or remove just for us.
