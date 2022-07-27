@@ -5,6 +5,8 @@ from django.contrib.auth import get_user_model
 
 
 class Task(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None)
     unique = True
     status = models.CharField(max_length=64, blank=True, null=True)
     command = models.CharField(max_length=4096, blank=True, null=True)
@@ -51,6 +53,8 @@ class SystemSpecs(models.Model):
 
 
 class Server(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None)
     system_specs = models.ForeignKey(SystemSpecs, on_delete=models.CASCADE,
                                      blank=True, null=True)
     ip_address = models.CharField(max_length=64)
@@ -70,6 +74,8 @@ class KeyPair(models.Model):
 
 
 class ServerUserKey(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None)
     server = models.ForeignKey(Server, on_delete=models.CASCADE,
                                blank=True, null=True)
     keypair = models.ForeignKey(KeyPair, on_delete=models.CASCADE,
@@ -77,6 +83,8 @@ class ServerUserKey(models.Model):
 
 
 class Pipeline(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None)
     name = models.CharField(max_length=4096, blank=True, null=True)
     description = models.TextField(blank=True, null=True, default="")
     repo = models.CharField(max_length=4096)
@@ -104,6 +112,8 @@ class GithubHook(models.Model):
     error = models.BooleanField(default=False)
     pipeline = models.ForeignKey(Pipeline, on_delete=models.CASCADE,
                                  blank=True, null=True)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None)
 
     def __str__(self):
         return self.repo or ''
