@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+
 # from jsonfield import JSONField
 
 
@@ -79,7 +80,8 @@ class Pipeline(models.Model):
     name = models.CharField(max_length=4096, blank=True, null=True)
     description = models.TextField(blank=True, null=True, default="")
     repo = models.CharField(max_length=4096)
-    environment_variable = models.JSONField(blank=True, null=True, default=dict)
+    environment_variable = models.JSONField(blank=True, null=True,
+                                            default=dict)
     task = models.ForeignKey(Task, on_delete=models.CASCADE,
                              blank=True, null=True)
     status = models.CharField(max_length=64, blank=True, null=True)
