@@ -1,5 +1,7 @@
 from django.db import models
+from knox.auth import get_user_model
 # from jsonfield import JSONField
+
 
 class Task(models.Model):
     unique = True
@@ -60,11 +62,24 @@ class Server(models.Model):
     in_use = models.BooleanField(default=False)
 
 
+class KeyPair(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None)
+    value = models.TextField()
+
+
+class ServerUserKey(models.Model):
+    server = models.ForeignKey(Server, on_delete=models.CASCADE,
+                               blank=True, null=True)
+    keypair = models.ForeignKey(KeyPair, on_delete=models.CASCADE,
+                                blank=True, null=True)
+
+
 class Pipeline(models.Model):
     name = models.CharField(max_length=4096, blank=True, null=True)
-    description = models.TextField(blank=True, null=True,default="")
+    description = models.TextField(blank=True, null=True, default="")
     repo = models.CharField(max_length=4096)
-    environment_variable = models.JSONField(blank=True, null=True,default=dict)
+    environment_variable = models.JSONField(blank=True, null=True, default=dict)
     task = models.ForeignKey(Task, on_delete=models.CASCADE,
                              blank=True, null=True)
     status = models.CharField(max_length=64, blank=True, null=True)
