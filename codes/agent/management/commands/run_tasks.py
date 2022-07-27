@@ -147,27 +147,29 @@ def make_ssh(server):
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())
     sshkey = "/opt/server-key"
-    if os.path.exists(sshkey):
-        ssh.connect(server.ip_address, username=server.username,
-                    key_filename=sshkey)
-    else:
-        ssh.connect(server.ip_address, username=server.username)
-    return ssh
-
-
-def configure_node(server):
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())
 
     try:
-        ssh.connect(server.ip_address, username=server.username)
+        if os.path.exists(sshkey):
+            ssh.connect(server.ip_address, username=server.username,
+                        key_filename=sshkey)
+        else:
+            ssh.connect(server.ip_address, username=server.username)
     except paramiko.ssh_exception.NoValidConnectionsError:
         server.error = True
         server.save()
         return
+    return ssh
 
-    server.error = True
+
+def configure_node(server):
+    ssh = make_ssh(server)
+    if not ssh:
+        print("Not able to make ssh on %s" % server.ip_address)
+        return
+
+    # we get to this point with server it means we are able to
+    # connect to it via ssh and can clear server error.
+    server.error = False
     server.save()
     fingerprint_node(ssh, server)
 
