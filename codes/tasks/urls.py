@@ -15,5 +15,9 @@ urlpatterns = [
     path('api/pipeline/',views.PipelineView.as_view(),name='pipeline'),
     path('api/pipeline/<int:pk>/',views.PipelineDetailView.as_view(),name='pipeline'),
     path('api/pipeline-server/', views.PipelineServerView.as_view(), name='pipeline-server'),
-    path('api/pipeline-server/<int:pk>/', views.PipelineServerDetailsView.as_view(), name='pipeline-server')
+    path('api/pipeline-server/<int:pk>/', views.PipelineServerDetailsView.as_view(), name='pipeline-server'),
+    path('api/key-pair/',views.KeyPairView.as_view(), name='key-pair'),
+    path('api/key-pair/<int:pk>/',views.KeyPairViewDetailView.as_view(), name='key-pair'),
+    path('api/server-user-key/',views.ServerUserKeyView.as_view(), name='server-user-key'),
+    path('api/server-user-key/<int:pk>/',views.ServerUserKeyDetailView.as_view(), name='server-user-key'),
 ]

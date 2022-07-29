@@ -9,7 +9,16 @@ import json
 import threading
 
 from agent.management.commands import run_tasks
-from tasks.models import Task, TaskLog, GithubHook, Server, Pipeline, PipelineServer
+from tasks.models import (
+    Task,
+    TaskLog,
+    GithubHook,
+    Server,
+    Pipeline,
+    PipelineServer,
+    KeyPair,
+    ServerUserKey,
+)
 from tasks.serialize import (
     TaskSerializer,
     TaskLogSerializer,
@@ -17,6 +26,8 @@ from tasks.serialize import (
     ServerSerializer,
     PipelineSerializer,
     PipelineServerSerializer,
+    KeyPairSerializer,
+    ServerUserKeySerializer,
 )
 
 
@@ -139,7 +150,7 @@ class PipelineDetailView(generics.GenericAPIView):
 
     def put(self, request, *args, **kwargs):
         if kwargs.get("pk"):
-            pipeline = Pipeline.objects.get(id=kwargs.get('pk'))
+            pipeline = Pipeline.objects.get(id=kwargs.get("pk"))
             serialized = self.get_serializer(pipeline, data=request.data)
             if serialized.is_valid():
                 serialized.save()
@@ -205,5 +216,105 @@ class PipelineServerDetailsView(generics.GenericAPIView):
         if kwargs.get("pk"):
             pipeline_server = PipelineServer.objects.get(id=kwargs.get("pk"))
             pipeline_server.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class KeyPairView(generics.GenericAPIView):
+    serializer_class = KeyPairSerializer
+    queryset = KeyPair.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        serialized = self.get_serializer(self.get_queryset(), many=True)
+        return Response(serialized.data, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        serialized_data = self.get_serializer(data=request.data)
+        if serialized_data.is_valid():
+            serialized_data.save()
+            return Response(serialized_data.data, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class KeyPairViewDetailView(generics.GenericAPIView):
+    serializer_class = KeyPairSerializer
+
+    def get_queryset(self):
+        return KeyPair.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        if kwargs.get("pk"):
+            try:
+                key_pair = KeyPair.objects.get(id=kwargs.get("pk"))
+                serialized = self.get_serializer(key_pair)
+                return Response(serialized.data, status=status.HTTP_200_OK)
+            except Pipeline.DoesNotExist:
+                return Response("Key pair Not Found", status=status.HTTP_404_NOT_FOUND)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def put(self, request, *args, **kwargs):
+        if kwargs.get("pk"):
+            key_pair = KeyPair.objects.get(id=kwargs.get("pk"))
+            serialized = self.get_serializer(key_pair, data=request.data)
+            if serialized.is_valid():
+                serialized.save()
+                return Response(serialized.data)
+            return Response(serialized.errors)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def delete(self, request, *args, **kwargs):
+        if kwargs.get("pk"):
+            key_pair = KeyPair.objects.get(id=kwargs.get("pk"))
+            key_pair.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class ServerUserKeyView(generics.GenericAPIView):
+    serializer_class = ServerUserKeySerializer
+    queryset = ServerUserKey.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        serialized = self.get_serializer(self.get_queryset(), many=True)
+        return Response(serialized.data, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        serialized_data = self.get_serializer(data=request.data)
+        if serialized_data.is_valid():
+            serialized_data.save()
+            return Response(serialized_data.data, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class ServerUserKeyDetailView(generics.GenericAPIView):
+    serializer_class = ServerUserKeySerializer
+
+    def get_queryset(self):
+        return ServerUserKey.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        if kwargs.get("pk"):
+            try:
+                server_user_key = ServerUserKey.objects.get(id=kwargs.get("pk"))
+                serialized = self.get_serializer(server_user_key)
+                return Response(serialized.data, status=status.HTTP_200_OK)
+            except Pipeline.DoesNotExist:
+                return Response("ServerUserKey Not Found", status=status.HTTP_404_NOT_FOUND)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def put(self, request, *args, **kwargs):
+        if kwargs.get("pk"):
+            server_user_key = ServerUserKey.objects.get(id=kwargs.get("pk"))
+            serialized = self.get_serializer(server_user_key, data=request.data)
+            if serialized.is_valid():
+                serialized.save()
+                return Response(serialized.data)
+            return Response(serialized.errors)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def delete(self, request, *args, **kwargs):
+        if kwargs.get("pk"):
+            server_user_key = ServerUserKey.objects.get(id=kwargs.get("pk"))
+            server_user_key.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
