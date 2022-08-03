@@ -33,6 +33,8 @@ class PipelineSerializer(serializers.ModelSerializer):
 
 
 class PipelineServerSerializer(serializers.ModelSerializer):
+  key_pair = serializers.JSONField()
+
   class Meta:
     model = PipelineServer
     fields = '__all__'
