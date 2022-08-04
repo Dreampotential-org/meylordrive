@@ -15,7 +15,7 @@ urlpatterns = [
     path('api/githubhoook/<int:id>/', views.GithubHookDetails.as_view()),
     path('', include(router.urls)),
     path('api/server/',views.ServerView.as_view(),name='server'),
-    path('api/server/<int:pk>',views.ServerDetailView.as_view(),name='server'),
+    path('api/server/<int:pk>/',views.ServerDetailView.as_view(),name='server'),
     path('api/pipeline/',views.PipelineView.as_view(),name='pipeline'),
     path('api/pipeline/<int:pk>/',views.PipelineDetailView.as_view(),name='pipeline'),
     path('api/pipeline-server/', views.PipelineServerView.as_view(), name='pipeline-server'),
