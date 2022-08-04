@@ -5,11 +5,13 @@ from . import views
 
 router = DefaultRouter()
 router.register(r'task-log', views.TaskLogView, basename="task-log")
+
 # router.register(r'server', views.ServerView, basename='server')
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
     path('tasks/', views.TaskDetails.as_view()),
+    path('tasks/<int:pk>/', views.TaskView.as_view()),
     path('api/githubhoook/<int:id>/', views.GithubHookDetails.as_view()),
     path('', include(router.urls)),
     path('api/server/',views.ServerView.as_view(),name='server'),
