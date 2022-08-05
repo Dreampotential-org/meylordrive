@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
+
 # from jsonfield import JSONField
 
 
@@ -77,9 +78,9 @@ class ServerUserKey(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
                              null=True, blank=True, default=None)
     server = models.ForeignKey(Server, on_delete=models.CASCADE,
-                               blank=True, null=True)
+                               blank=True, null=True,default=None)
     keypair = models.ForeignKey(KeyPair, on_delete=models.CASCADE,
-                                blank=True, null=True)
+                                blank=True, null=True,default=None)
 
 
 class Pipeline(models.Model):
