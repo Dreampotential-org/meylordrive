@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from tasks.models import (Task, TaskLog, GithubHook, Server, Pipeline, PipelineServer, KeyPair, ServerUserKey)
+from tasks.models import (Task, TaskLog, Server, Pipeline, PipelineServer, KeyPair, ServerUserKey)
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -11,12 +11,6 @@ class TaskSerializer(serializers.ModelSerializer):
 class TaskLogSerializer(serializers.ModelSerializer):
   class Meta:
     model = TaskLog
-    fields = "__all__"
-
-
-class GithubHookSerializer(serializers.ModelSerializer):
-  class Meta:
-    model = GithubHook
     fields = "__all__"
 
 
