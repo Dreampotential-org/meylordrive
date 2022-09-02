@@ -107,3 +107,14 @@ class PipelineServer(models.Model):
 
     class Meta:
         unique_together = ('pipeline', 'server')
+
+
+class GithubHook(models.Model):
+    error = models.BooleanField(default=False)
+    pipeline = models.ForeignKey(Pipeline, on_delete=models.CASCADE,
+                                 blank=True, null=True)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None)
+
+    def __str__(self):
+        return self.repo or ''

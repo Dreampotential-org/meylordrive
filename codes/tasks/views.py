@@ -16,6 +16,7 @@ from agent.management.commands import run_tasks
 from tasks.models import (
   Task,
   TaskLog,
+  GithubHook,
   Server,
   Pipeline,
   PipelineServer,
@@ -26,6 +27,7 @@ from tasks.models import (
 from tasks.serialize import (
   TaskSerializer,
   TaskLogSerializer,
+  GithubHookSerializer,
   ServerSerializer,
   PipelineSerializer,
   PipelineServerSerializer,
@@ -118,30 +120,31 @@ class TaskLogView(ModelViewSet):
     return TaskLog.objects.all()
 
 
-# class GithubHookDetails(APIView):
-#  def post(self, request, id):
-#    req = {"repo": str(request.data)}
-#    serializeobj = GithubHookSerializer(data=req)
-#    threads = []
-#    if serializeobj.is_valid():
-#      serializeobj.save()
-#      pipeline = Pipeline.objects.get(id=id)
-#      pipelines_servers = PipelineServer.objects.filter(pipeline=pipeline)
-#      for pipeline_server in pipelines_servers:
-#        task_log = TaskLog()
-#        task_log.task = pipeline.task
-#        task_log.file_log = f"./logs/{task_log.id}.txt"
-#        task_log.save()
-#        t = threading.Thread(target=run_job, args=(pipeline_server, task_log))
-#        t.start()
-#        threads.append(t)
-#      for t in threads:
-#        t.join()
-#      return Response(serializeobj.data, status=status.HTTP_201_CREATED)
-#    return Response(
-#      {"message": json.dumps(serializeobj.errors)},
-#      status=status.HTTP_400_BAD_REQUEST,
-#    )
+class GithubHookDetails(APIView):
+  def post(self, request, id):
+    req = {"repo": str(request.data)}
+    serializeobj = GithubHookSerializer(data=req)
+    threads = []
+    if serializeobj.is_valid():
+      serializeobj.save()
+      pipeline = Pipeline.objects.get(id=id)
+      pipelines_servers = PipelineServer.objects.filter(pipeline=pipeline)
+      for pipeline_server in pipelines_servers:
+        task_log = TaskLog()
+        task_log.task = pipeline.task
+        task_log.file_log = f"./logs/{task_log.id}.txt"
+        task_log.save()
+        t = threading.Thread(target=run_job, args=(pipeline_server, task_log))
+        t.start()
+        threads.append(t)
+      for t in threads:
+        t.join()
+      return Response(serializeobj.data, status=status.HTTP_201_CREATED)
+    return Response(
+      {"message": json.dumps(serializeobj.errors)},
+      status=status.HTTP_400_BAD_REQUEST,
+    )
+
 
 class ServerView(generics.GenericAPIView):
   """Task log  Api ViewSet."""

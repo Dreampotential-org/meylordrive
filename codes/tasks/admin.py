@@ -1,10 +1,15 @@
 from django.contrib import admin
+from tasks.models import GithubHook
 from tasks.models import Task
 from tasks.models import Pipeline
 from tasks.models import TaskLog
 from tasks.models import PipelineServer
 from tasks.models import SystemSpecs
 from tasks.models import Server
+
+
+class GitHubAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in GithubHook._meta.get_fields()]
 
 
 class TaskAdmin(admin.ModelAdmin):
@@ -41,3 +46,4 @@ admin.site.register(SystemSpecs, SystemSpecsAdmin)
 admin.site.register(TaskLog, TaskLogAdmin)
 admin.site.register(Pipeline, PipelineAdmin)
 admin.site.register(Task, TaskAdmin)
+admin.site.register(GithubHook, GitHubAdmin)
