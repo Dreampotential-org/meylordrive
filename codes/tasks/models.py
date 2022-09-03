@@ -17,6 +17,9 @@ class Task(models.Model):
     repo = models.CharField(max_length=4096, null=True, blank=True)
     name = models.CharField(max_length=4096, null=True, blank=True)
     meta = models.TextField(null=True, blank=True)
+    description = models.TextField(blank=True, null=True, default="")
+    environment_variable = models.JSONField(blank=True, null=True,
+                                            default=dict)
 
 
 class TaskLog(models.Model):
@@ -78,43 +81,16 @@ class ServerUserKey(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
                              null=True, blank=True, default=None)
     server = models.ForeignKey(Server, on_delete=models.CASCADE,
-                               blank=True, null=True,default=None)
+                               blank=True, null=True, default=None)
     keypair = models.ForeignKey(KeyPair, on_delete=models.CASCADE,
-                                blank=True, null=True,default=None)
+                                blank=True, null=True, default=None)
 
 
-class Pipeline(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
-                             null=True, blank=True, default=None)
-    name = models.CharField(max_length=4096, blank=True, null=True)
-    description = models.TextField(blank=True, null=True, default="")
-    repo = models.CharField(max_length=4096)
-    environment_variable = models.JSONField(blank=True, null=True,
-                                            default=dict)
+class TaskServer(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE,
                              blank=True, null=True)
-    status = models.CharField(max_length=64, blank=True, null=True)
-
-    def __str__(self):
-        return str(self.repo) or ''
-
-
-class PipelineServer(models.Model):
-    pipeline = models.ForeignKey(Pipeline, on_delete=models.CASCADE,
-                                 blank=True, null=True)
     server = models.ForeignKey(Server, on_delete=models.CASCADE,
                                blank=True, null=True)
 
     class Meta:
-        unique_together = ('pipeline', 'server')
-
-
-class GithubHook(models.Model):
-    error = models.BooleanField(default=False)
-    pipeline = models.ForeignKey(Pipeline, on_delete=models.CASCADE,
-                                 blank=True, null=True)
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
-                             null=True, blank=True, default=None)
-
-    def __str__(self):
-        return self.repo or ''
+        unique_together = ('task', 'server')
