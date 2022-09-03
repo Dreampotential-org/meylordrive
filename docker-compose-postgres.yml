@@ -4,7 +4,7 @@ services:
     db:
         image: postgis/postgis
         ports:
-            - 5434:5432
+            - 5775:5432
         volumes:
             - ../postgres-meylorCI:/var/lib/postgresql/data
         environment:
