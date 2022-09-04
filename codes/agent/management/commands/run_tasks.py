@@ -7,11 +7,14 @@ from datetime import datetime
 server_prints = {}
 
 
-def run_job(server, task):
-    return
+def configure_server(server, task):
     print("Run job server: %s %s" % (server.username, server.ip_address))
     finger_print = configure_node(server)
-    run_log_ssh_command(make_ssh(server), "sudo bash kill-docker.sh")
+    # XXX this kills all containers on host so need to exclude containers
+    # required for service to work.
+
+    # XXX clear nodes to clean state.
+    # run_log_ssh_command(make_ssh(server), "sudo bash kill-docker.sh")
     return finger_print
 
 
@@ -54,6 +57,10 @@ def run_log_ssh_command(ssh, command, task_log=None):
 
     # How to implement and interface
     #  XXX https://github.com/mthenw/frontail
+
+    path = 'logs'
+    if not os.path.exists(path):
+        os.makedirs(path)
 
     if task_log:
         # XXX someone needs to autocreate logs dir if not here..
@@ -145,7 +152,7 @@ def fingerprint_node(ssh, server):
 def make_ssh(server):
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.set_missing_host_key_policy(paramiko.MissingHostKeyPolicy())
+
     sshkey = "/opt/server-key"
 
     try:
@@ -196,21 +203,21 @@ def populate_system_specs(server, system_spec):
     server.system_specs.threads_per_core = system_spec['Thread(s) per core']
     server.system_specs.cores_per_socket = system_spec['Core(s) per socket']
     server.system_specs.sockets = system_spec['Socket(s)']
-    server.system_specs.numa_nodes = system_spec['NUMA node(s)']
+    server.system_specs.numa_nodes = system_spec.get('NUMA node(s)', 0)
     server.system_specs.vendor_id = system_spec['Vendor ID']
     server.system_specs.cpu_family = system_spec['CPU family']
     server.system_specs.model = system_spec['Model']
     server.system_specs.model_name = system_spec['Model name']
     server.system_specs.stepping = system_spec['Stepping']
-    server.system_specs.cpu_mhz = system_spec['CPU MHz']
+    server.system_specs.cpu_mhz = system_spec.get('CPU MHz', 0)
     server.system_specs.bogo_mips = system_spec['BogoMIPS']
     server.system_specs.hypervisor_vendor = system_spec['Hypervisor vendor']
     server.system_specs.virtualization_type = system_spec.get(
         'Virtualization Type')
     server.system_specs.l1d_cache = system_spec['L1d cache']
     server.system_specs.l1i_cache = system_spec['L1i cache']
-    server.system_specs.l2_cache = system_spec['L2 cache']
-    server.system_specs.l3_cache = system_spec['L3 cache']
+    server.system_specs.l2_cache = system_spec.get('L2 cache', 0)
+    server.system_specs.l3_cache = system_spec.get('L3 cache', 0)
     server.system_specs.total_memory = system_spec['total_memory']
     server.system_specs.save()
     server.save()
@@ -251,7 +258,7 @@ class Command(BaseCommand):
         servers = Server.objects.filter()
         for server in servers:
             task = Task()
-            t = threading.Thread(target=run_job, args=(server, task))
+            t = threading.Thread(target=configure_server, args=(server, task))
             t.start()
             threads.append(t)
 
