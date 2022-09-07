@@ -7,12 +7,12 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
+from agent.management.commands.run_tasks import run_task
 # from django.contrib.auth.models import User
 
 import json
 import threading
 
-from agent.management.commands import run_tasks
 from tasks.models import (
   Task,
   TaskLog,
@@ -31,22 +31,6 @@ from tasks.serialize import (
 )
 
 from .extra_serializer.server_serializer import ServerCallSerializer
-
-
-def run_job(server_pipeline, task_log):
-    ssh = run_tasks.make_ssh(server_pipeline.server)
-    print(
-        "Run job server: %s %s"
-        % (server_pipeline.server.username, server_pipeline.server.ip_address)
-    )
-    run_tasks.get_repo(ssh, server_pipeline.pipeline.repo, task_log)
-    run_tasks.run_log_ssh_task(
-        ssh,
-        server_pipeline.server,
-        server_pipeline.pipeline.task,
-        task_log,
-        server_pipeline.pipeline.repo,
-      )
 
 
 class TaskDetails(APIView):
@@ -118,18 +102,26 @@ class TaskLogView(ModelViewSet):
 
 
 class TaskTrigger(APIView):
-    def post(self, request, id):
 
+
+    def post(self, request, id):
+        # here is where we trigger the tasks.
         threads = []
+        # look up the tas
         task = Task.objects.get(id=id)
+        print("We have a task %s" % task)
+        # get list of servers that are mapped to task
         task_servers = TaskServer.objects.filter(task=task)
+        print("Here are the task servers: %s" % task_servers)
         for task_server in task_servers:
+
+            # XXX create helper heutl 
             task_log = TaskLog()
             task_log.task = task
             task_log.file_log = f"./logs/{task_log.id}.txt"
             task_log.save()
-            t = threading.Thread(target=run_job,
-                                 args=(task_server, task_log))
+            t = threading.Thread(target=run_task,
+                                 args=(task_server.server, task, task_log))
             t.start()
             threads.append(t)
 

@@ -19,6 +19,7 @@ def configure_server(server, task):
 
 
 def run_task(server, task, task_log):
+    print(server)
     print("Run job server: %s %s" % (server.username, server.ip_address))
 
     # how to run automatic
