@@ -8,34 +8,31 @@ from tasks.models import KeyPair, ServerUserKey
 
 
 class TaskAdmin(admin.ModelAdmin):
-    pass
-    #list_display = [field.name for field in Task._meta.get_fields()]
+    list_display = ("name", "status", "repo",)
 
 
 class TaskLogAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in TaskLog._meta.get_fields()]
+    pass
 
 
 class TaskServerAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in TaskServer._meta.get_fields()]
+    pass
 
 
 class SystemSpecsAdmin(admin.ModelAdmin):
-    # list_display = [field.name for field in SystemSpecs._meta.get_fields()]
     pass
 
 
 class ServerAdmin(admin.ModelAdmin):
-    #list_display = [field.name for field in Server._meta.get_fields()]
-    pass
+    list_display = ("name", "ip_address", "alive",)
 
 
 class KeyPairAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in TaskLog._meta.get_fields()]
+    pass
 
 
 class ServerUserKeyAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in TaskLog._meta.get_fields()]
+    pass
 
 
 admin.site.register(TaskServer, TaskServerAdmin)
