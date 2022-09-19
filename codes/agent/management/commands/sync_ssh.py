@@ -16,21 +16,21 @@ class Command(BaseCommand):
         # get a list of servers
         servers = Server.objects.filter().exclude(system_specs=None)
 
-        # get list of keypairs
-        keypairs = KeyPair.objects.filter()
-        authorized_keys = ""
-        for keypair in keypairs:
-            authorized_keys += keypair.value
-
-        f = open("demofile", "w")
-        f.write(authorized_keys)
-        f.close()
-
         for server in servers:
-            # here we need to write authorized_key file to server
-            # then scp to server
+            server_user_keys = ServerUserKey.objects.filter(
+                server=server)
+
+            # get list of keypairs
+            authorized_keys = ""
+            for server_user_key in server_user_keys:
+                authorized_keys += keypair.value
+
+            f = open("demofile", "w")
+            f.write(authorized_keys)
+            f.close()
 
             finger_print = configure_node(server)
+            # XXX how to do amerge or apend
             command = ("scp demofile %s@%s:~/.ssh/authorized_keys"
                        % (server.username, server.ip_address))
             print(command)

@@ -8,6 +8,7 @@ class TasksConfig(AppConfig):
     verbose_name = "My Application"
 
     def ready(self):
+        return
         os.system("eval `ssh-agent -s`")
         os.system("chmod 600 /opt/server-key")
         time.sleep(5)
