@@ -21,6 +21,9 @@ class Task(models.Model):
     environment_variable = models.JSONField(blank=True, null=True,
                                             default=dict)
 
+    def __str__(self):
+        return self.name
+
 
 class TaskLog(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE,)
@@ -55,6 +58,11 @@ class SystemSpecs(models.Model):
     l3_cache = models.CharField(max_length=100)
     total_memory = models.IntegerField(blank=True, null=True)
 
+    def ___str__(self):
+        return str(self.model_name)
+    
+
+
 
 class Server(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
@@ -70,11 +78,19 @@ class Server(models.Model):
     alive = models.BooleanField(default=False)
     in_use = models.BooleanField(default=False)
 
+    def __str__(self):
+        return str(self.name)
+
+
+
 
 class KeyPair(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
                              null=True, blank=True, default=None)
     value = models.TextField()
+
+    def __str__(self):
+        return str(self.user)
 
 
 class ServerUserKey(models.Model):
@@ -83,7 +99,17 @@ class ServerUserKey(models.Model):
     server = models.ForeignKey(Server, on_delete=models.CASCADE,
                                blank=True, null=True, default=None)
     keypair = models.ForeignKey(KeyPair, on_delete=models.CASCADE,
-                                blank=True, null=True, default=None)
+                                blank=True, null=True, default=None)  
+    def __str__(self):
+        return f"{self.user},  {self.server},  {self.keypair}"
+
+class ServerGroup(models.Model):
+    name = models.CharField(max_length=100)
+    users = models.ManyToManyField(get_user_model())
+    servers = models.ManyToManyField(Server)
+        
+    def __str__(self):
+        return str(self.name)
 
 
 class TaskServer(models.Model):
