@@ -6,5 +6,5 @@ services:
         volumes:
             - ./codes:/home/web/codes
         ports:
-            - 8100:8000
+            - 8021:8000
         command: bash -c "/usr/local/bin/gunicorn --bind :8000 --timeout 999 --workers 8 --env DJANGO_SETTINGS_MODULE=web.settings  web.wsgi:application"

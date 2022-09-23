@@ -13,11 +13,11 @@ COPY ./requirements.txt /tmp/requirements.txt
 RUN pip3 install -r /tmp/requirements.txt
 
 COPY entrypoint.sh /entrypoint.sh
-RUN eval `ssh-agent -s`
-RUN ssh-add
-RUN ssh-add /opt/server-key
-RUN chmod 600 /opt/server-key
-RUN chown ubuntu:ubuntu /opt/server-key
+# RUN eval `ssh-agent -s`
+# RUN ssh-add
+# RUN ssh-add /opt/server-key
+# RUN chmod 600 /opt/server-key
+# RUN chown ubuntu:ubuntu /opt/server-key
 
 
 WORKDIR /home/web/codes
