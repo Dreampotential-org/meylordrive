@@ -50,15 +50,14 @@ def get_repo(ssh, repo, task_log):
 
 
 def run_log_ssh_command(ssh, command, task_log=None):
-    print("COMMAND[%s]" % command)
-    stdin, stdout, stderr = ssh.exec_command(command)
-    exit_status = stdout.channel.recv_exit_status()          # Blocking call
+    print("COMMAND[%s]" % (command))
+    stdin, stdout, stderr = ssh.exec_command(
+        command)
+    exit_status = stdout.channel.recv_exit_status()  # Blocking call
     stderr.channel.recv_exit_status()
     print("Exit status: %s" % exit_status)
 
-    # How to implement and interface
     #  XXX https://github.com/mthenw/frontail
-
     path = 'logs'
     if not os.path.exists(path):
         os.makedirs(path)
@@ -104,7 +103,8 @@ def run_log_ssh_task(ssh, server, task, task_log, repo):
     fileErr = open(f"./logs/{'err_'+str(task_log.id)}.txt", "a")
     repo_dir = repo.rsplit("/", 1)[1].split(".git")[0]
     stdin, stdout, stderr = ssh.exec_command(
-        "cd %s && %s" % (repo_dir, task.command), get_pty=True)
+        "cd %s && %s" % (repo_dir, task.command), get_pty=True,
+        environment=task.environment_variable)
     while True:
         v = stdout.channel.recv(1024)
         if not v:
