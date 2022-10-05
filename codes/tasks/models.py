@@ -120,3 +120,9 @@ class TaskServer(models.Model):
 
     class Meta:
         unique_together = ('task', 'server')
+
+
+class Domain(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None)
+    name = models.TextField()

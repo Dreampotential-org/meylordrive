@@ -181,10 +181,11 @@ def configure_node(server):
     server.save()
     fingerprint_node(ssh, server)
 
+    # XXX think about...
     # XXX make configurable for customer account or remove just for us.
-    command = ("scp server-key %s@%s:~/"
-               % (server.username, server.ip_address))
-    os.system(command)
+    # command = ("scp server-key %s@%s:~/"
+    #            % (server.username, server.ip_address))
+    # os.system(command)
 
     command = ("scp kill-docker.sh %s@%s:~/"
                % (server.username, server.ip_address))
