@@ -96,8 +96,10 @@ class ServerUserKey(models.Model):
                                blank=True, null=True, default=None)
     keypair = models.ForeignKey(KeyPair, on_delete=models.CASCADE,
                                 blank=True, null=True, default=None)
+
     def __str__(self):
         return f"{self.user},  {self.server},  {self.keypair}"
+
 
 class ServerGroup(models.Model):
     name = models.CharField(max_length=100)
@@ -118,8 +120,48 @@ class TaskServer(models.Model):
         unique_together = ('task', 'server')
 
 
+class ProjectMember(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None)
+    role = models.TextField(blank=True, null=True)
+    name = models.TextField(blank=True, null=True)
+
+
+class ProjectCommand(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None)
+    cmd = models.CharField(max_length=4096, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_started_at = models.DateTimeField(blank=True, null=True)
+    last_finished_at = models.DateTimeField(blank=True, null=True)
+    repo = models.CharField(max_length=4096, null=True, blank=True)
+    name = models.CharField(max_length=4096, null=True, blank=True)
+    meta = models.TextField(null=True, blank=True)
+    description = models.TextField(blank=True, null=True, default="")
+    environment_variable = models.JSONField(blank=True, null=True,
+                                            default=dict)
+
+    def __str__(self):
+        return self.name
+
+
+class ProjectService(models.Model):
+    repo = models.CharField(max_length=4096, null=True, blank=True)
+    command = models.ForeignKey(ProjectCommand, on_delete=models.CASCADE,
+                                null=True, blank=True)
+    name = models.TextField(blank=True, null=True)
+    server_group = models.ForeignKey(ServerGroup, on_delete=models.CASCADE,
+                                    blank=True, null=True)
+
+
+
+
+
 class Domain(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
                              null=True, blank=True, default=None)
-    name = models.TextField()
-    value = models.TextField()
+    name = models.TextField(blank=True, null=True)
+    value = models.TextField(blank=True, null=True)
+    project_service = models.ForeignKey(
+        ProjectService, on_delete=models.CASCADE,
+        blank=True, null=True)

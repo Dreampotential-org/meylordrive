@@ -20,9 +20,9 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('', include("proxy_web.urls")),
     path('', include('tasks.urls')),
+    path('admin/', admin.site.urls),
     path("usersystem/",include('usersystem.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

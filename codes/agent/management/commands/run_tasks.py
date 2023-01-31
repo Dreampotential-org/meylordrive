@@ -1,4 +1,4 @@
-from tasks.models import Task, Server, SystemSpecs, TaskLog
+from tasks.models import Task, Server, SystemSpecs, TaskLog, ProjectService
 import paramiko
 import os
 from django.core.management.base import BaseCommand
@@ -16,6 +16,21 @@ def configure_server(server, task):
     # XXX clear nodes to clean state.
     # run_log_ssh_command(make_ssh(server), "sudo bash kill-docker.sh")
     return finger_print
+
+
+def run_project_command(server, project_command):
+    task_log = TaskLog()
+    task_log.save()
+    get_repo(make_ssh(server), project_command.repo, task_log)
+
+
+def start_project_service(project_service):
+
+    # get list of servers and do one at a time to start...
+
+    # start a task_log...
+    for server in project_service.server_group.servers:
+        run_project_command(server,  project_service.command)
 
 
 def run_task(server, task, task_log):
@@ -36,7 +51,7 @@ def get_repo(ssh, repo, task_log):
     if repo is None:
         return
     print(repo)
-    # run_log_ssh_command(ssh, "rm -fr %s" % repo., task_log)
+
     parsed_repo = repo.rsplit("/", 1)[1].split(".git")[0]
     response = run_log_ssh_command(
         ssh, f"cd {parsed_repo} && git pull", task_log)
@@ -68,16 +83,16 @@ def run_log_ssh_command(ssh, command, task_log=None):
         fileErr = open(f"./logs/{'err_'+str(task_log.id)}.txt", "a")
     print("STARTING OF LOOP")
     if len(stdout.read()) > 0:
-        for l in stdout.read().splitlines():
-            print(l)
+        for line in stdout.read().splitlines():
+            print(line)
             if task_log:
-                fileOut.write(str(l))
+                fileOut.write(str(line))
     print("STDERR")
     if len(stderr.read()) > 0:
-        for l in stderr.read().splitlines():
-            print(l)
+        for line in stderr.read().splitlines():
+            print(line)
             if task_log:
-                fileErr.write(str(l))
+                fileErr.write(str(line))
     # file1.write(str(l) + "\n")
     # file1.close()
     print("ENDING OF LOOP")
@@ -109,16 +124,16 @@ def run_log_ssh_task(ssh, server, task, task_log, repo):
         v = stdout.channel.recv(1024)
         if not v:
             break
-        for l in v.splitlines():
-            print(task.command, "==>", l)
-            fileOut.write(str(l) + "\n")
+        for line in v.splitlines():
+            print(task.command, "==>", line)
+            fileOut.write(str(line) + "\n")
     fileOut.close()
     stderr.channel.recv_exit_status()
     if len(stderr.read()) > 0:
         task.status = "FAILED"
-        for l in stderr.read().splitlines():
-            print(l)
-            fileErr.write(str(l), "\n")
+        for line in stderr.read().splitlines():
+            print(line)
+            fileErr.write(str(line), "\n")
     else:
         task.status = "COMPLETED"
     task.finished_at = datetime.now()
@@ -275,6 +290,12 @@ class Command(BaseCommand):
         # now we can progress tasks
         print("Running the tasks")
         # find list of status which do not have a status
+
+        project_services = ProjectService.objects.filter()
+        for project_service in project_services:
+            start_project_service(project_service)
+
+        return
 
         tasks = Task.objects.filter()
         print("Number of tasks to run: %s" % len(tasks))
