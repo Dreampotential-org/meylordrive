@@ -2,29 +2,6 @@ from django.db import models
 from django.contrib.auth import get_user_model
 
 
-# from jsonfield import JSONField
-
-
-class Task(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
-                             null=True, blank=True, default=None)
-    unique = True
-    status = models.CharField(max_length=64, blank=True, null=True)
-    command = models.CharField(max_length=4096, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    started_at = models.DateTimeField(blank=True, null=True)
-    finished_at = models.DateTimeField(blank=True, null=True)
-    repo = models.CharField(max_length=4096, null=True, blank=True)
-    name = models.CharField(max_length=4096, null=True, blank=True)
-    meta = models.TextField(null=True, blank=True)
-    description = models.TextField(blank=True, null=True, default="")
-    environment_variable = models.JSONField(blank=True, null=True,
-                                            default=dict)
-
-    def __str__(self):
-        return self.name
-
-
 class SystemSpecs(models.Model):
     architecture = models.CharField(max_length=100)
     cpu_op_modes = models.CharField(max_length=100)
@@ -101,16 +78,6 @@ class ServerGroup(models.Model):
 
     def __str__(self):
         return str(self.name)
-
-
-class TaskServer(models.Model):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE,
-                             blank=True, null=True)
-    server = models.ForeignKey(Server, on_delete=models.CASCADE,
-                               blank=True, null=True)
-
-    class Meta:
-        unique_together = ('task', 'server')
 
 
 class ProjectMember(models.Model):

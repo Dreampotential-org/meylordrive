@@ -115,7 +115,7 @@ def run_project_service(server, project_service, project_service_log):
     repo_dir = project_service.repo.rsplit("/", 1)[1].split(".git")[0]
     ssh = make_ssh(server)
 
-    print(repo_dir)
+    print("#@#$@#$ %s" % repo_dir)
 
     stdin, stdout, stderr = ssh.exec_command(
         "cd %s && %s" % (repo_dir, project_service.command.cmd), get_pty=True,
