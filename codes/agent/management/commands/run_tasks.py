@@ -1,4 +1,4 @@
-from tasks.models import Task, Server, SystemSpecs, TaskLog, ProjectService
+from tasks.models import Server, SystemSpecs, ProjectServiceLog, ProjectService
 import paramiko
 import os
 from django.core.management.base import BaseCommand
@@ -7,7 +7,7 @@ from datetime import datetime
 server_prints = {}
 
 
-def configure_server(server, task):
+def configure_server(server):
     print("Run job server: %s %s" % (server.username, server.ip_address))
     finger_print = configure_node(server)
     # XXX this kills all containers on host so need to exclude containers
@@ -19,52 +19,52 @@ def configure_server(server, task):
 
 
 def run_project_command(server, project_command):
-    task_log = TaskLog()
-    task_log.save()
-    get_repo(make_ssh(server), project_command.repo, task_log)
+    project_service_log = ProjectServiceLog()
+    # task_log.save()
+    get_repo(make_ssh(server), project_command.repo, project_service_log)
+    # think..
+    # now run project_command.command.. which creates a task.
 
 
 def start_project_service(project_service):
 
     # get list of servers and do one at a time to start...
 
+    project_service_log = ProjectServiceLog()
+
     # start a task_log...
-    for server in project_service.server_group.servers:
-        run_project_command(server,  project_service.command)
+    for server in project_service.server_group.servers.all():
+        run_project_service(server,  project_service, project_service_log)
 
 
 def run_task(server, task, task_log):
     print(server)
     print("Run job server: %s %s" % (server.username, server.ip_address))
 
-    # how to run automatic
-    # os.system("eval `ssh-agent -s`")
-    # os.system("ssh-add")
-    # os.system("ssh-add server-key")
     get_repo(make_ssh(server), task.repo, task)
     run_log_ssh_task(make_ssh(server), server,
                      task, task_log, task.repo)
     return
 
 
-def get_repo(ssh, repo, task_log):
+def get_repo(ssh, repo, project_service_log):
     if repo is None:
         return
     print(repo)
 
     parsed_repo = repo.rsplit("/", 1)[1].split(".git")[0]
     response = run_log_ssh_command(
-        ssh, f"cd {parsed_repo} && git pull", task_log)
+        ssh, f"cd {parsed_repo} && git pull", project_service_log)
     if response == 0:
-        # run_log_ssh_command(ssh, "git pull", task_log)
+        # run_log_ssh_command(ssh, "git pull", project_service_log)
         pass
     else:
-        run_log_ssh_command(ssh, "git clone %s" % repo, task_log)
+        run_log_ssh_command(ssh, "git clone %s" % repo, project_service_log)
     # run_log_ssh_command(
-    #     ssh, "rm -fr %s" % parsed_repo, task_log)
+    #     ssh, "rm -fr %s" % parsed_repo, project_service_log)
 
 
-def run_log_ssh_command(ssh, command, task_log=None):
+def run_log_ssh_command(ssh, command, project_service_log=None):
     print("COMMAND[%s]" % (command))
     stdin, stdout, stderr = ssh.exec_command(
         command)
@@ -77,21 +77,21 @@ def run_log_ssh_command(ssh, command, task_log=None):
     if not os.path.exists(path):
         os.makedirs(path)
 
-    if task_log:
+    if project_service_log:
         # XXX someone needs to autocreate logs dir if not here..
-        fileOut = open(f"./logs/{'out_'+str(task_log.id)}.txt", "a")
-        fileErr = open(f"./logs/{'err_'+str(task_log.id)}.txt", "a")
+        fileOut = open(f"./logs/{'out_'+str(project_service_log.id)}.txt", "a")
+        fileErr = open(f"./logs/{'err_'+str(project_service_log.id)}.txt", "a")
     print("STARTING OF LOOP")
     if len(stdout.read()) > 0:
         for line in stdout.read().splitlines():
             print(line)
-            if task_log:
+            if project_service_log:
                 fileOut.write(str(line))
     print("STDERR")
     if len(stderr.read()) > 0:
         for line in stderr.read().splitlines():
             print(line)
-            if task_log:
+            if project_service_log:
                 fileErr.write(str(line))
     # file1.write(str(l) + "\n")
     # file1.close()
@@ -108,14 +108,62 @@ def line_buffered(f):
             line_buf = ''
 
 
-def run_log_ssh_task(ssh, server, task, task_log, repo):
+def run_project_service(server, project_service, project_service_log):
+
+    if project_service.repo is None:
+        return
+
+    project_service.project_command.status = "RUNNING"
+    project_service.command.started_at = datetime.now()
+    print("COMMAND[%s]" % project_service.command.cmd)
+
+    repo_dir = project_service.repo
+
+    # XXX  put this in better spot.
+    project_service_log.stdout = \
+        "./logs/{'out_'+str(project_service_log.id)}.txt"
+    project_service_log.stderr = \
+        "./logs/{'err_'+str(project_service_log.id)}.txt"
+    project_service_log.save()
+
+    fileOut = open(f"./logs/{'out_'+str(project_service_log.id)}.txt", "a")
+    fileErr = open(f"./logs/{'err_'+str(project_service_log.id)}.txt", "a")
+
+    repo_dir = project_service.repo.rsplit("/", 1)[1].split(".git")[0]
+    ssh = make_ssh(server)
+
+    stdin, stdout, stderr = ssh.exec_command(
+        "cd %s && %s" % (repo_dir, project_service.command.cmd), get_pty=True,
+        environment=project_service.command.environment_variable)
+
+    while True:
+        v = stdout.channel.recv(1024)
+        if not v:
+            break
+        for line in v.splitlines():
+            print(project_service.command.cmd, "==>", line)
+            fileOut.write(str(line) + "\n")
+    fileOut.close()
+    stderr.channel.recv_exit_status()
+    if len(stderr.read()) > 0:
+        project_service.status = "FAILED"
+        for line in stderr.read().splitlines():
+            print(line)
+            fileErr.write(str(line), "\n")
+    else:
+        project_service.status = "COMPLETED"
+    project_service.command.last_finished_at = datetime.now()
+    fileErr.close()
+
+
+def run_log_ssh_task(ssh, server, task, project_service_log, repo):
     if repo is None:
         return
     task.status = "RUNNING"
     task.started_at = datetime.now()
     print("COMMAND[%s]" % task.command)
-    fileOut = open(f"./logs/{'out_'+str(task_log.id)}.txt", "a")
-    fileErr = open(f"./logs/{'err_'+str(task_log.id)}.txt", "a")
+    fileOut = open(f"./logs/{'out_'+str(project_service_log.id)}.txt", "a")
+    fileErr = open(f"./logs/{'err_'+str(project_service_log.id)}.txt", "a")
     repo_dir = repo.rsplit("/", 1)[1].split(".git")[0]
     stdin, stdout, stderr = ssh.exec_command(
         "cd %s && %s" % (repo_dir, task.command), get_pty=True,
@@ -274,8 +322,7 @@ class Command(BaseCommand):
         # get all servers and configure them
         servers = Server.objects.filter()
         for server in servers:
-            task = Task()
-            t = threading.Thread(target=configure_server, args=(server, task))
+            t = threading.Thread(target=configure_server, args=(server))
             t.start()
             threads.append(t)
 
@@ -294,34 +341,6 @@ class Command(BaseCommand):
         project_services = ProjectService.objects.filter()
         for project_service in project_services:
             start_project_service(project_service)
-
-        return
-
-        tasks = Task.objects.filter()
-        print("Number of tasks to run: %s" % len(tasks))
-        for task in tasks:
-            # set task status to pending
-            task.status = 'pending'
-            task.save()
-
-            server = get_server()
-            if server is False:
-                print("No servers available")
-                os.exit(1)
-
-            server.in_use = True
-            server.save()
-
-            task_log = TaskLog()
-            task_log.task = task
-            task_log.file_log = f"./logs/{task_log.id}.txt"
-            task_log.save()
-
-            # run the task
-            t = threading.Thread(
-                target=run_task, args=(server, task, task_log))
-            t.start()
-            threads.append(t)
 
         # wait for complete
         for t in threads:

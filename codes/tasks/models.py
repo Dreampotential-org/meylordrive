@@ -25,13 +25,6 @@ class Task(models.Model):
         return self.name
 
 
-class TaskLog(models.Model):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE,)
-    stdout = models.TextField(blank=True, null=True)
-    file_log = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-
 class SystemSpecs(models.Model):
     architecture = models.CharField(max_length=100)
     cpu_op_modes = models.CharField(max_length=100)
@@ -131,10 +124,10 @@ class ProjectCommand(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
                              null=True, blank=True, default=None)
     cmd = models.CharField(max_length=4096, blank=True, null=True)
+    status = models.CharField(max_length=64, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     last_started_at = models.DateTimeField(blank=True, null=True)
     last_finished_at = models.DateTimeField(blank=True, null=True)
-    repo = models.CharField(max_length=4096, null=True, blank=True)
     name = models.CharField(max_length=4096, null=True, blank=True)
     meta = models.TextField(null=True, blank=True)
     description = models.TextField(blank=True, null=True, default="")
@@ -150,11 +143,10 @@ class ProjectService(models.Model):
     command = models.ForeignKey(ProjectCommand, on_delete=models.CASCADE,
                                 null=True, blank=True)
     name = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=64, blank=True, null=True)
+
     server_group = models.ForeignKey(ServerGroup, on_delete=models.CASCADE,
                                     blank=True, null=True)
-
-
-
 
 
 class Domain(models.Model):
@@ -165,3 +157,14 @@ class Domain(models.Model):
     project_service = models.ForeignKey(
         ProjectService, on_delete=models.CASCADE,
         blank=True, null=True)
+
+
+class ProjectServiceLog(models.Model):
+    project_service = models.ForeignKey(ProjectService,
+                                        on_delete=models.CASCADE,)
+    stdout = models.TextField(blank=True, null=True)
+    file_log = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+
