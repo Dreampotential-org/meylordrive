@@ -10,6 +10,7 @@ router.register(r'task-log', views.TaskLogView, basename="task-log")
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
+    path('/', views.Domain.as_view()),
     path('tasks/', views.TaskDetails.as_view()),
     path('tasks/<int:pk>/', views.TaskView.as_view()),
     path('api/task-trigger/<int:id>/', views.TaskTrigger.as_view()),

@@ -33,6 +33,13 @@ from tasks.serialize import (
 from .extra_serializer.server_serializer import ServerCallSerializer
 
 
+class Domain(APIView):
+    def get(self, request):
+        print(request)
+        print(dir(request))
+        return Response({"message": "hello"})
+
+
 class TaskDetails(APIView):
     def post(self, request):
         try:
@@ -103,7 +110,6 @@ class TaskLogView(ModelViewSet):
 
 class TaskTrigger(APIView):
 
-
     def post(self, request, id):
         # here is where we trigger the tasks.
         threads = []
@@ -115,7 +121,7 @@ class TaskTrigger(APIView):
         print("Here are the task servers: %s" % task_servers)
         for task_server in task_servers:
 
-            # XXX create helper heutl 
+            # XXX create helper heut
             task_log = TaskLog()
             task_log.task = task
             task_log.file_log = f"./logs/{task_log.id}.txt"

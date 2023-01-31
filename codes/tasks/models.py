@@ -60,8 +60,6 @@ class SystemSpecs(models.Model):
 
     def ___str__(self):
         return str(self.model_name)
-    
-
 
 
 class Server(models.Model):
@@ -82,8 +80,6 @@ class Server(models.Model):
         return str(self.name)
 
 
-
-
 class KeyPair(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
                              null=True, blank=True, default=None)
@@ -99,7 +95,7 @@ class ServerUserKey(models.Model):
     server = models.ForeignKey(Server, on_delete=models.CASCADE,
                                blank=True, null=True, default=None)
     keypair = models.ForeignKey(KeyPair, on_delete=models.CASCADE,
-                                blank=True, null=True, default=None)  
+                                blank=True, null=True, default=None)
     def __str__(self):
         return f"{self.user},  {self.server},  {self.keypair}"
 
@@ -107,7 +103,7 @@ class ServerGroup(models.Model):
     name = models.CharField(max_length=100)
     users = models.ManyToManyField(get_user_model())
     servers = models.ManyToManyField(Server)
-        
+
     def __str__(self):
         return str(self.name)
 
@@ -126,3 +122,4 @@ class Domain(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
                              null=True, blank=True, default=None)
     name = models.TextField()
+    value = models.TextField()

@@ -1,0 +1,1 @@
+gunicorn  --env DJANGO_SETTINGS_MODULE=dprojx.settings web.wsgi --workers 8 --timeout 999 --bind=0.0.0.0:4443 --certfile=/etc/letsencrypt/live/api.lifeforceenergy.us/fullchain.pem  --keyfile=/etc/letsencrypt/live/api.lifeforceenergy.us/privkey.pem

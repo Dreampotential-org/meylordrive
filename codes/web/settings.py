@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'knox',
     'corsheaders',
     'usersystem',
-
+    'proxy_web',
 ]
 
 MIDDLEWARE = [
@@ -93,7 +93,7 @@ WSGI_APPLICATION = 'web.wsgi.application'
 
 db_password = os.environ.get('db_password', 'EhB4bINnDFmzI0Bg')
 db_user = os.environ.get('db_user', 'postgres')
-db_host = os.environ.get('db_user', '3.21.231.89')
+db_host = os.environ.get('db_user', 'localhost')
 
 DATABASES = {
     'default': {
