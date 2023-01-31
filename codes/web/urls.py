@@ -20,7 +20,6 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path('', include("proxy_web.urls")),
     path('', include('tasks.urls')),
     path('admin/', admin.site.urls),
     path("usersystem/",include('usersystem.urls')),

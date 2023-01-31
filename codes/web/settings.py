@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'knox',
     'corsheaders',
     'usersystem',
-    'proxy_web',
 ]
 
 MIDDLEWARE = [
