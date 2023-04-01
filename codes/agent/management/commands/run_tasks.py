@@ -176,10 +176,10 @@ def make_ssh(server):
                         key_filename=sshkey)
         else:
             ssh.connect(server.ip_address, username=server.username)
-    except paramiko.ssh_exception.NoValidConnectionsError:
+    except paramiko.ssh_exception.NoValidConnectionsError as e:
         server.error = True
         server.save()
-        return
+        raise e
     return ssh
 
 

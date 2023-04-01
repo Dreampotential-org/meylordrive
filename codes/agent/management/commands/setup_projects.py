@@ -22,8 +22,8 @@ class Command(BaseCommand):
         Server.objects.filter().delete()
 
         server = Server()
-        server.ip_address = "18.246.29.198"
-        server.username = "ubuntu"
+        server.ip_address = "localhost"
+        server.username = "jj"
         server.save()
 
         server_group = ServerGroup()
@@ -53,6 +53,7 @@ class Command(BaseCommand):
 
         for config in configs:
 
+            print(config)
             # first we create a project service
             ps = ProjectService()
             ps.repo = config['repo']
