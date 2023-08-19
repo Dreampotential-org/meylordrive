@@ -9,7 +9,7 @@ router = DefaultRouter()
 # router.register(r'server', views.ServerView, basename='server')
 
 urlpatterns = [
-    # path('admin/', admin.site.urls),
+#    path('admin/', admin.site.urls),
 #    path('tasks/', views.TaskDetails.as_view()),
 #    path('tasks/<int:pk>/', views.TaskView.as_view()),
 #    path('api/task-trigger/<int:id>/', views.TaskTrigger.as_view()),

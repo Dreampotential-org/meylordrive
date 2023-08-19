@@ -7,7 +7,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
-from agent.management.commands.run_tasks import run_task
+# from agent.management.commands.run_tasks import run_task
 # from django.contrib.auth.models import User
 
 import json

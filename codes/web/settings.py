@@ -16,7 +16,7 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CSRF_TRUSTED_ORIGINS = ['https://mapi.dreampotential.org', 'https://api.alt-r.world']
+CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'https://mapi.dreampotential.org', 'https://api.alt-r.world']
 
 
 
@@ -28,9 +28,11 @@ SECRET_KEY = 'z@g8x(zh990d)ti@6)^a7ng2=t21_)dkwfs4n50d#(v@dy@f=r'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+CSRF_COOKIE_SECURE = False
 
 ALLOWED_HOSTS = ['*']
 
+CSRF_COOKIE_HTTPONLY = True
 
 # Application definition
 

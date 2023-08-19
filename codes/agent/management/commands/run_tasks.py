@@ -4,11 +4,13 @@ import os
 from django.core.management.base import BaseCommand
 import threading
 from datetime import datetime
+from utils.chirp import CHIRP
+
 server_prints = {}
 
 
 def configure_server(server):
-    print("Run job server: %s %s" % (server.username, server.ip_address))
+    CHIRP.info("Run job server: %s %s" % (server.username, server.ip_address))
     finger_print = configure_node(server)
     # XXX this kills all containers on host so need to exclude containers
     # required for service to work.
@@ -30,7 +32,6 @@ def start_project_service(project_service):
 
     # get list of servers and do one at a time to start...
 
-    project_service_log = ProjectServiceLog()
 
     # start a task_log...
     for server in project_service.server_group.servers.all():
@@ -40,27 +41,29 @@ def start_project_service(project_service):
 def get_repo(ssh, repo, project_service_log):
     if repo is None:
         return
-    print(repo)
+    CHIRP.info(repo)
 
     parsed_repo = repo.rsplit("/", 1)[1].split(".git")[0]
     response = run_log_ssh_command(
-        ssh, f"cd {parsed_repo} && git pull", project_service_log)
+        ssh, f"cd {parsed_repo} && git pull origin main", project_service_log)
     if response == 0:
         # run_log_ssh_command(ssh, "git pull", project_service_log)
         pass
     else:
-        run_log_ssh_command(ssh, "git clone %s" % repo, project_service_log)
+        run_log_ssh_command(
+            ssh,
+            "eval `ssh-agent`; ssh-add id_rsa; git checkout origin/main; git clone %s" % repo, project_service_log)
     # run_log_ssh_command(
     #     ssh, "rm -fr %s" % parsed_repo, project_service_log)
 
 
 def run_log_ssh_command(ssh, command, project_service_log=None):
-    print("COMMAND[%s]" % (command))
+    CHIRP.info("COMMAND[%s]" % (command))
     stdin, stdout, stderr = ssh.exec_command(
         command)
     exit_status = stdout.channel.recv_exit_status()  # Blocking call
     stderr.channel.recv_exit_status()
-    print("Exit status: %s" % exit_status)
+    CHIRP.info("Exit status: %s" % exit_status)
 
     #  XXX https://github.com/mthenw/frontail
     path = 'logs'
@@ -71,21 +74,21 @@ def run_log_ssh_command(ssh, command, project_service_log=None):
         # XXX someone needs to autocreate logs dir if not here..
         fileOut = open(f"./logs/{'out_'+str(project_service_log.id)}.txt", "a")
         fileErr = open(f"./logs/{'err_'+str(project_service_log.id)}.txt", "a")
-    print("STARTING OF LOOP")
+    CHIRP.info("STARTING OF LOOP")
     if len(stdout.read()) > 0:
         for line in stdout.read().splitlines():
-            print(line)
+            CHIRP.info(line)
             if project_service_log:
                 fileOut.write(str(line))
-    print("STDERR")
+    CHIRP.info("STDERR")
     if len(stderr.read()) > 0:
         for line in stderr.read().splitlines():
-            print(line)
+            CHIRP.info(line)
             if project_service_log:
                 fileErr.write(str(line))
     # file1.write(str(l) + "\n")
     # file1.close()
-    print("ENDING OF LOOP")
+    CHIRP.info("ENDING OF LOOP")
     return int(exit_status)
 
 
@@ -98,14 +101,19 @@ def line_buffered(f):
             line_buf = ''
 
 
-def run_project_service(server, project_service, project_service_log):
+def run_project_service(server, project_service):
+    project_service_log = ProjectServiceLog()
 
     if project_service.repo is None:
         return
 
+    CHIRP.info("server.ip_address=%s" % server.ip_address)
+    get_repo(make_ssh(server), project_service.repo, project_service_log)
+
     project_service.command.status = "RUNNING"
     project_service.command.started_at = datetime.now()
-    print("COMMAND[%s]" % project_service.command.cmd)
+    CHIRP.info("Server: %s" % server.ip_address)
+    CHIRP.info("COMMAND[%s]" % project_service.command.cmd)
 
     repo_dir = project_service.repo
 
@@ -115,7 +123,7 @@ def run_project_service(server, project_service, project_service_log):
     repo_dir = project_service.repo.rsplit("/", 1)[1].split(".git")[0]
     ssh = make_ssh(server)
 
-    print(repo_dir)
+    CHIRP.info(repo_dir)
 
     stdin, stdout, stderr = ssh.exec_command(
         "cd %s && %s" % (repo_dir, project_service.command.cmd), get_pty=True,
@@ -126,14 +134,15 @@ def run_project_service(server, project_service, project_service_log):
         if not v:
             break
         for line in v.splitlines():
-            print(project_service.command.cmd, "==>", line)
+            CHIRP.info('%s[%s] ==> %s'
+                       % (server.ip_address, project_service.command.cmd[:8], line))
             fileOut.write(str(line) + "\n")
     fileOut.close()
     stderr.channel.recv_exit_status()
     if len(stderr.read()) > 0:
         project_service.status = "FAILED"
         for line in stderr.read().splitlines():
-            print(line)
+            CHIRP.info(line)
             fileErr.write(str(line), "\n")
     else:
         project_service.status = "COMPLETED"
@@ -161,7 +170,7 @@ def fingerprint_node(ssh, server):
                 dic[i.split(":")[0]] = i[1:].split(":")[1].strip()
     # print(dic)
     server_prints[server.id] = dic
-    print(dic)
+    CHIRP.info(dic)
 
 
 def make_ssh(server):
@@ -186,7 +195,7 @@ def make_ssh(server):
 def configure_node(server):
     ssh = make_ssh(server)
     if not ssh:
-        print("Not able to make ssh on %s" % server.ip_address)
+        CHIRP.info("Not able to make ssh on %s" % server.ip_address)
         return
 
     # we get to this point with server it means we are able to
@@ -227,7 +236,7 @@ def populate_system_specs(server, system_spec):
     server.system_specs.stepping = system_spec['Stepping']
     server.system_specs.cpu_mhz = system_spec.get('CPU MHz', 0)
     server.system_specs.bogo_mips = system_spec['BogoMIPS']
-    server.system_specs.hypervisor_vendor = system_spec['Hypervisor vendor']
+    server.system_specs.hypervisor_vendor = system_spec.get('Hypervisor vendor')
     server.system_specs.virtualization_type = system_spec.get(
         'Virtualization Type')
     server.system_specs.l1d_cache = system_spec['L1d cache']
@@ -240,9 +249,10 @@ def populate_system_specs(server, system_spec):
 
 
 def get_server():
-    servers = Server.objects.filter(in_use=False).exclude(system_specs=None)
+    servers = Server.objects.filter().exclude().order_by("?")
+    return servers[0]
     if len(servers) == 0:
-        print("No servers available")
+        CHIRP.info("No servers available")
         return False
     server_stats = {}
     for server in servers:
@@ -260,7 +270,7 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
-        print("Start...")
+        CHIRP.info("Start...")
 
         # at the start we clear all severs that are in use.
         servers = Server.objects.filter().exclude(system_specs=None)
@@ -272,26 +282,34 @@ class Command(BaseCommand):
 
         # get all servers and configure them
         servers = Server.objects.filter()
-        for server in servers:
-            t = threading.Thread(target=configure_server, args=(server))
-            t.start()
-            threads.append(t)
+        CHIRP.info("NUMBER OF SERVERS: %s" % len(servers))
+        # for server in servers:
+        #    t = threading.Thread(target=configure_server, args=[server])
+        #    t.start()
+        #    threads.append(t)
 
         # wait for all threads
-        for t in threads:
-            t.join()
+        # for t in threads:
+        #    t.join()
 
         # populate server fingerprint in db
-        for server_print in server_prints.keys():
-            populate_system_specs(server, server_prints[server_print])
+        # for server_print in server_prints.keys():
+        # populate_system_specs(server, server_prints[server_print])
 
         # now we can progress tasks
-        print("Running the tasks")
+        CHIRP.info("Running the tasks")
         # find list of status which do not have a status
 
         project_services = ProjectService.objects.filter()
+        CHIRP.info("NUmber of services: %s" % len(project_services))
         for project_service in project_services:
-            start_project_service(project_service)
+            server = get_server()
+            CHIRP.info("START_SERVEICE###")
+            # start_project_service(project_service)
+            t = threading.Thread(target=run_project_service,
+                                 args=[server, project_service])
+            t.start()
+            threads.append(t)
 
         # wait for complete
         for t in threads:

@@ -9,7 +9,7 @@ django-cors-headers==3.11.0
 django-rest-knox==4.2.0
 django-rest-passwordreset==1.2.1
 djangorestframework==3.13.1
-gevent==21.12.0
+gevent
 greenlet==1.1.2
 jmespath==1.0.0
 parallel-ssh==2.10.0

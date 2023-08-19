@@ -4,6 +4,7 @@ from tasks.models import ProjectService
 from tasks.models import ProjectCommand
 from tasks.models import Server
 from tasks.models import ServerGroup
+from utils.us_states import states
 
 
 class Command(BaseCommand):
@@ -21,33 +22,27 @@ class Command(BaseCommand):
         Domain.objects.filter().delete()
         Server.objects.filter().delete()
 
-        server = Server()
-        server.ip_address = "localhost"
-        server.username = "jj"
-        server.save()
+        ips = ['clnode308.clemson.cloudlab.us', 'clnode310.clemson.cloudlab.us',
+               'clnode292.clemson.cloudlab.us',  'clnode288.clemson.cloudlab.us']
+        for ip in ips:
+            server = Server()
+            server.ip_address = ip
+            server.username = "arosen"
+            server.save()
 
         server_group = ServerGroup()
-        server_group.name = "useiam"
+        server_group.name = "prod"
         server_group.save()
         server_group.servers.add(server)
         server_group.save()
 
-        configs = [
-            {'domain': 'useiam.com',
-             'start': 'npm install && npm start & ',
-             'name': 'useiam-site',
-             'repo': 'git@gitlab.com:devs176/useiam-site.git'},
-
-            {'domain': 'prod-api.useiam.com',
-             'start': 'bash scripts/start.sh',
-             'name': 'useiam-server',
-             'repo':  'git@gitlab.com:devs176/useiam-server.git'},
-
-            {'domain': 'm.useiam.com',
-             'start': 'bash scripts/start-prod.sh',
-             'name': 'useiam',
-             'repo': 'git@gitlab.com:devs176/useiam-site.git'},
-        ]
+        configs = []
+        for state in states.keys():
+            configs.append({
+                'domain': '',
+                'start': 'bash install-ubuntu.sh; virtualenv -p python3 venv; source venv/bin/activate; pip install -r requirements.txt; STATE=%s python codes/manage.py get_redfin_cvs_fails' % state,
+                'name': 'django-zillow',
+                'repo': 'git@gitlab.com:a4496/django-zillow.git'})
 
 
 
@@ -68,9 +63,3 @@ class Command(BaseCommand):
 
             pc.save()
             ps.save()
-
-            d = Domain()
-            d.name = config['domain']
-            d.project_service = ps
-            d.save()
-

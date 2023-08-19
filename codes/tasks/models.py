@@ -19,7 +19,7 @@ class SystemSpecs(models.Model):
     stepping = models.CharField(max_length=100)
     cpu_mhz = models.CharField(max_length=100)
     bogo_mips = models.CharField(max_length=100)
-    hypervisor_vendor = models.CharField(max_length=100)
+    hypervisor_vendor = models.CharField(max_length=100, blank=True, null=True)
     virtualization_type = models.CharField(max_length=100,
                                            blank=True, null=True)
     l1d_cache = models.CharField(max_length=100)
