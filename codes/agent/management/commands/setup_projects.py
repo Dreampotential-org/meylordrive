@@ -22,8 +22,14 @@ class Command(BaseCommand):
         Domain.objects.filter().delete()
         Server.objects.filter().delete()
 
-        ips = ['clnode308.clemson.cloudlab.us', 'clnode310.clemson.cloudlab.us',
-               'clnode292.clemson.cloudlab.us',  'clnode288.clemson.cloudlab.us']
+        ips = ['130.127.133.20',
+               '130.127.133.39',
+               '128.105.144.111',
+               '130.127.133.18',
+               '128.105.144.109',
+               '128.105.144.118',
+               '130.127.133.30']
+
         for ip in ips:
             server = Server()
             server.ip_address = ip
