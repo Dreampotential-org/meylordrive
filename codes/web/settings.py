@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'knox',
     'corsheaders',
     'usersystem',
+    'project',
+    'api',
 ]
 
 MIDDLEWARE = [

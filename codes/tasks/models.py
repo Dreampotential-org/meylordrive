@@ -105,7 +105,21 @@ class ProjectCommand(models.Model):
         return self.name
 
 
+class Org(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None)
+    name = models.CharField(max_length=4096, blank=True, null=True)
+
+
+class Project(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None)
+    repo = models.CharField(max_length=4096, null=True, blank=True)
+
+
 class ProjectService(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None)
     repo = models.CharField(max_length=4096, null=True, blank=True)
     command = models.ForeignKey(ProjectCommand, on_delete=models.CASCADE,
                                 null=True, blank=True)
