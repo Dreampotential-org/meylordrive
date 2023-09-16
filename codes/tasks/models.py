@@ -132,6 +132,3 @@ class ProjectServiceLog(models.Model):
     stdout = models.TextField(blank=True, null=True)
     file_log = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
-
-

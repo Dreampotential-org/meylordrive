@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-# from . import views
+from . import views
 
 router = DefaultRouter()
 # router.register(r'task-log', views.TaskLogView, basename="task-log")
@@ -10,6 +10,7 @@ router = DefaultRouter()
 
 urlpatterns = [
 #    path('admin/', admin.site.urls),
+#    path('api/create/project-service/', views.ProjectServiceView.as_view()),
 #    path('tasks/', views.TaskDetails.as_view()),
 #    path('tasks/<int:pk>/', views.TaskView.as_view()),
 #    path('api/task-trigger/<int:id>/', views.TaskTrigger.as_view()),

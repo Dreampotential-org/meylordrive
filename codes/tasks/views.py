@@ -7,30 +7,53 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
-# from agent.management.commands.run_tasks import run_task
+#from agent.management.commands.run_tasks import run_task
 # from django.contrib.auth.models import User
 
 import json
 import threading
 
 from tasks.models import (
-  Task,
-  TaskLog,
+  ProjectService,
   Server,
-  TaskServer,
   KeyPair,
   ServerUserKey,
 )
 from tasks.serialize import (
-  TaskSerializer,
-  TaskLogSerializer,
   ServerSerializer,
-  TaskServerSerializer,
   KeyPairSerializer,
   ServerUserKeySerializer,
+  ProjectServiceSerializer,
 )
 
 from .extra_serializer.server_serializer import ServerCallSerializer
+
+
+class ProjectServiceView(APIView):
+
+    serializer_class = ServerSerializer
+    queryset = ProjectService.objects.all()
+
+    def post(self, request):
+        try:
+            request.data["meta"] = json.dumps(request.data["meta"])
+        except KeyError:
+            pass
+
+        serializeobj = ProjectServiceSerializer(data=request.data)
+        if serializeobj.is_valid():
+            serializeobj.save()
+            return Response(serializeobj.data, status=status.HTTP_201_CREATED)
+
+        return Response({"message": json.dumps(serializeobj.errors)},
+                        status=status.HTTP_400_BAD_REQUEST,)
+
+    def get(self, request):
+        detailsObj = ProjectService.objects.all()
+        project_services = ProjectService(detailsObj)
+        serialized = self.get_serializer(project_services, many=True)
+        return Response(dlSerializeObj.data, status=status.HTTP_200_OK)
+
 
 
 class Domain(APIView):
@@ -40,100 +63,80 @@ class Domain(APIView):
         return Response({"message": "hello"})
 
 
-class TaskDetails(APIView):
-    def post(self, request):
-        try:
-            request.data["meta"] = json.dumps(request.data["meta"])
-        except KeyError:
-            pass
 
-        serializeobj = TaskSerializer(data=request.data)
-        if serializeobj.is_valid():
-            serializeobj.save()
-            return Response(serializeobj.data, status=status.HTTP_201_CREATED)
-
-        return Response({"message": json.dumps(serializeobj.errors)},
-                        status=status.HTTP_400_BAD_REQUEST,)
-
-    def get(self, request):
-        detailsObj = Task.objects.all()
-        dlSerializeObj = TaskSerializer(detailsObj, many=True)
-        return Response(dlSerializeObj.data, status=status.HTTP_200_OK)
-
-
-class TaskView(APIView):
-    def get(self, request, pk):
-        try:
-            detailsObj = Task.objects.get(id=pk)
-            dlSerializeObj = TaskSerializer(detailsObj)
-            return Response(dlSerializeObj.data, status=status.HTTP_200_OK)
-        except Task.DoesNotExist:
-            return Response("Task Dose Not Exist!",
-                            status=status.HTTP_404_NOT_FOUND)
-
-    def put(self, request, pk):
-        try:
-            try:
-                request.data["meta"] = json.dumps(request.data["meta"])
-            except KeyError:
-                pass
-            task = get_object_or_404(Task.objects.all(), pk=pk)
-            serialized = TaskSerializer(instance=task,
-                                        data=request.data, partial=True)
-            if serialized.is_valid(raise_exception=True):
-                serialized.save()
-            response = Response(serialized.data, status=status.HTTP_200_OK)
-        except Exception:
-            response = Response(serialized.errors,
-                                status=status.HTTP_405_METHOD_NOT_ALLOWED)
-            return response
-
-    def delete(self, request, pk):
-        try:
-            task_object = Task.objects.get(id=pk)
-            task_object.delete()
-            return Response("Task Delete Successfully!",
-                            status=status.HTTP_200_OK)
-        except Task.DoesNotExist:
-            return Response("Task Dose Not Exist!",
-                            status=status.HTTP_404_NOT_FOUND)
+#class TaskView(APIView):
+#    def get(self, request, pk):
+#        try:
+#            detailsObj = Task.objects.get(id=pk)
+#            dlSerializeObj = TaskSerializer(detailsObj)
+#            return Response(dlSerializeObj.data, status=status.HTTP_200_OK)
+#        except Task.DoesNotExist:
+#            return Response("Task Dose Not Exist!",
+#                            status=status.HTTP_404_NOT_FOUND)
+#
+#    def put(self, request, pk):
+#        try:
+#            try:
+#                request.data["meta"] = json.dumps(request.data["meta"])
+#            except KeyError:
+#                pass
+#            task = get_object_or_404(Task.objects.all(), pk=pk)
+#            serialized = TaskSerializer(instance=task,
+#                                        data=request.data, partial=True)
+#            if serialized.is_valid(raise_exception=True):
+#                serialized.save()
+#            response = Response(serialized.data, status=status.HTTP_200_OK)
+#        except Exception:
+#            response = Response(serialized.errors,
+#                                status=status.HTTP_405_METHOD_NOT_ALLOWED)
+#            return response
+#
+#    def delete(self, request, pk):
+#        try:
+#            task_object = Task.objects.get(id=pk)
+#            task_object.delete()
+#            return Response("Task Delete Successfully!",
+#                            status=status.HTTP_200_OK)
+#        except Task.DoesNotExist:
+#            return Response("Task Dose Not Exist!",
+#                            status=status.HTTP_404_NOT_FOUND)
 
 
-class TaskLogView(ModelViewSet):
-    """Task log  Api ViewSet."""
-
-    serializer_class = TaskLogSerializer
-
-    def get_queryset(self):
-        return TaskLog.objects.all()
-
-
-class TaskTrigger(APIView):
-
-    def post(self, request, id):
-        # here is where we trigger the tasks.
-        threads = []
-        # look up the tas
-        task = Task.objects.get(id=id)
-        print("We have a task %s" % task)
-        # get list of servers that are mapped to task
-        task_servers = TaskServer.objects.filter(task=task)
-        print("Here are the task servers: %s" % task_servers)
-        for task_server in task_servers:
-
-            # XXX create helper heut
-            task_log = TaskLog()
-            task_log.task = task
-            task_log.file_log = f"./logs/{task_log.id}.txt"
-            task_log.save()
-            t = threading.Thread(target=run_task,
-                                 args=(task_server.server, task, task_log))
-            t.start()
-            threads.append(t)
-
-        for t in threads:
-            t.join()
-        return Response({}, status=status.HTTP_201_CREATED)
+#class TaskLogView(ModelViewSet):
+#    """Task log  Api ViewSet."""
+#
+#    serializer_class = TaskLogSerializer
+#
+#    def get_queryset(self):
+#        return TaskLog.objects.all()
+#
+#
+#class TaskTrigger(APIView):
+#
+#    def post(self, request, id):
+#        # here is where we trigger the tasks.
+#        threads = []
+#        # look up the tas
+#        task = Task.objects.get(id=id)
+#        print("We have a task %s" % task)
+#        # get list of servers that are mapped to task
+#        task_servers = TaskServer.objects.filter(task=task)
+#        print("Here are the task servers: %s" % task_servers)
+#        for task_server in task_servers:
+#
+#            # XXX create helper heut
+#            task_log = TaskLog()
+#            task_log.task = task
+#            task_log.file_log = f"./logs/{task_log.id}.txt"
+#            task_log.save()
+#            t = threading.Thread(target=run_task,
+#                                 args=(task_server.server, task, task_log))
+#            t.start()
+#            threads.append(t)
+#
+#        for t in threads:
+#            t.join()
+#        return Response({}, status=status.HTTP_201_CREATED)
 
 
 class ServerView(generics.GenericAPIView):
@@ -255,60 +258,60 @@ class ServerDetailView(generics.GenericAPIView):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-class TaskServerView(generics.GenericAPIView):
-    serializer_class = TaskServerSerializer
+#class TaskServerView(generics.GenericAPIView):
+#    serializer_class = TaskServerSerializer
+#
+#    def get_queryset(self):
+#        return TaskServer.objects.all()
+#
+#    def get(self, request, *args, **kwargs):
+#        serialized = self.get_serializer(self.get_queryset(), many=True)
+#        return Response(serialized.data, status=status.HTTP_200_OK)
+#
+#    def post(self, request, *args, **kwargs):
+#        serialized_data = self.get_serializer(data=request.data)
+#        if serialized_data.is_valid():
+#            serialized_data.save()
+#            return Response(serialized_data.data,
+#                            status=status.HTTP_201_CREATED)
+#        return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def get_queryset(self):
-        return TaskServer.objects.all()
 
-    def get(self, request, *args, **kwargs):
-        serialized = self.get_serializer(self.get_queryset(), many=True)
-        return Response(serialized.data, status=status.HTTP_200_OK)
+#class TaskServerDetailsView(generics.GenericAPIView):
+#    serializer_class = TaskServerSerializer
 
-    def post(self, request, *args, **kwargs):
-        serialized_data = self.get_serializer(data=request.data)
-        if serialized_data.is_valid():
-            serialized_data.save()
-            return Response(serialized_data.data,
-                            status=status.HTTP_201_CREATED)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+#    def get_queryset(self):
+#        return TaskServer.objects.all()
+#
+#    def get(self, request, *args, **kwargs):
+#        if kwargs.get("pk"):
+#            try:
+#                task_server = TaskServer.objects.get(id=kwargs.get("pk"))
+#                serialized = self.get_serializer(task_server)
+#                return Response(serialized.data, status=status.HTTP_200_OK)
+#            except Exception:
+#                return Response(
+#                    "Pipeline server Not Found",
+#                    status=status.HTTP_404_NOT_FOUND
+#                )
+#        return Response(status=status.HTTP_204_NO_CONTENT)
+#
+#    def put(self, request, *args, **kwargs):
+#        if kwargs.get("pk"):
+#            task_server = TaskServer.objects.get(id=kwargs.get("pk"))
+#            serialized = self.get_serializer(task_server, data=request.data)
+#            if serialized.is_valid():
+#                serialized.save()
+#                return Response(serialized.data)
+#            return Response(serialized.errors)
+#        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-
-class TaskServerDetailsView(generics.GenericAPIView):
-    serializer_class = TaskServerSerializer
-
-    def get_queryset(self):
-        return TaskServer.objects.all()
-
-    def get(self, request, *args, **kwargs):
-        if kwargs.get("pk"):
-            try:
-                task_server = TaskServer.objects.get(id=kwargs.get("pk"))
-                serialized = self.get_serializer(task_server)
-                return Response(serialized.data, status=status.HTTP_200_OK)
-            except Exception:
-                return Response(
-                    "Pipeline server Not Found",
-                    status=status.HTTP_404_NOT_FOUND
-                )
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    def put(self, request, *args, **kwargs):
-        if kwargs.get("pk"):
-            task_server = TaskServer.objects.get(id=kwargs.get("pk"))
-            serialized = self.get_serializer(task_server, data=request.data)
-            if serialized.is_valid():
-                serialized.save()
-                return Response(serialized.data)
-            return Response(serialized.errors)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def delete(self, request, *args, **kwargs):
-        if kwargs.get("pk"):
-            task_server = TaskServer.objects.get(id=kwargs.get("pk"))
-            task_server.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+#    def delete(self, request, *args, **kwargs):
+#        if kwargs.get("pk"):
+#            task_server = TaskServer.objects.get(id=kwargs.get("pk"))
+#            task_server.delete()
+#            return Response(status=status.HTTP_204_NO_CONTENT)
+#        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class KeyPairView(generics.GenericAPIView):
