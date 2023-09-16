@@ -176,10 +176,13 @@ AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 ALLOWED_HOSTS = ['*']
 
 # Email
-EMAIL_BACKEND = 'django_ses.SESBackend'
-EMAIL_AWS_ACCESS_KEY_ID = 'AKIARWLPGYIKWTF4OEPZ'
-EMAIL_AWS_SECRET_ACCESS_KEY = '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'
-DEFAULT_FROM_EMAIL = 'mail-api@dreampotential.org'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.office365.com'
+EMAIL_HOST_USER = 'aaron@realtorstat.com'
+EMAIL_HOST_PASSWORD = 'Sha1nesor@'
+EMAIL_PORT = 587
+
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
