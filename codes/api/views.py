@@ -18,7 +18,7 @@ def create_org(request):
     return Response({'id': org.id})
 
 
-@api_view(["POST"])
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def list_orgs(request):
     orgs = Org.objects.filter(user=request.user)
