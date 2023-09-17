@@ -3,6 +3,8 @@ from rest_framework.decorators import api_view
 
 from tasks.models import Project, ProjectService, ProjectCommand, Org
 from rest_framework.response import Response
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 
 @api_view(["POST"])
@@ -31,7 +33,7 @@ def create_project(request):
     project = Project()
     org = Org.objects.filter(request.data.get("org_id")).first()
     project.org = org
-    project.user request.user
+    project.user = request.user
     project.repo = request.data.get("repo")
     project.save()
 
