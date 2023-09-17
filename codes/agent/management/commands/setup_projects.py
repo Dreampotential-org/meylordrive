@@ -22,13 +22,15 @@ class Command(BaseCommand):
         Domain.objects.filter().delete()
         Server.objects.filter().delete()
 
-        ips = ['130.127.133.20',
-               '130.127.133.39',
-               '128.105.144.111',
-               '130.127.133.18',
-               '128.105.144.109',
-               '128.105.144.118',
-               '130.127.133.30']
+#        ips = ['130.127.133.20',
+#               '130.127.133.39',
+#               '128.105.144.111',
+#               '130.127.133.18',
+#               '128.105.144.109',
+#               '128.105.144.118',
+#               '130.127.133.30']
+        ips = ['198.22.255.27']
+
 
         for ip in ips:
             server = Server()
@@ -41,15 +43,21 @@ class Command(BaseCommand):
         server_group.save()
         server_group.servers.add(server)
         server_group.save()
+        #    configs.append({
+        #        'domain': '',
+        #        'start': 'bash install-ubuntu.sh; virtualenv -p python3 venv; source venv/bin/activate; pip install -r requirements.txt; STATE=%s python codes/manage.py get_redfin_cvs_fails' % state,
+        #        'name': 'django-zillow',
+        #        'repo': 'git@gitlab.com:a4496/django-zillow.git'})
+
 
         configs = []
         for state in states.keys():
             configs.append({
                 'domain': '',
-                'start': 'bash install-ubuntu.sh; virtualenv -p python3 venv; source venv/bin/activate; pip install -r requirements.txt; STATE=%s python codes/manage.py get_redfin_cvs_fails' % state,
-                'name': 'django-zillow',
-                'repo': 'git@gitlab.com:a4496/django-zillow.git'})
-
+                # 'start': 'bash install-ubuntu.sh; virtualenv -p python3 venv; source venv/bin/activate; pip install -r requirements.txt; STATE=%s python codes/manage.py get_redfin_cvs_fails' % state,
+                'name': 'prometheus',
+                'start': "HOSTNAME=$(hostname) docker stack deploy -c docker-stack.yml prom",
+                'repo': 'git@github.com:vegasbrianc/prometheus.git'})
 
 
         for config in configs:
@@ -68,4 +76,4 @@ class Command(BaseCommand):
             pc.repo = config['repo']
 
             pc.save()
-            ps.save()
+            ps.save(kkkkkk)
