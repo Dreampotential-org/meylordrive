@@ -33,3 +33,4 @@ requests
 django-jsonfield
 knox==0.1.11
 Jinja2
+drf-yas==1.21.7
