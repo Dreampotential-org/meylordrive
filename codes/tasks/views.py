@@ -102,6 +102,35 @@ class Domain(APIView):
 #                            status=status.HTTP_404_NOT_FOUND)
 
 
+# XXX update this to ProjectCommand
+#    def run_project_command(self, request, id):
+#        # here is where we trigger the tasks.
+#        threads = []
+#        # look up the tas
+#        task = Task.objects.get(id=id)
+#        print("We have a task %s" % task)
+#        # get list of servers that are mapped to task
+#        task_servers = TaskServer.objects.filter(task=task)
+#        print("Here are the task servers: %s" % task_servers)
+#        for task_server in task_servers:
+#
+#            # XXX create helper heut
+#            task_log = TaskLog()
+#            task_log.task = task
+#            task_log.file_log = f"./logs/{task_log.id}.txt"
+#            task_log.save()
+#            t = threading.Thread(target=run_task,
+#                                 args=(task_server.server, task, task_log))
+#            t.start()
+#            threads.append(t)
+#
+#        for t in threads:
+#            t.join()
+#        return Response({}, status=status.HTTP_201_CREATED)
+
+
+
+
 #class TaskLogView(ModelViewSet):
 #    """Task log  Api ViewSet."""
 #

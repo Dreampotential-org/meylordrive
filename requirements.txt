@@ -23,7 +23,7 @@ s3transfer==0.6.0
 six==1.16.0
 sqlparse==0.4.2
 ssh-python==0.10.0
-ssh2-python==0.27.0
+#ssh2-python==0.27.0
 urllib3==1.26.9
 zope.event==4.5.0
 zope.interface==5.4.0
@@ -33,4 +33,5 @@ requests
 django-jsonfield
 knox==0.1.11
 Jinja2
-drf-yas==1.21.7
+drf-yasg
+djangorestframework
