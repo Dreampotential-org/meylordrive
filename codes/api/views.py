@@ -1,6 +1,7 @@
 from rest_framework.decorators import api_view
 
 from tasks.models import Project, ProjectService, ProjectCommand, Org
+from agent.models import ApiKey
 from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -163,3 +164,26 @@ def remove_member(request, member_id):
     return Response({'status': "ok"})
 
 
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def create_api_key(request):
+    api_key = ApiKey()
+    api_key.user = request.user
+    api_key.save()
+
+    return Response({'id': api_key.id})
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def list_api_keys(request, member_id):
+    keys = ApiKey.objects.filter(user=request.user)
+
+    return Response(keys)
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def delete_api_key(request, api_key_id):
+    ApiKey.objects.filter(id=api_key_id).delete()
+
+    return Response({'status': "ok"})

@@ -23,6 +23,11 @@ urlpatterns = [
     path('api/list-project-services', views.list_project_services),
     path('api/delete-project_service/<int:project_service_id>', views.delete_project_service),
 
+    path('api/create-api-key', views.create_api_key),
+    path('api/list-api-keys', views.list_api_keys),
+    path('api/delete-api-key/<int:api_key_id>', views.delete_api_key),
+
+
 
 
 ]
