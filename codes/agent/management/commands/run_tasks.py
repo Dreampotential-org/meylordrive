@@ -283,18 +283,18 @@ class Command(BaseCommand):
         # get all servers and configure them
         servers = Server.objects.filter()
         CHIRP.info("NUMBER OF SERVERS: %s" % len(servers))
-        # for server in servers:
-        #    t = threading.Thread(target=configure_server, args=[server])
-        #    t.start()
-        #    threads.append(t)
+        for server in servers:
+            t = threading.Thread(target=configure_server, args=[server])
+            t.start()
+            threads.append(t)
 
         # wait for all threads
-        # for t in threads:
-        #    t.join()
+        for t in threads:
+            t.join()
 
         # populate server fingerprint in db
-        # for server_print in server_prints.keys():
-        # populate_system_specs(server, server_prints[server_print])
+        for server_print in server_prints.keys():
+            populate_system_specs(server, server_prints[server_print])
 
         # now we can progress tasks
         CHIRP.info("Running the tasks")
