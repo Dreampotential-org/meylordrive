@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
 
+from task.models import KeyPair
+
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -83,5 +85,23 @@ def create_project_command(request):
 def list_project_commands(request):
     project_commands = ProjectCommand.objects.filter(user=request.user)
     return Response(project_commands)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_keypairs(request):
+    keypairs = KeyPair.objects.filter(user=request.user)
+    return Response(keypairs)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def create_keypair(request):
+    keypair = KeyPair()
+    keypair.value = request.data.get("value")
+    keypair.user = request.user
+    keypair.save()
+
+    return Response({'id': keypair.id})
 
 

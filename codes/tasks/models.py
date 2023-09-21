@@ -115,6 +115,7 @@ class Project(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
                              null=True, blank=True, default=None)
     repo = models.CharField(max_length=4096, null=True, blank=True)
+    # can create public private projects
 
 
 class ProjectService(models.Model):
