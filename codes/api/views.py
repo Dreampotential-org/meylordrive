@@ -5,7 +5,14 @@ from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
 
-from tasks.models import KeyPair
+from tasks.models import KeyPair, ProjectMember
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def delete_org(request, org_id):
+    Org().objects.filter(id=org_id, uesr=request.user).delete()
+    return Response({'message': "Okay"})
 
 
 @api_view(["POST"])
@@ -47,7 +54,6 @@ def list_projects(request):
     return Response(orgs)
 
 
-
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_project_service(request):
@@ -60,12 +66,19 @@ def create_project_service(request):
 
     return Response({'id': project_service.id})
 
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def list_project_services(request):
     project_services = ProjectService.objects.filter(user=request.user)
     return Response(project_services)
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def delete_project_service(request, project_service_id):
+    ProjectService.objects.filter(user=request.user,
+                                  id=project_service_id).delete()
+    return Response({"message": "Okay"})
 
 
 @api_view(["POST"])
@@ -93,6 +106,12 @@ def get_keypairs(request):
     keypairs = KeyPair.objects.filter(user=request.user)
     return Response(keypairs)
 
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def delete_keypair(request, keypair_id):
+    KeyPair.objects.filter(user=request.user, id=keypair_id).delete()
+    return Response({"status": "Okay"})
+
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -103,5 +122,44 @@ def create_keypair(request):
     keypair.save()
 
     return Response({'id': keypair.id})
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def add_member(request):
+    # look up pm of user making the request
+    pm = ProjectMember.objects.filter(user=request.user)
+    # check user is admin or Role XXX
+    if not pm.admin:
+        return Response({'error': "User is not an admin of a group."})
+
+    user = ProjectMember.objects.filter(
+        id=request.data.get("member_id")
+    ).first()
+
+    # first user has to have a accout XXX
+    o = Org.objects.filter(id=request.data.get("org_id")).first()
+    if not o:
+        return Response({'message': "Not a valid org_id"})
+
+    # Create new OrgMember
+    pm = ProjectMember()
+    pm.user = user
+    pm.added_by = request.user
+    pm.org = o
+
+    # Need to verify user is allowed to do such thing
+    # pm.user = request.user
+    pm.save()
+
+    return Response({'id': pm.id})
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def remove_member(request, member_id):
+    pm = ProjectMember.objects.filter(id=member_id)
+    pm.remove()
+
+    return Response({'status': "ok"})
 
 

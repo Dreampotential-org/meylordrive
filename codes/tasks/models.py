@@ -2,6 +2,11 @@ from django.db import models
 from django.contrib.auth import get_user_model
 
 
+class Org(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None)
+    name = models.CharField(max_length=4096, blank=True, null=True)
+
 class SystemSpecs(models.Model):
     architecture = models.CharField(max_length=100)
     cpu_op_modes = models.CharField(max_length=100)
@@ -81,10 +86,17 @@ class ServerGroup(models.Model):
 
 
 class ProjectMember(models.Model):
+    added_by = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None,
+                            related_name="added_by")
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
                              null=True, blank=True, default=None)
+    admin = models.BooleanField(default=False)
     role = models.TextField(blank=True, null=True)
     name = models.TextField(blank=True, null=True)
+
+    org = models.ForeignKey(Org, on_delete=models.CASCADE,
+                            null=True, blank=True, default=None)
 
 
 class ProjectCommand(models.Model):
@@ -103,12 +115,6 @@ class ProjectCommand(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class Org(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
-                             null=True, blank=True, default=None)
-    name = models.CharField(max_length=4096, blank=True, null=True)
 
 
 class Project(models.Model):
@@ -147,3 +153,4 @@ class ProjectServiceLog(models.Model):
     stdout = models.TextField(blank=True, null=True)
     file_log = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
