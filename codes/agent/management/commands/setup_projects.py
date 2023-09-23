@@ -56,7 +56,7 @@ class Command(BaseCommand):
                 'domain': '',
                  'start': 'bash install-ubuntu.sh; virtualenv -p python3 venv; source venv/bin/activate; pip install -r requirements.txt; STATE=%s python codes/manage.py get_redfin_cvs_fails' % state,
                 'name': 'prometheus',
-                'start': "HOSTNAME=$(hostname) docker stack deploy -c docker-stack.yml prom",
+                # 'start': "HOSTNAME=$(hostname) docker stack deploy -c docker-stack.yml prom",
                 #'repo': 'git@github.com:vegasbrianc/prometheus.git'})
                 'repo': 'git@gitlab.com:a4496/django-zillow.git'})
 

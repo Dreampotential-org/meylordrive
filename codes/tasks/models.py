@@ -7,6 +7,7 @@ class Org(models.Model):
                              null=True, blank=True, default=None)
     name = models.CharField(max_length=4096, blank=True, null=True)
 
+
 class SystemSpecs(models.Model):
     architecture = models.CharField(max_length=100)
     cpu_op_modes = models.CharField(max_length=100)
@@ -86,9 +87,10 @@ class ServerGroup(models.Model):
 
 
 class ProjectMember(models.Model):
-    added_by = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
-                             null=True, blank=True, default=None,
-                            related_name="added_by")
+    added_by = models.ForeignKey(
+        get_user_model(), on_delete=models.CASCADE, null=True,
+        blank=True, default=None,
+        related_name="added_by")
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
                              null=True, blank=True, default=None)
     admin = models.BooleanField(default=False)
@@ -133,8 +135,9 @@ class ProjectService(models.Model):
     name = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=64, blank=True, null=True)
 
-    server_group = models.ForeignKey(ServerGroup, on_delete=models.CASCADE,
-                                    blank=True, null=True)
+    server_group = models.ForeignKey(
+        ServerGroup, on_delete=models.CASCADE,
+        blank=True, null=True)
 
 
 class Domain(models.Model):
@@ -147,10 +150,17 @@ class Domain(models.Model):
         blank=True, null=True)
 
 
+class ProjectCommandLog(models.Model):
+    project_command = models.ForeignKey(ProjectCommand,
+                                        on_delete=models.CASCADE,)
+    stdout = models.TextField(blank=True, null=True)
+    file_log = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
 class ProjectServiceLog(models.Model):
     project_service = models.ForeignKey(ProjectService,
                                         on_delete=models.CASCADE,)
     stdout = models.TextField(blank=True, null=True)
     file_log = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-

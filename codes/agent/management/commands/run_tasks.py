@@ -1,4 +1,4 @@
-from tasks.models import Server, SystemSpecs, ProjectServiceLog, ProjectService
+from tasks.models import Server, SystemSpecs, ProjectServiceLog, ProjectService, ProjectCommandLog
 import paramiko
 import os
 from django.core.management.base import BaseCommand
@@ -21,38 +21,31 @@ def configure_server(server):
 
 
 def run_project_command(server, project_command):
-    project_service_log = ProjectServiceLog()
+    project_command_log = ProjectCommandLog()
+    project_command_log.project_command = project_command
+
+    project_command_log.save()
     # task_log.save()
-    get_repo(make_ssh(server), project_command.repo, project_service_log)
+    get_repo(make_ssh(server), project_command.repo, project_command_log)
     # think..
     # now run project_command.command.. which creates a task.
 
 
-def start_project_service(project_service):
-
-    # get list of servers and do one at a time to start...
-
-
-    # start a task_log...
-    for server in project_service.server_group.servers.all():
-        run_project_service(server,  project_service, project_service_log)
-
-
-def get_repo(ssh, repo, project_service_log):
+def get_repo(ssh, repo, project_log):
     if repo is None:
         return
     CHIRP.info(repo)
 
     parsed_repo = repo.rsplit("/", 1)[1].split(".git")[0]
     response = run_log_ssh_command(
-        ssh, f"cd {parsed_repo} && git pull origin main", project_service_log)
+        ssh, f"cd {parsed_repo} && git pull origin main", project_log)
     if response == 0:
         # run_log_ssh_command(ssh, "git pull", project_service_log)
         pass
     else:
         run_log_ssh_command(
             ssh,
-            "eval `ssh-agent`; ssh-add id_rsa; git checkout origin/main; git clone %s" % repo, project_service_log)
+            "eval `ssh-agent`; ssh-add id_rsa; git checkout origin/main; git clone %s" % repo, project_log)
     # run_log_ssh_command(
     #     ssh, "rm -fr %s" % parsed_repo, project_service_log)
 
@@ -305,7 +298,6 @@ class Command(BaseCommand):
         for project_service in project_services:
             server = get_server()
             CHIRP.info("START_SERVEICE###")
-            # start_project_service(project_service)
             t = threading.Thread(target=run_project_service,
                                  args=[server, project_service])
             t.start()
