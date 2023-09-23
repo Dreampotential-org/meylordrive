@@ -1,4 +1,4 @@
-from tasks.models import Server, SystemSpecs, ProjectServiceLog, ProjectService, ProjectCommandLog
+from tasks.models import Server, SystemSpecs, ProjectService, ProjectCommandLog
 import paramiko
 import os
 from django.core.management.base import BaseCommand
@@ -62,7 +62,9 @@ def run_log_ssh_command(ssh, command, project_log=None):
     if not os.path.exists(path):
         os.makedirs(path)
 
-    if project_log:
+    # Why tis this code not working here
+    if project_log.id:
+        raise TypeError
         print("%s" % project_log.id)
         # XXX someone needs to autocreate logs dir if not here..
         fileOut = open(f"./logs/{'out_'+str(project_log.id)}.txt", "a")
@@ -71,13 +73,13 @@ def run_log_ssh_command(ssh, command, project_log=None):
     if len(stdout.read()) > 0:
         for line in stdout.read().splitlines():
             CHIRP.info(line)
-            if project_service_log:
+            if project_log:
                 fileOut.write(str(line))
     CHIRP.info("STDERR")
     if len(stderr.read()) > 0:
         for line in stderr.read().splitlines():
             CHIRP.info(line)
-            if project_service_log:
+            if project_log:
                 fileErr.write(str(line))
     # file1.write(str(l) + "\n")
     # file1.close()
@@ -98,6 +100,8 @@ def run_project_service(server, project_service):
 
     # run the ProjectCommand
     project_command_log = ProjectCommandLog()
+
+    project_command_log.project_service = project_service.command
 
     if project_service.repo is None:
         return
