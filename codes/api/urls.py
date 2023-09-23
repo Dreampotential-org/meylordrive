@@ -29,5 +29,12 @@ urlpatterns = [
 
 
 
+    path('api/project-command', views.create_project_command),
+    path('api/list-project-commands', views.list_project_commands),
+    path('api/delete-project-command/<int:project_command_id>',
+         views.delete_project_command),
+
+
+
 
 ]

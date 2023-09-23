@@ -11,6 +11,13 @@ from tasks.models import KeyPair, ProjectMember
 
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
+def delete_project_command(request, project_command_id):
+    ProjectCommand().objects.filter(
+        id=project_command_id, uesr=request.user).delete()
+    return Response({'message': "Okay"})
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
 def delete_org(request, org_id):
     Org().objects.filter(id=org_id, uesr=request.user).delete()
     return Response({'message': "Okay"})
@@ -37,22 +44,26 @@ def list_orgs(request):
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def create_project(request):
+def create_project_command(request):
 
-    project = Project()
-    org = Org.objects.filter(request.data.get("org_id")).first()
-    project.org = org
-    project.user = request.user
-    project.repo = request.data.get("repo")
-    project.save()
+    project_command = ProjectCommand()
+    # org = Org.objects.filter(request.data.get("org_id")).first()
+    # project.org = org
+    project_command.user = request.user
+    project_command.name = request.data.get("name")
+    project_command.environment_variables = request.data.get(
+        "environment_variables")
+    project_command.save()
 
-    return Response({'id': org.id})
+    return Response({'id': project_command.id})
+
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def list_projects(request):
-    orgs = Org.objects.filter(user=request.user)
-    return Response(orgs)
+def list_project_commands(request):
+    project_commands = ProjectCommand.objects.filter(user=request.user)
+
+    return Response(project_commands)
 
 
 @api_view(["POST"])
@@ -66,6 +77,28 @@ def create_project_service(request):
     project_service.save()
 
     return Response({'id': project_service.id})
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def create_project(request):
+
+    project = Project()
+    org = Org.objects.filter(request.data.get("org_id")).first()
+    project.org = org
+    project.user = request.user
+    project.repo = request.data.get("repo")
+    project.save()
+
+    return Response({'id': org.id})
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def list_projects(request):
+    orgs = Org.objects.filter(user=request.user)
+    return Response(orgs)
+
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -82,30 +115,12 @@ def delete_project_service(request, project_service_id):
     return Response({"message": "Okay"})
 
 
-@api_view(["POST"])
-@permission_classes([IsAuthenticated])
-def create_project_command(request):
-    project_command = ProjectCommand()
-    project_command.repo = request.data.get("repo")
-    project_command.command = request.data.get("command")
-    project_command.name = request.data.get("name")
-    project_command.user = request.user
-    project_command.save()
-
-    return Response({'id': project_command.id})
-
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def list_project_commands(request):
-    project_commands = ProjectCommand.objects.filter(user=request.user)
-    return Response(project_commands)
-
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_keypairs(request):
     keypairs = KeyPair.objects.filter(user=request.user)
     return Response(keypairs)
+
 
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
@@ -154,6 +169,7 @@ def add_member(request):
     pm.save()
 
     return Response({'id': pm.id})
+
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
