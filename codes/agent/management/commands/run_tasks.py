@@ -50,10 +50,9 @@ def get_repo(ssh, repo, project_log):
     #     ssh, "rm -fr %s" % parsed_repo, project_service_log)
 
 
-def run_log_ssh_command(ssh, command, project_service_log=None):
+def run_log_ssh_command(ssh, command, project_log=None):
     CHIRP.info("COMMAND[%s]" % (command))
-    stdin, stdout, stderr = ssh.exec_command(
-        command)
+    stdin, stdout, stderr = ssh.exec_command(command)
     exit_status = stdout.channel.recv_exit_status()  # Blocking call
     stderr.channel.recv_exit_status()
     CHIRP.info("Exit status: %s" % exit_status)
@@ -63,10 +62,11 @@ def run_log_ssh_command(ssh, command, project_service_log=None):
     if not os.path.exists(path):
         os.makedirs(path)
 
-    if project_service_log:
+    if project_log:
+        print("%s" % project_log.id)
         # XXX someone needs to autocreate logs dir if not here..
-        fileOut = open(f"./logs/{'out_'+str(project_service_log.id)}.txt", "a")
-        fileErr = open(f"./logs/{'err_'+str(project_service_log.id)}.txt", "a")
+        fileOut = open(f"./logs/{'out_'+str(project_log.id)}.txt", "a")
+        fileErr = open(f"./logs/{'err_'+str(project_log.id)}.txt", "a")
     CHIRP.info("STARTING OF LOOP")
     if len(stdout.read()) > 0:
         for line in stdout.read().splitlines():
@@ -95,13 +95,15 @@ def line_buffered(f):
 
 
 def run_project_service(server, project_service):
-    project_service_log = ProjectServiceLog()
+
+    # run the ProjectCommand
+    project_command_log = ProjectCommandLog()
 
     if project_service.repo is None:
         return
 
     CHIRP.info("server.ip_address=%s" % server.ip_address)
-    get_repo(make_ssh(server), project_service.repo, project_service_log)
+    get_repo(make_ssh(server), project_service.repo, project_command_log)
 
     project_service.command.status = "RUNNING"
     project_service.command.started_at = datetime.now()
@@ -110,8 +112,8 @@ def run_project_service(server, project_service):
 
     repo_dir = project_service.repo
 
-    fileOut = open(f"./logs/{'out_'+str(project_service_log.id)}.txt", "a")
-    fileErr = open(f"./logs/{'err_'+str(project_service_log.id)}.txt", "a")
+    fileOut = open(f"./logs/{'out_'+str(project_command_log.id)}.txt", "a")
+    fileErr = open(f"./logs/{'err_'+str(project_command_log.id)}.txt", "a")
 
     repo_dir = project_service.repo.rsplit("/", 1)[1].split(".git")[0]
     ssh = make_ssh(server)
