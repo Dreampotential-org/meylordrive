@@ -34,6 +34,17 @@ urlpatterns = [
     path('api/delete-project-command/<int:project_command_id>',
          views.delete_project_command),
 
+    path('api/server', views.create_server),
+    path('api/list-servers', views.list_servers),
+    path('api/delete-server/<int:server_id>',
+         views.delete_server),
+
+
+    path('api/server-group', views.create_server_group),
+    path('api/list-server-groups', views.list_server_groups),
+    path('api/delete-server-group/<int:server_group_id>',
+         views.delete_server_group),
+
 
 
 

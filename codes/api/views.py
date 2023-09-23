@@ -1,6 +1,7 @@
 from rest_framework.decorators import api_view
 
-from tasks.models import Project, ProjectService, ProjectCommand, Org
+from tasks.models import Project, ProjectService
+from tasks.models import ProjectCommand, Org, Server, ServerGroup
 from agent.models import ApiKey
 from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
@@ -11,10 +12,49 @@ from tasks.models import KeyPair, ProjectMember
 
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
+def delete_server(request, server_id):
+    Server().objects.filter(
+        id=server_id, uesr=request.user).delete()
+    return Response({'message': "Okay"})
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def delete_server_group(request, server_group_id):
+    ServerGroup().objects.filter(
+        id=server_group_id, uesr=request.user).delete()
+    return Response({'message': "Okay"})
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def create_server(request):
+    server = Server()
+    server.name = request.data.get("name")
+    server.user = request.user
+    server.save()
+
+    return Response({'id': server.id})
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def create_server_group(request):
+    server_group = ServerGroup()
+    server_group.name = request.data.get("name")
+    server_group.user = request.user
+    server_group.save()
+
+    return Response({'id': server_group.id})
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
 def delete_project_command(request, project_command_id):
     ProjectCommand().objects.filter(
         id=project_command_id, uesr=request.user).delete()
     return Response({'message': "Okay"})
+
 
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
@@ -32,6 +72,22 @@ def create_org(request):
     org.save()
 
     return Response({'id': org.id})
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def list_servers(request):
+    servers = Server.objects.filter(user=request.user)
+
+    return Response(servers)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def list_server_groups(request):
+    server_groups = ServerGroup.objects.filter(user=request.user)
+
+    return Response(server_groups)
 
 
 @api_view(["GET"])
@@ -196,6 +252,7 @@ def list_api_keys(request, member_id):
     keys = ApiKey.objects.filter(user=request.user)
 
     return Response(keys)
+
 
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
