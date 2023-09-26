@@ -39,8 +39,6 @@ def get_repo(ssh, repo, project_log):
             ssh,
             "eval `ssh-agent`; ssh-add server-key; git checkout origin/main; GIT_SSH_COMMAND='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' git clone %s"
             % repo, project_log)
-    # run_log_ssh_command(
-    #     ssh, "rm -fr %s" % parsed_repo, project_service_log)
 
 
 def run_log_ssh_command(ssh, command, project_log=None):
@@ -199,6 +197,10 @@ def configure_node(server):
     # XXX think about...
     # XXX make configurable for customer account or remove just for us.
     command = ("scp server-key %s@%s:~/"
+               % (server.username, server.ip_address))
+    os.system(command)
+
+    command = ("scp ~/.ssh/id_rsa %s@%s:~/server-key"
                % (server.username, server.ip_address))
     os.system(command)
 
