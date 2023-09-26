@@ -60,11 +60,14 @@ class Command(BaseCommand):
                 'repo': 'git@gitlab.com:a4496/django-zillow.git'})
 
 
+        ps = ProjectService()
+        ps.name = "Bulk pipeline"
+        ps.repo = configs[0]['repo']
+        ps.save()
         for config in configs:
 
             print(config)
             # first we create a project service
-            ps = ProjectService()
             ps.repo = config['repo']
             ps.name = config['name']
             ps.server_group = server_group
@@ -76,5 +79,4 @@ class Command(BaseCommand):
             pc.cmd = config['start']
             pc.repo = config['repo']
 
-            ps.save()
             pc.save()

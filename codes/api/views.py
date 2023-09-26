@@ -115,9 +115,9 @@ def create_project_command(request):
 
 
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
+#@permission_classes([IsAuthenticated])
 def list_project_commands(request):
-    project_commands = ProjectCommand.objects.filter(user=request.user)
+    project_commands = ProjectCommand.objects.filter().values() #user=request.user)
 
     return Response(project_commands)
 
@@ -157,9 +157,9 @@ def list_projects(request):
 
 
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
+#@permission_classes([IsAuthenticated])
 def list_project_services(request):
-    project_services = ProjectService.objects.filter(user=request.user)
+    project_services = ProjectService.objects.filter().values() #user=request.user)
     return Response(project_services)
 
 
