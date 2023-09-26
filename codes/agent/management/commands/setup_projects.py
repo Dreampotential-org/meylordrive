@@ -53,7 +53,7 @@ class Command(BaseCommand):
         for state in states.keys():
             configs.append({
                 'domain': '',
-                 'start': 'bash install-ubuntu.sh; virtualenv -p python3 venv; source venv/bin/activate; pip install -r requirements.txt; STATE=%s python codes/manage.py get_redfin_cvs_fails' % state,
+                 'start': 'sudo COMMAND=get_redfin_cvs_fails scripts/batch.sh',
                 'name': 'prometheus',
                 #'start': "HOSTNAME=$(hostname) docker stack deploy -c docker-stack.yml prom",
                 #'repo': 'git@github.com:vegasbrianc/prometheus.git'})

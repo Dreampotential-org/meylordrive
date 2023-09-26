@@ -54,13 +54,9 @@ def run_log_ssh_command(ssh, command, project_log=None):
     if not os.path.exists(path):
         os.makedirs(path)
 
-    # Why tis this code not working here
-    if project_log.id:
-        raise TypeError
-        print("%s" % project_log.id)
-        # XXX someone needs to autocreate logs dir if not here..
-        fileOut = open(f"./logs/{'out_'+str(project_log.id)}.txt", "a")
-        fileErr = open(f"./logs/{'err_'+str(project_log.id)}.txt", "a")
+    # XXX create logs dir if not here...
+    fileOut = open(f"./logs/{'out_'+str(project_log.id)}.txt", "a")
+    fileErr = open(f"./logs/{'err_'+str(project_log.id)}.txt", "a")
     CHIRP.info("STARTING OF LOOP")
     if len(stdout.read()) > 0:
         for line in stdout.read().splitlines():
@@ -90,6 +86,8 @@ def line_buffered(f):
 
 def run_project_command(server, project_command):
     project_command_log = ProjectCommandLog()
+    project_command_log.project_command = project_command
+    project_command_log.save()
 
     if project_command.project_service.repo is None:
         return
