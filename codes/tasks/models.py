@@ -101,19 +101,31 @@ class ProjectMember(models.Model):
                             null=True, blank=True, default=None)
 
 
+class ProjectService(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None)
+    repo = models.CharField(max_length=4096, null=True, blank=True)
+    name = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=64, blank=True, null=True)
+
+    server_group = models.ForeignKey(ServerGroup, on_delete=models.CASCADE,
+                                    blank=True, null=True)
+
 class ProjectCommand(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
                              null=True, blank=True, default=None)
     cmd = models.CharField(max_length=4096, blank=True, null=True)
     status = models.CharField(max_length=64, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    last_started_at = models.DateTimeField(blank=True, null=True)
-    last_finished_at = models.DateTimeField(blank=True, null=True)
+    started_at = models.DateTimeField(blank=True, null=True)
+    finished_at = models.DateTimeField(blank=True, null=True)
     name = models.CharField(max_length=4096, null=True, blank=True)
     meta = models.TextField(null=True, blank=True)
     description = models.TextField(blank=True, null=True, default="")
     environment_variable = models.JSONField(blank=True, null=True,
                                             default=dict)
+    project_service = models.ForeignKey(ProjectService,
+        on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -124,20 +136,6 @@ class Project(models.Model):
                              null=True, blank=True, default=None)
     repo = models.CharField(max_length=4096, null=True, blank=True)
     # can create public private projects
-
-
-class ProjectService(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
-                             null=True, blank=True, default=None)
-    repo = models.CharField(max_length=4096, null=True, blank=True)
-    command = models.ForeignKey(ProjectCommand, on_delete=models.CASCADE,
-                                null=True, blank=True)
-    name = models.TextField(blank=True, null=True)
-    status = models.CharField(max_length=64, blank=True, null=True)
-
-    server_group = models.ForeignKey(
-        ServerGroup, on_delete=models.CASCADE,
-        blank=True, null=True)
 
 
 class Domain(models.Model):
