@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels',
     'drf_yasg',
     'tasks',
     'agent',
@@ -89,6 +90,7 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = 'web.routing.application'
 WSGI_APPLICATION = 'web.wsgi.application'
 
 
@@ -193,3 +195,14 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 APPEND_SLASH = False
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# settings.py
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
