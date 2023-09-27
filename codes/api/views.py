@@ -122,6 +122,20 @@ def list_project_commands(request):
     return Response(project_commands)
 
 
+@api_view(["GET"])
+#@permission_classes([IsAuthenticated])
+def list_project_service_commands(request, project_service_id):
+    project_service = ProjectService.objects.filter(
+        id=project_service_id).first()
+    project_commands = ProjectCommand.objects.filter(
+        project_service=project_service
+    ).values() #user=request.user)
+
+    return Response(project_commands)
+
+
+
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_project_service(request):

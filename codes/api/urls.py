@@ -21,7 +21,8 @@ urlpatterns = [
 
     path('api/project-sevice', views.create_project_service),
     path('api/list-project-services', views.list_project_services),
-    path('api/delete-project_service/<int:project_service_id>', views.delete_project_service),
+    path('api/delete-project_service/<int:project_service_id>',
+         views.delete_project_service),
 
     path('api/create-api-key', views.create_api_key),
     path('api/list-api-keys', views.list_api_keys),
@@ -30,6 +31,8 @@ urlpatterns = [
 
 
     path('api/project-command', views.create_project_command),
+    path('api/list-project-service-commands/<int:project_service_id>',
+         views.list_project_service_commands),
     path('api/list-project-commands', views.list_project_commands),
     path('api/delete-project-command/<int:project_command_id>',
          views.delete_project_command),
