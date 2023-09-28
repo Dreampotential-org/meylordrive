@@ -6,9 +6,6 @@ RUN apt-get update --fix-missing && \
     apt-get install -y python3 libpq-dev && \
     apt-get install -y python3-pip ssh git
 
-COPY id_rsa /root/.ssh/id_rsa
-RUN chown -R root:root /root/.ssh
-
 
 COPY ./requirements.txt /tmp/requirements.txt
 

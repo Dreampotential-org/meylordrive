@@ -35,5 +35,4 @@ knox==0.1.11
 Jinja2
 drf-yasg
 djangorestframework
-django-channels
 channels
