@@ -24,7 +24,6 @@ class Command(BaseCommand):
 
         ips = [
                'clnode179.clemson.cloudlab.us',
-               'clnode174.clemson.cloudlab.us',
                'clnode139.clemson.cloudlab.us',
                'clnode133.clemson.cloudlab.us',
                ]
