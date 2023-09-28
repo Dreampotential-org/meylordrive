@@ -49,18 +49,32 @@ class Command(BaseCommand):
 
 
         configs = []
-        for state in states.keys():
+        for i in range(10):
             configs.append({
                 'domain': '',
                  'start': 'sudo COMMAND=get_redfin_cvs_fails scripts/batch.sh',
-                'name': 'prometheus',
-                #'start': "HOSTNAME=$(hostname) docker stack deploy -c docker-stack.yml prom",
-                #'repo': 'git@github.com:vegasbrianc/prometheus.git'})
+                'name': 'sync_data',
+                'repo': 'git@gitlab.com:a4496/django-zillow.git'})
+
+        for i in range(10):
+            configs.append({
+                'domain': '',
+                 'start': 'sudo COMMAND=get_homes scripts/batch.sh',
+                'name': 'get_homes',
                 'repo': 'git@gitlab.com:a4496/django-zillow.git'})
 
 
+        for i in range(10):
+            configs.append({
+                'domain': '',
+                 'start': 'sudo COMMAND=sync_homes scripts/batch.sh',
+                'name': 'sync_homes',
+                'repo': 'git@gitlab.com:a4496/django-zillow.git'})
+
+
+
         ps = ProjectService()
-        ps.name = "Bulk pipeline"
+        ps.name = "AgentStat services"
         ps.repo = configs[0]['repo']
         ps.save()
         for config in configs:
