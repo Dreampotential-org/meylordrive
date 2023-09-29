@@ -8,6 +8,7 @@ from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
 
 from tasks.models import KeyPair, ProjectMember
+from utils.chirp import CHIRP
 
 
 @api_view(["DELETE"])

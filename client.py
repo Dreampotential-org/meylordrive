@@ -1,5 +1,3 @@
-import websocket
-import thread
 import time
 import asyncio
 import websockets

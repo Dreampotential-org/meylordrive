@@ -36,3 +36,4 @@ Jinja2
 drf-yasg
 djangorestframework
 channels
+websockets
