@@ -11,6 +11,7 @@ urlpatterns = [
     path('api/delete-keypair/<int:keypair_id>', views.get_keypairs),
 
     path("api/add_member/", views.add_member),
+    path("api/list-members/", views.list_members),
     path("api/remove_member/<int:member_id>", views.remove_member),
 
 

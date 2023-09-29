@@ -210,6 +210,28 @@ def create_keypair(request):
     return Response({'id': keypair.id})
 
 
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def list_members(request):
+    # look up pm of user making the request
+    pm = ProjectMember.objects.filter(user=request.user)
+    # check user is admin or Role XXX
+
+    user = ProjectMember.objects.filter(
+        id=request.data.get("member_id")
+    ).first()
+
+    # first user has to have a accout XXX
+    o = Org.objects.filter(id=request.data.get("org_id")).first()
+    if not o:
+        return Response({'message': "Not a valid org_id"})
+
+    # Create new OrgMember
+    members = ProjectMember().objects.filter(org=o).values()
+    return Response(members)
+
+
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def add_member(request):
