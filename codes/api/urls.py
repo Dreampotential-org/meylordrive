@@ -1,5 +1,6 @@
 from django.urls import path, include
 from . import views
+from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = [
     path('api/create-org', views.create_org),
@@ -20,7 +21,7 @@ urlpatterns = [
     path('api/delete-org/<int:org_id>', views.delete_org),
 
 
-    path('api/project-sevice', views.create_project_service),
+    path('api/project-service', views.create_project_service),
     path('api/list-project-services', views.list_project_services),
     path('api/delete-project_service/<int:project_service_id>',
          views.delete_project_service),

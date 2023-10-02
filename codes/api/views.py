@@ -137,12 +137,11 @@ def list_project_service_commands(request, project_service_id):
 
 
 
-@api_view(["POST"])
 @permission_classes([IsAuthenticated])
+@api_view(["POST"])
 def create_project_service(request):
     project_service = ProjectService()
     project_service.repo = request.data.get("repo")
-    project_service.command = request.data.get("command")
     project_service.name = request.data.get("name")
     project_service.user = request.user
     project_service.save()
@@ -155,13 +154,13 @@ def create_project_service(request):
 def create_project(request):
 
     project = Project()
-    org = Org.objects.filter(request.data.get("org_id")).first()
+    org = Org.objects.filter(id=request.data.get("org_id")).first()
     project.org = org
     project.user = request.user
     project.repo = request.data.get("repo")
     project.save()
 
-    return Response({'id': org.id})
+    return Response({'id': project.id})
 
 
 @api_view(["GET"])

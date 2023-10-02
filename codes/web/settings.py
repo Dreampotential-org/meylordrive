@@ -18,8 +18,6 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'https://mapi.dreampotential.org', 'https://api.alt-r.world']
 
-
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -32,7 +30,7 @@ CSRF_COOKIE_SECURE = False
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = False
 
 # Application definition
 
@@ -54,13 +52,14 @@ INSTALLED_APPS = [
     'usersystem',
     'project',
     'api',
+    'storage',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+#    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
