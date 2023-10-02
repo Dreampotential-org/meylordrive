@@ -205,3 +205,4 @@ CHANNEL_LAYERS = {
         },
     },
 }
+MEDIA_ROOT="/data"

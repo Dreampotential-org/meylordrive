@@ -43,9 +43,12 @@ def convert_and_save_video(myfile, request):
 
     # WE need to update this and make it more simple
 
-    os.makedirs('/opt/%s/', user_hash)
+    try:
+        os.makedirs('/data/meylor-uploads/%s/' % user_hash)
+    except FileExistsError:
+        pass
     uploaded_name = (
-        "/opt/%s/%s-%s" % (user_hash, uuid.uuid4(), myfile.name)
+        "/data/meylor-uploads/%s/%s-%s" % (user_hash, uuid.uuid4(), myfile.name)
     ).lower()
 
     filename = fs.save(uploaded_name, myfile)
@@ -80,7 +83,6 @@ from django.views.decorators.csrf import csrf_exempt
 # @permission_classes([IsAuthenticated])
 @csrf_exempt
 def video_upload(request):
-    CHIRP.error("I am here video_upload")
     CHIRP.error(request.FILES)
     CHIRP.error(request.data)
     video = request.data.get('video')
@@ -95,11 +97,13 @@ def video_upload(request):
 
 @api_view(['GET'])
 def stream_video(request, video_id):
-    upload = Upload.objects.filter(id=video_id).first()
-
+    upload = Upload.objects.filter(id=int(video_id)).first()
+    if not upload:
+        return Response("Not Found")
+    print(upload.id)
     # XXX We need to detect the type of file a upload is and do
     # different behav based on content
-    path = settings.BASE_DIR + upload.path
+    path = "/data" + upload.Url
     range_header = request.META.get('HTTP_RANGE', '').strip()
     range_match = video_utils.range_re.match(range_header)
     size = os.path.getsize(path)
