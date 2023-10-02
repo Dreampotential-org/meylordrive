@@ -42,8 +42,10 @@ def convert_and_save_video(myfile, request):
     ).hexdigest()
 
     # WE need to update this and make it more simple
+
+    os.makedirs('/opt/%s/', user_hash)
     uploaded_name = (
-        "%s/%s-%s" % (user_hash, uuid.uuid4(), myfile.name)
+        "/opt/%s/%s-%s" % (user_hash, uuid.uuid4(), myfile.name)
     ).lower()
 
     filename = fs.save(uploaded_name, myfile)
