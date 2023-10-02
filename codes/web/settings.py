@@ -177,7 +177,7 @@ AWS_STORAGE_BUCKET_NAME = 'sfappv2'
 
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', "api.dreampotential.org"]
 
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
