@@ -49,9 +49,11 @@ INSTALLED_APPS = [
     'django_rest_passwordreset',
     'knox',
     'corsheaders',
+    'channels',
     'usersystem',
     'project',
     'api',
+    'server_websocket'
 ]
 
 MIDDLEWARE = [
@@ -89,6 +91,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'web.wsgi.application'
+ASGI_APPLICATION = "server_websocket.routing.application"
 
 
 # Database
@@ -148,10 +151,21 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication', ),
 }
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('localhost', 6379)],
+        },
+    },
+}
+
 # KNOX
 REST_KNOX = {
     'USER_SERIALIZER': 'usersystem.serializer.UserSerializer',
 }
+
+
 
 
 REST_KNOX = {
