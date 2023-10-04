@@ -15,6 +15,10 @@ pip install -r requirements.txt
 # run server
 `python codes/manage.py  runserver`
 
+
+# update ~/.ssh/config
+StrictHostKeyChecking=accept-new
+
 # runs the tasks we have on servers
 `python codes/manage.py  run_tasks`
 

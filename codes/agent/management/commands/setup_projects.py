@@ -22,14 +22,12 @@ class Command(BaseCommand):
         Domain.objects.filter().delete()
         Server.objects.filter().delete()
 
-#        ips = ['130.127.133.20',
-#               '130.127.133.39',
-#               '128.105.144.111',
-#               '130.127.133.18',
-#               '128.105.144.109',
-#               '128.105.144.118',
-#               '130.127.133.30']
-        ips = ['198.22.255.27']
+        ips = [
+               'clnode179.clemson.cloudlab.us',
+               'clnode139.clemson.cloudlab.us',
+               'clnode133.clemson.cloudlab.us',
+               ]
+        # ips = ['198.22.255.27']
 
 
         for ip in ips:
@@ -51,29 +49,47 @@ class Command(BaseCommand):
 
 
         configs = []
-        for state in states.keys():
+        for i in range(10):
             configs.append({
                 'domain': '',
-                # 'start': 'bash install-ubuntu.sh; virtualenv -p python3 venv; source venv/bin/activate; pip install -r requirements.txt; STATE=%s python codes/manage.py get_redfin_cvs_fails' % state,
-                'name': 'prometheus',
-                'start': "HOSTNAME=$(hostname) docker stack deploy -c docker-stack.yml prom",
-                'repo': 'git@github.com:vegasbrianc/prometheus.git'})
+                 'start': 'sudo COMMAND=get_redfin_cvs_fails scripts/batch.sh',
+                'name': 'sync_data',
+                'repo': 'git@gitlab.com:a4496/django-zillow.git'})
+
+        for i in range(10):
+            configs.append({
+                'domain': '',
+                 'start': 'sudo COMMAND=get_homes scripts/batch.sh',
+                'name': 'get_homes',
+                'repo': 'git@gitlab.com:a4496/django-zillow.git'})
 
 
+        for i in range(10):
+            configs.append({
+                'domain': '',
+                 'start': 'sudo COMMAND=sync_homes scripts/batch.sh',
+                'name': 'sync_homes',
+                'repo': 'git@gitlab.com:a4496/django-zillow.git'})
+
+
+
+        ps = ProjectService()
+        ps.name = "AgentStat services"
+        ps.repo = configs[0]['repo']
+        ps.save()
         for config in configs:
 
             print(config)
             # first we create a project service
-            ps = ProjectService()
             ps.repo = config['repo']
             ps.name = config['name']
             ps.server_group = server_group
 
             pc = ProjectCommand()
-            ps.command = pc
+            # ps.command = pc
+            pc.project_service = ps
 
             pc.cmd = config['start']
             pc.repo = config['repo']
 
             pc.save()
-            ps.save(kkkkkk)
