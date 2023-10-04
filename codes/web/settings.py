@@ -199,3 +199,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 APPEND_SLASH = False
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+REST_KNOX = {
+    'TOKEN_TTL': None,  # will create tokens that never expire
+}
+
