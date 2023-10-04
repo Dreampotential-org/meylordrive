@@ -16,7 +16,8 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'https://mapi.dreampotential.org', 'https://api.alt-r.world']
+CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'https://mapi.dreampotential.org',
+                        'https://api.alt-r.world']
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -52,7 +53,7 @@ INSTALLED_APPS = [
     'usersystem',
     'project',
     'api',
-    'server_websocket'
+    'server_websocket',
     'storage',
 ]
 
@@ -60,7 +61,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-#    'django.middleware.csrf.CsrfViewMiddleware',
+    #    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -93,7 +94,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'web.wsgi.application'
 ASGI_APPLICATION = "server_websocket.routing.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
@@ -111,7 +111,6 @@ DATABASES = {
         'PASSWORD': db_password,
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -131,7 +130,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
@@ -145,10 +143,9 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Make knox’s Token Authentication default
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication', ),
+    'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',),
 }
 
 CHANNEL_LAYERS = {
@@ -164,9 +161,6 @@ CHANNEL_LAYERS = {
 REST_KNOX = {
     'USER_SERIALIZER': 'usersystem.serializer.UserSerializer',
 }
-
-
-
 
 REST_KNOX = {
     'SECURE_HASH_ALGORITHM': 'cryptography.hazmat.primitives.hashes.SHA512',
@@ -198,7 +192,6 @@ EMAIL_HOST = 'smtp.office365.com'
 EMAIL_HOST_USER = 'aaron@realtorstat.com'
 EMAIL_HOST_PASSWORD = 'Sha1nesor@'
 EMAIL_PORT = 587
-
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
