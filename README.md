@@ -31,3 +31,8 @@ ssh-add
 ssh-add server-key
 
 
+## running asgi server
+
+`daphne web.asgi:application`
+
+
