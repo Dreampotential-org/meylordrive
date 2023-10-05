@@ -79,8 +79,8 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 # Create your views here.
-@api_view(['POST'])
 # @permission_classes([IsAuthenticated])
+@api_view(['POST'])
 @csrf_exempt
 def video_upload(request):
     CHIRP.error(request.FILES)
