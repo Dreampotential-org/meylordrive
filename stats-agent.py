@@ -38,8 +38,8 @@ def get_stats():
         "SwapPercentage": swap.percent,
         "TotalBytesSent": get_size(net_io.bytes_sent),
         "TotalBytesReceived": get_size(net_io.bytes_recv),
-        "TotalRead": get_size(disk_io.read_bytes),
-        "TotalWrite": get_size(disk_io.write_bytes),
+        #"TotalRead": get_size(disk_io.read_bytes),
+        #"TotalWrite": get_size(disk_io.write_bytes),
     }
 
     print(stats)
