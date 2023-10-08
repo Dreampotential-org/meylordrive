@@ -37,3 +37,4 @@ drf-yasg
 djangorestframework
 channels
 websockets
+psutil
