@@ -32,6 +32,8 @@ def delete_server_group(request, server_group_id):
 def create_server(request):
     server = Server()
     server.name = request.data.get("name")
+    server.ip_address = request.data.get("ip_address")
+    server.username = request.data.get("username")
     server.user = request.user
     server.save()
 
