@@ -38,3 +38,5 @@ djangorestframework
 channels
 websockets
 psutil
+channels-redis
+django-channels
