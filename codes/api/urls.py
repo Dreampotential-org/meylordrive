@@ -41,8 +41,8 @@ urlpatterns = [
 
     path('api/server', views.create_server),
     path('api/list-servers', views.list_servers),
-    path('api/delete-server/<int:server_id>',
-         views.delete_server),
+    path('api/delete-server/<int:server_id>', views.delete_server),
+    path('api/stats', views.stats_entry),
 
 
     path('api/server-group', views.create_server_group),
