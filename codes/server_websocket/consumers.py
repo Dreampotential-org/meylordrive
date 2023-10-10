@@ -35,6 +35,32 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # await self.print_stats_data(new_entry)
 
     @database_sync_to_async  # Decorating the function to be run in a synchronous manner
+    def get_task(self, req_params):
+
+        # get a task on a node...
+        # XXX we will need to do like mark the task being running on server.
+
+        with transaction.atomic():
+            project_command = ProjectCommand.objects.select_for_update(
+                    skip_locked=True).filter(
+                ).exclude(status='running').first()
+
+            if project_command:
+                project_command.status = 'running'
+                project_command.save()
+
+
+            # do some clean up method
+            # last_heard_running
+
+
+            # update status
+            # project_commands[0].status == 'running'
+
+        return project_commands[0]
+
+
+    @database_sync_to_async  # Decorating the function to be run in a synchronous manner
     def create_entry(self, stats_json):
         """
         Synchronous function to create a new entry in the database with the provided JSON data.
@@ -59,8 +85,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             swap_percentage=stats_json['SwapPercentage'],
             total_bytes_sent=stats_json['TotalBytesSent'],
             total_bytes_received=stats_json['TotalBytesReceived'],
-            total_read=stats_json['TotalRead'],
-            total_write=stats_json['TotalWrite'],
+            # total_read=stats_json['TotalRead'],
+            # total_write=stats_json['TotalWrite'],
         )
 
     @staticmethod
