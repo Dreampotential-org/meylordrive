@@ -1,7 +1,8 @@
+from django.http import JsonResponse
 from rest_framework.decorators import api_view
 
 from tasks.models import Project, ProjectService
-from tasks.models import ProjectCommand, Org, Server, ServerGroup
+from tasks.models import ProjectCommand, Org, Server, ServerGroup, StatsEntry
 from agent.models import ApiKey
 from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
@@ -91,6 +92,30 @@ def list_server_groups(request):
     server_groups = ServerGroup.objects.filter(user=request.user)
 
     return Response(server_groups)
+
+@api_view(["GET"])
+# @permission_classes([IsAuthenticated])
+def stats_entry(request):
+    stats = StatsEntry.objects.last()
+    stats_dict = {
+        'system': stats.system,
+        'node_name': stats.node_name,
+        'release': stats.release,
+        'version': stats.version,
+        'machine': stats.machine,
+        'processor': stats.processor,
+        'ip_address': stats.ip_address,
+        'mac_address': stats.mac_address,
+        'total_swap': stats.total_swap,
+        'swap_free': stats.swap_free,
+        'used_swap': stats.used_swap,
+        'swap_percentage': stats.swap_percentage,
+        'total_bytes_sent': stats.total_bytes_sent,
+        'total_bytes_received': stats.total_bytes_received,
+        'total_read': stats.total_read,
+        'total_write': stats.total_write,
+    }
+    return JsonResponse(stats_dict)
 
 
 @api_view(["GET"])

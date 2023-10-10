@@ -1,8 +1,13 @@
+import datetime
+import json
+import time
 import uuid
 import re
 import socket
 import platform
 import psutil
+import asyncio
+import websockets
 
 def get_size(bytes, suffix="B"):
     """
@@ -22,9 +27,10 @@ def get_stats():
     uname = platform.uname()
     swap = psutil.swap_memory()
     net_io = psutil.net_io_counters()
+    disk_io = psutil.disk_io_counters()
 
     stats = {
-        "System": uname.system,
+        "System": uname.system + str(datetime.datetime.utcnow()),
         "Node Name": uname.node,
         "Release": uname.release,
         "Version": uname.version,
@@ -38,12 +44,38 @@ def get_stats():
         "SwapPercentage": swap.percent,
         "TotalBytesSent": get_size(net_io.bytes_sent),
         "TotalBytesReceived": get_size(net_io.bytes_recv),
-        #"TotalRead": get_size(disk_io.read_bytes),
-        #"TotalWrite": get_size(disk_io.write_bytes),
+        "TotalRead": get_size(disk_io.read_bytes),
+        "TotalWrite": get_size(disk_io.write_bytes),
     }
 
-    print(stats)
+    return stats
 
 
+# Replace sets with lists in stats_json
+def convert_sets_to_lists(obj):
+    if isinstance(obj, set):
+        return list(obj)
+    elif isinstance(obj, dict):
+        return {key: convert_sets_to_lists(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_sets_to_lists(item) for item in obj]
+    else:
+        return obj
 
-get_stats()
+
+async def main():
+    uri = "ws://127.0.0.1:8000/ws/chat/"
+    async with websockets.connect(uri) as websocket:
+        # WebSocket connection is open
+        print(f"Connected Over {uri}")
+        while True:
+            stats_json = convert_sets_to_lists(get_stats())
+            print(f"Stats Json: {stats_json}")
+            stats_string = json.dumps(stats_json)
+            # Send a message to the server
+            await websocket.send(stats_string)
+            time.sleep(5)
+
+
+if __name__ == "__main__":
+    asyncio.get_event_loop().run_until_complete(main())
