@@ -4,12 +4,15 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 # from tasks.models import StatsEntry
 from channels.db import database_sync_to_async
+from django.db import transaction
+from asgiref.sync import async_to_sync
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
     """
     A consumer that handles WebSocket connections for chat functionality.
     """
+
     async def connect(self):
         """
         Async function called when the WebSocket is handshaking as part of connection process.
@@ -33,32 +36,34 @@ class ChatConsumer(AsyncWebsocketConsumer):
         new_entry = await self.create_entry(stats_json)
         # Uncomment the next line if you want to print the newly created entry's data
         # await self.print_stats_data(new_entry)
+        await self.send_task_data()
 
-    @database_sync_to_async  # Decorating the function to be run in a synchronous manner
-    def get_task(self, req_params):
+    async def send_task_data(self):
+        # Call the sync function to get project command in async context
+        project_command = await database_sync_to_async(self.get_project_command)()
 
-        # get a task on a node...
-        # XXX we will need to do like mark the task being running on server.
+        # Check if a project_command is found
+        if project_command:
+            print(f"Project Command: {project_command}")
+            await self.send(json.dumps(project_command))
+        else:
+            # If no project_command is found, you can send a message to indicate that the queue is empty
+            await self.send(json.dumps({'message': 'No tasks available.'}))
 
+    # Define synchronous method for getting project command
+    def get_project_command(self):
+        from tasks.models import ProjectCommand
         with transaction.atomic():
-            project_command = ProjectCommand.objects.select_for_update(
-                    skip_locked=True).filter(
-                ).exclude(status='running').first()
+
+            project_command = ProjectCommand.objects.select_for_update(skip_locked=True).filter().exclude(status__isnull=False).first()
+            # project_command = ProjectCommand.objects.filter().values()
+            # project_command = ProjectCommand.objects.filter(status=None).first()
+            print(f"Project: {project_command}")
 
             if project_command:
                 project_command.status = 'running'
                 project_command.save()
-
-
-            # do some clean up method
-            # last_heard_running
-
-
-            # update status
-            # project_commands[0].status == 'running'
-
-        return project_commands[0]
-
+        return project_command
 
     @database_sync_to_async  # Decorating the function to be run in a synchronous manner
     def create_entry(self, stats_json):
