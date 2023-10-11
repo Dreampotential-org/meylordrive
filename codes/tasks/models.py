@@ -131,9 +131,6 @@ class ProjectCommand(models.Model):
     project_service = models.ForeignKey(ProjectService,
                                         on_delete=models.CASCADE, null=True, blank=True)
 
-    def __str__(self):
-        return self.name
-
 
 class Project(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
