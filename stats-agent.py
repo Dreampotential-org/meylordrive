@@ -7,9 +7,13 @@ import socket
 import platform
 import psutil
 import asyncio
+import threading
 import websockets
 import subprocess
-from utils.chirp import CHIRP
+from codes.utils.chirp import CHIRP
+
+
+# from codes.agent.management.commands.run_tasks import run_log_ssh_command
 
 
 def get_size(bytes, suffix="B"):
@@ -69,34 +73,28 @@ def convert_sets_to_lists(obj):
         return obj
 
 
-
-def send_health_data(websocket):
-    # WebSocket connection is open
-    print(f"Connected Over {uri}")
+async def send_health_data(websocket):
     while True:
+        print("Task 1")
         stats_json = convert_sets_to_lists(get_stats())
         print(f"Stats Json: {stats_json}")
         stats_string = json.dumps(stats_json)
         # Send a message to the server
         await websocket.send(stats_string)
-        time.sleep(5)
+        await asyncio.sleep(5)
 
 
-import threading
-
-def main_loop(websocket):
-    while True:
-        # query for get_task
-        task = websocket.connect("/get_task")
-        if task:
-            # start another thread
-            t = threading.Thread(target=run_project_command, args=[task])
-            t.start()
-        else:
-            # sleep
-
-
-
+async def main_loop(websocket, project_command):
+    # Handle the received data here
+    print("Final")
+    print(f"Received data: {project_command}")
+    if project_command:
+        # start another thread
+        t = threading.Thread(target=run_project_command, args=[project_command])
+        t.start()
+    else:
+        print("comes here in else")
+        time.sleep(10)
 
 
 def do_command(command, task_id):
@@ -105,9 +103,8 @@ def do_command(command, task_id):
                                stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     stdout, stderr
-    fileOut = open(f"./logs/{'out_'+str(task_id)}.txt", "a")
-    fileErr = open(f"./logs/{'err_'+str(task_id)}.txt", "a")
-
+    fileOut = open(f"./logs/{'out_' + str(task_id)}.txt", "a")
+    fileErr = open(f"./logs/{'err_' + str(task_id)}.txt", "a")
 
     # for future task is build api server aroud log file
     if len(stdout.read()) > 0:
@@ -140,9 +137,8 @@ def get_repo(task):
             ssh,
             "eval `ssh-agent`; ssh-add id_rsa; git checkout origin/main; git clone %s" % repo, project_log)
 
-def run_project_command(task):
 
-
+def run_project_command(project_command):
     get_repo(task.repo)
 
     project_command.project_service.status = "RUNNING"
@@ -153,8 +149,8 @@ def run_project_command(task):
 
     repo_dir = project_command.project_service.repo
 
-    fileOut = open(f"./logs/{'out_'+str(task.id)}.txt", "a")
-    fileErr = open(f"./logs/{'err_'+str(task.id)}.txt", "a")
+    fileOut = open(f"./logs/{'out_' + str(project_command.id)}.txt", "a")
+    fileErr = open(f"./logs/{'err_' + str(project_command.id)}.txt", "a")
 
     repo_dir = project_command.project_service.repo.rsplit("/", 1)[1].split(".git")[0]
     ssh = make_ssh(server)
@@ -188,30 +184,39 @@ def run_project_command(task):
     fileErr.close()
 
 
-
+async def receive_task_data(websocket):
+    received_data = []
+    while True:
+        data = await websocket.recv()
+        json_data = json.loads(data)
+        # Handle the received data here
+        print(f"Received data: {data}")
+        # Add your processing logic for received data here
+        received_data.append(json_data)
+        return received_data
 
 
 async def main():
     uri = "ws://127.0.0.1:8000/ws/chat/"
-    threads = []
     async with websockets.connect(uri) as websocket:
-
+        # WebSocket connection is open
+        print(f"Connected Over {uri}")
         # start some threads
-        t = threading.Thread(target=send_health_data, args=[websocket])
-        t.start()
-        threads.append(t)
+        # Start the tasks to send and receive data
+        tasks = [
+            asyncio.create_task(send_health_data(websocket)),
+            asyncio.create_task(receive_task_data(websocket)),
+        ]
 
+        results = await asyncio.gather(*tasks)
+        command_data = results[1]
 
-        # start the main worker thread
-        t = threading.Thread(target=main_loop, args=[websocket])
-        t.start()
-        threads.append(t)
+        tasks_two = [
+            asyncio.create_task(main_loop(websocket, command_data)),
+        ]
 
+        await asyncio.gather(*tasks_two)
 
-
-    # wait for all threads
-    for t in threads:
-        t.join()
 
 if __name__ == "__main__":
     asyncio.get_event_loop().run_until_complete(main())

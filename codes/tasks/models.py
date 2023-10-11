@@ -120,7 +120,7 @@ class ProjectCommand(models.Model):
     cmd = models.CharField(max_length=4096, blank=True, null=True)
     status = models.CharField(max_length=64, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    last_heard_running = models.DateTimeField(auto_now_add=True)
+    # last_heard_running = models.DateTimeField(auto_now_add=True)
     started_at = models.DateTimeField(blank=True, null=True)
     finished_at = models.DateTimeField(blank=True, null=True)
     name = models.CharField(max_length=4096, null=True, blank=True)
