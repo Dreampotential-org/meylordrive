@@ -1,4 +1,12 @@
-# MeylorCI
+# MeylorDrive
+
+This project makes it easy to manage a single or thousands of nodes system to orchestrate  
+
+Get Instant 
+Monitor Utilization
+Infrastructure access 
+Search, Dashboard, Explorer, Services and Commands
+
 
 ## Install
 
@@ -9,27 +17,16 @@ pip install -r requirements.txt
 ```
 
 ### Setup database
-`./scripts/local_db.sh`
-`python codes/manage.py  migrate`
+```
+./scripts/local_db.sh
+python codes/manage.py  migrate
+
+```
 
 # run server
-`python codes/manage.py  runserver`
-
-
-# update ~/.ssh/config
-StrictHostKeyChecking=accept-new
-
-# runs the tasks we have on servers
-`python codes/manage.py  run_tasks`
-
-
-
-## debug ssh key issue
-eval `ssh-agent -s`
-ssh-add
-
-ssh-add server-key
-
+```
+python codes/manage.py  runserver
+```
 
 ## running asgi server
 
