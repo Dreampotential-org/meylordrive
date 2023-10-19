@@ -1,1 +1,1 @@
-from .routing import websocket_urlpatterns
+# from .routing import websocket_urlpatterns
