@@ -312,7 +312,7 @@ def create_api_key(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def list_api_keys(request, member_id):
-    keys = ApiKey.objects.filter(user=request.user)
+    keys = ApiKey.objects.filter(user=request.user).values()
 
     return Response(keys)
 

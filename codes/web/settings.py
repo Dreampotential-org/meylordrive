@@ -16,7 +16,9 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'https://mapi.dreampotential.org',
+CSRF_TRUSTED_ORIGINS = ['http://localhost',
+                        'http://127.0.0.1',
+                        'https://mapi.dreampotential.org',
                         'https://api.alt-r.world']
 
 # Quick-start development settings - unsuitable for production
@@ -99,7 +101,7 @@ ASGI_APPLICATION = "server_websocket.routing.application"
 
 db_password = os.environ.get('db_password', 'EhB4bINnDFmzI0Bg')
 db_user = os.environ.get('db_user', 'postgres')
-db_host = os.environ.get('db_user', 'localhost')
+db_host = os.environ.get('db_user', '130.127.133.189')
 
 DATABASES = {
     'default': {
