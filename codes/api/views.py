@@ -81,7 +81,7 @@ def create_org(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def list_servers(request):
-    servers = Server.objects.filter(user=request.user).values()
+    servers = Server.objects.filter(user=request.user)
 
     return Response(servers)
 
@@ -89,7 +89,7 @@ def list_servers(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def list_server_groups(request):
-    server_groups = ServerGroup.objects.filter(user=request.user).values()
+    server_groups = ServerGroup.objects.filter(user=request.user)
 
     return Response(server_groups)
 
@@ -121,7 +121,7 @@ def stats_entry(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def list_orgs(request):
-    orgs = Org.objects.filter(user=request.user).values()
+    orgs = Org.objects.filter(user=request.user)
 
     return Response(orgs)
 
@@ -193,7 +193,7 @@ def create_project(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def list_projects(request):
-    orgs = Org.objects.filter(user=request.user).values()
+    orgs = Org.objects.filter(user=request.user)
     return Response(orgs)
 
 
@@ -215,7 +215,7 @@ def delete_project_service(request, project_service_id):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_keypairs(request):
-    keypairs = KeyPair.objects.filter(user=request.user).values()
+    keypairs = KeyPair.objects.filter(user=request.user)
     return Response(keypairs)
 
 

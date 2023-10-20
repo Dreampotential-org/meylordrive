@@ -9,7 +9,7 @@ urlpatterns = [
 
     path('api/create-keypair', views.create_keypair),
     path('api/list-keypairs', views.get_keypairs),
-    path('api/delete-keypair/<int:keypair_id>', views.get_keypairs),
+    path('api/delete-keypair/<int:keypair_id>', views.delete_keypair),
 
     path("api/add_member/", views.add_member),
     path("api/list-members/", views.list_members),

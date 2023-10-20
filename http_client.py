@@ -1,6 +1,6 @@
 import requests
 
-headers = { "Authorization" : "Token b8a2625b450267174d581086712ac6ce1944016551bfb9171a9687f9e3006051"}
+headers = { "Authorization" : "Token 069bf758c411b2f5bd3374d8faa74318d31bcb6dd99b67715ad29907502bd3e7"}
 
 
 # body = {
@@ -19,8 +19,10 @@ body = {'value': "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDk2ZJWJ1vVtEoKDN8eXWUvJw
 # req = requests.post(
 #     "https://api.dreampotential.org/api/create-keypair", headers=headers, json=body)
 
-req = requests.post(
-    "http://localhost:8000/api/create-keypair", headers=headers, json=body)
+# req = requests.post(
+#     "http://localhost:8000/api/create-keypair", headers=headers, json=body)
 
+req = requests.delete(
+    "http://localhost:8000/api/delete-keypair/12", headers=headers, json=body)
 
-# print(req.json())
+print(req.json())
