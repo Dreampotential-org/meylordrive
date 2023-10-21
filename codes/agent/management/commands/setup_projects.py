@@ -17,6 +17,7 @@ class Command(BaseCommand):
 
         # we want to think about this model.
 
+        AMOUNT = 12
         ProjectCommand.objects.filter().delete()
         ProjectService.objects.filter().delete()
         Domain.objects.filter().delete()
@@ -26,6 +27,10 @@ class Command(BaseCommand):
             'clnode144.clemson.cloudlab.us',
             'clnode138.clemson.cloudlab.us',
             'clnode157.clemson.cloudlab.us',
+
+            'clnode225.clemson.cloudlab.us',
+            'clnode252.clemson.cloudlab.us',
+            'clnode227.clemson.cloudlab.us',
         ]
 
         username = 'arosen'
@@ -46,7 +51,7 @@ class Command(BaseCommand):
         for i in range(7):
             configs.append({
                 'domain': '',
-                 'start': 'sudo COMMAND=get_redfin_cvs_fails scripts/batch.sh',
+                'start': 'sudo COMMAND=get_redfin_cvs_fails scripts/batch.sh',
                 'name': 'sync_data',
                 'repo': 'git@gitlab.com:a4496/django-zillow.git'})
 
@@ -61,10 +66,9 @@ class Command(BaseCommand):
         for i in range(7):
             configs.append({
                 'domain': '',
-                 'start': 'sudo COMMAND=sync_homes scripts/batch.sh',
+                'start': 'sudo COMMAND=sync_homes scripts/batch.sh',
                 'name': 'sync_homes',
                 'repo': 'git@gitlab.com:a4496/django-zillow.git'})
-
 
 
         ps = ProjectService()
