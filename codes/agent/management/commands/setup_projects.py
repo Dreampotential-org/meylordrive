@@ -23,17 +23,17 @@ class Command(BaseCommand):
         Server.objects.filter().delete()
 
         ips = [
-               'clnode179.clemson.cloudlab.us',
-               'clnode139.clemson.cloudlab.us',
-               'clnode133.clemson.cloudlab.us',
-               ]
-        # ips = ['198.22.255.27']
+            'clnode144.clemson.cloudlab.us',
+            'clnode138.clemson.cloudlab.us',
+            'clnode157.clemson.cloudlab.us',
+        ]
 
+        username = 'arosen'
 
         for ip in ips:
             server = Server()
             server.ip_address = ip
-            server.username = "arosen"
+            server.username = username
             server.save()
 
         server_group = ServerGroup()
@@ -41,22 +41,16 @@ class Command(BaseCommand):
         server_group.save()
         server_group.servers.add(server)
         server_group.save()
-        #    configs.append({
-        #        'domain': '',
-        #        'start': 'bash install-ubuntu.sh; virtualenv -p python3 venv; source venv/bin/activate; pip install -r requirements.txt; STATE=%s python codes/manage.py get_redfin_cvs_fails' % state,
-        #        'name': 'django-zillow',
-        #        'repo': 'git@gitlab.com:a4496/django-zillow.git'})
-
 
         configs = []
-        for i in range(10):
+        for i in range(7):
             configs.append({
                 'domain': '',
                  'start': 'sudo COMMAND=get_redfin_cvs_fails scripts/batch.sh',
                 'name': 'sync_data',
                 'repo': 'git@gitlab.com:a4496/django-zillow.git'})
 
-        for i in range(10):
+        for i in range(7):
             configs.append({
                 'domain': '',
                  'start': 'sudo COMMAND=get_homes scripts/batch.sh',
@@ -64,7 +58,7 @@ class Command(BaseCommand):
                 'repo': 'git@gitlab.com:a4496/django-zillow.git'})
 
 
-        for i in range(10):
+        for i in range(7):
             configs.append({
                 'domain': '',
                  'start': 'sudo COMMAND=sync_homes scripts/batch.sh',
