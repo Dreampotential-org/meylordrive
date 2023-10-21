@@ -11,6 +11,10 @@ Search, Dashboard, Explorer, Services and Commands
 ## Install
 
 ```
+# Linux
+sudo apt-get install cmake
+
+
 virtualenv -p python3 venv
 source venv/bin/activate
 pip install -r requirements.txt
