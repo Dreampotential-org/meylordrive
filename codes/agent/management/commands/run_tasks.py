@@ -37,7 +37,8 @@ def get_repo(ssh, repo, project_log):
     else:
         run_log_ssh_command(
             ssh,
-            "eval `ssh-agent`; ssh-add id_rsa; git checkout origin/main; git clone %s" % repo, project_log)
+            "eval `ssh-agent`; ssh-add server-key; git checkout origin/main; GIT_SSH_COMMAND='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' git clone %s"
+            % repo, project_log)
     # run_log_ssh_command(
     #     ssh, "rm -fr %s" % parsed_repo, project_service_log)
 
@@ -195,9 +196,9 @@ def configure_node(server):
 
     # XXX think about...
     # XXX make configurable for customer account or remove just for us.
-    # command = ("scp server-key %s@%s:~/"
-    #            % (server.username, server.ip_address))
-    # os.system(command)
+    command = ("scp server-key %s@%s:~/"
+               % (server.username, server.ip_address))
+    os.system(command)
 
     command = ("scp kill-docker.sh %s@%s:~/"
                % (server.username, server.ip_address))
