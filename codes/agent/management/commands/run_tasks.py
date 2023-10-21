@@ -99,6 +99,8 @@ def run_project_command(server, project_command):
     project_command.project_service.status = "RUNNING"
     project_command.status = "RUNNING"
     project_command.started_at = datetime.now()
+    project_command.save()
+    project_command.project_service.save()
     CHIRP.info("Server: %s" % server.ip_address)
     CHIRP.info("COMMAND[%s]" % project_command.cmd)
 
