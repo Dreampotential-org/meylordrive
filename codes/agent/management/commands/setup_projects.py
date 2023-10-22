@@ -31,6 +31,16 @@ class Command(BaseCommand):
             'clnode225.clemson.cloudlab.us',
             'clnode252.clemson.cloudlab.us',
             'clnode227.clemson.cloudlab.us',
+
+            'clnode307.clemson.cloudlab.us',
+            'clnode293.clemson.cloudlab.us',
+            'clnode302.clemson.cloudlab.us',
+
+            'clnode149.clemson.cloudlab.us',
+            'clnode162.clemson.cloudlab.us',
+            'clnode145.clemson.cloudlab.us',
+            'clnode143.clemson.cloudlab.us',
+
         ]
 
         username = 'arosen'
