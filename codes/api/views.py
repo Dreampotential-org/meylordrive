@@ -212,6 +212,35 @@ def delete_project_service(request, project_service_id):
     return Response({"message": "Okay"})
 
 
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def create_project_command(request):
+    project_command = ProjectCommand()
+    project_command.repo = request.data.get("repo")
+    project_command.command = request.data.get("command")
+    project_command.name = request.data.get("name")
+    project_command.user = request.user
+    project_command.save()
+
+    return Response({'id': project_command.id})
+
+@api_view(["GET"])
+#@permission_classes([IsAuthenticated])
+def list_project_commands(request):
+    project_commands = ProjectCommand.objects.filter().values() # user=request.user)
+    return Response(project_commands)
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def delete_project_command(request, project_command_id):
+    ProjectCommand.objects.filter(
+        user=request.user, id=project_command_id
+    ).delete()
+    return Response({"status": "Okay"})
+
+
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_keypairs(request):

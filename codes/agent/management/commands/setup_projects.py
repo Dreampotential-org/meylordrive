@@ -86,8 +86,6 @@ class Command(BaseCommand):
         ps.repo = configs[0]['repo']
         ps.save()
         for config in configs:
-
-            print(config)
             # first we create a project service
             ps.repo = config['repo']
             ps.name = config['name']
@@ -96,7 +94,6 @@ class Command(BaseCommand):
             pc = ProjectCommand()
             # ps.command = pc
             pc.project_service = ps
-
             pc.cmd = config['start']
             pc.repo = config['repo']
 
