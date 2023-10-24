@@ -58,12 +58,28 @@ class Command(BaseCommand):
         server_group.save()
 
         configs = []
-        for i in range(7):
+
+        configs.append({
+            'domain': '',
+            'start': 'sudo COMMAND=score_es scripts/batch.sh',
+            'name': 'score_es',
+            'repo': 'git@gitlab.com:a4496/django-zillow.git'})
+
+
+        for i in range(60):
             configs.append({
                 'domain': '',
                 'start': 'sudo COMMAND=get_redfin_cvs_fails scripts/batch.sh',
                 'name': 'sync_data',
                 'repo': 'git@gitlab.com:a4496/django-zillow.git'})
+
+        for i in range(7):
+            configs.append({
+                'domain': '',
+                 'start': 'sudo COMMAND=get_agent_photos scripts/batch.sh',
+                'name': 'get_homes',
+                'repo': 'git@gitlab.com:a4496/django-zillow.git'})
+
 
         for i in range(7):
             configs.append({
