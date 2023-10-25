@@ -73,7 +73,6 @@ class Command(BaseCommand):
                 'repo': 'git@gitlab.com:a4496/django-zillow.git'})
 
 
-        for i in range(7):
             configs.append({
                 'domain': '',
                 'start': 'sudo COMMAND=sync_homes scripts/batch.sh',
