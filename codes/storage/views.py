@@ -19,7 +19,7 @@ from wsgiref.util import FileWrapper
 @api_view(['POST'])
 def add_comment(request):
     comment = Comment()
-    upload = Upload.objects.list(
+    upload = Upload.objects.filter(
         id=int(request.data.get("upload_id"))).first()
 
     if not upload:
@@ -28,14 +28,19 @@ def add_comment(request):
 
     comment.upload = upload
     comment.message = request.data.get("message")
-    comment.user = request.user
+
+    try:
+        comment.user = request.user
+    except (AttributeError, ValueError):
+        pass
+
     comment.save()
 
     return Response({'status': 'okay'})
 
 @api_view(['GET'])
 def list_comments(request, upload_id):
-    comments = Comment.objects.list(
+    comments = Comment.objects.filter(
         upload__id=int(upload_id)).values()
 
     return Response(comments)
