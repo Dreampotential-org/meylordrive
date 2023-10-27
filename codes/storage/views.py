@@ -9,17 +9,43 @@ import hashlib
 import uuid
 from utils.chirp import CHIRP
 
-from storage.models import Upload
+from storage.models import Upload, Comment
 from storage import video_utils
 import mimetypes
 from django.http.response import StreamingHttpResponse
 from wsgiref.util import FileWrapper
 
 
+@api_view(['POST'])
+def add_comment(request):
+    comment = Comment()
+    upload = Upload.objects.list(
+        id=int(request.data.get("upload_id"))).first()
+
+    if not upload:
+        return Response({
+            'error': "no id %s" % request.data.get("upload_id")})
+
+    comment.upload = upload
+    comment.message = request.data.get("message")
+    comment.user = request.user
+    comment.save()
+
+    return Response({'status': 'okay'})
+
+@api_view(['GET'])
+def list_comments(request, upload_id):
+    comments = Comment.objects.list(
+        upload__id=int(upload_id)).values()
+
+    return Response(comments)
+
+
 def convert_file(uploaded_file_url):
     outfile = "%s.mp4" % uploaded_file_url.rsplit(".", 1)[0]
     command = (
-        'avconv -i ./%s -codec copy ./%s' % (uploaded_file_url, outfile)
+        'avconv -i ./%s -codec copy ./%s' % (uploaded_file_url,
+                                             outfile)
     )
     print(command)
     os.system(command)
