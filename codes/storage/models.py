@@ -2,6 +2,10 @@ from django.db import models
 from django.contrib.auth import get_user_model
 
 
+class View(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
 class Upload(models.Model):
     Url = models.CharField(max_length=500)
     path = models.CharField(max_length=500)
