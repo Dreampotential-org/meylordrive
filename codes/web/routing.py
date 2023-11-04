@@ -1,7 +1,7 @@
 # routing.py
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.urls import path
-from your_app.consumers import YourConsumer  # Replace with your WebSocket consumer
+from server_agent.consumers import ServerAgentConsumer  # Replace with your WebSocket consumer
 
 application = ProtocolTypeRouter({
     "websocket": URLRouter([

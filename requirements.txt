@@ -39,4 +39,4 @@ channels
 websockets
 psutil
 channels-redis
-django-channels
+#django-channels
