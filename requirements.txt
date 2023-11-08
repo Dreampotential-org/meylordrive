@@ -40,3 +40,4 @@ websockets
 psutil
 channels-redis
 #django-channels
+social-auth-app-django       
