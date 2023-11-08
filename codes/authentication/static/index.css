@@ -1,0 +1,35 @@
+/* Style container-fluid */
+.container-fluid {
+    height: 100vh;
+    background-color: flex; /* Should this be a color value? */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Style container-fluid div */
+.container-fluid > div {
+    width: 85%; /* Changed to a percentage value */
+    min-width: 300px;
+    max-width: 500px;
+}
+
+/* Style card */
+.card {
+    width: 100%;
+    background-color: #282c34;
+}
+
+/* Style social-container */
+.social-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Style links in buttons */
+.btn a,
+.btn a:hover {
+    color: white;
+    text-decoration: none;
+}

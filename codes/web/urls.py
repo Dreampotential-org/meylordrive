@@ -17,12 +17,16 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-
+from codes.authentication import views
 from django.urls import re_path
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from server_agent.routing import websocket_urlpatterns
+from django.urls import path, include
+from django.contrib import admin
+from django.contrib.auth.views import LogoutView
+
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -38,13 +42,20 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-  # path('', include('tasks.urls')),
+    path('login/', views.login, name='login'),
+
+    path('signup/', views.signup, name='signup'),
+    path('logout/', views.logout_view, name='logout'),
+    path('social-auth/', include('social_django.urls', namespace='social')), 
+
+    path('', views.home, name='home'),
   path('admin/', admin.site.urls),
   path("usersystem/", include('usersystem.urls')),
   path("storage/", include('storage.urls')),
   path("", include('api.urls')),
   path('ws/', include(websocket_urlpatterns)),
   path('server-agent/', include('server_agent.urls')),
+
   path('swagger<format>', schema_view.without_ui(cache_timeout=0), name='schema-json'),
   path('swagger', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
   path('redoc', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),

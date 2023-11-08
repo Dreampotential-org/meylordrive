@@ -71,6 +71,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+   'social_django.middleware.SocialAuthExceptionMiddleware', 
+
 
 ]
 
@@ -91,6 +93,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+
             ],
         },
     },
@@ -208,3 +212,19 @@ REST_KNOX = {
     'TOKEN_TTL': None,  # will create tokens that never expire
 }
 
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '1080935805006-grv71s87oklr4eoos6h8m0no6rjtnrt7.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+
+LOGIN_URL='login'
+LOGIN_REDIRECT_URL='home'
+LOGOUT_URL='logout'
+LOGOUT_REDIRECT_URL ='login'
+
+# SOCIAL_AUTH_GOOGLE_OAUTH2_KEY ='1080935805006-grv71s87oklr4eoos6h8m0no6rjtnrt7.apps.googleusercontent.com'
+# SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET='GOCSPX-Vn_olHbd6biA408Ky2UU5¡LHoU3x'
+SOCIAL_AUTH_REDIRECT_URI = 'http://localhost:8000/social-auth/complete/google-oauth2/'
