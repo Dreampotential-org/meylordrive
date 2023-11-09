@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'api',
     'server_websocket',
     'storage',
+    'ai',
 ]
 
 MIDDLEWARE = [
