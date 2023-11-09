@@ -42,3 +42,4 @@ channels-redis
 #django-channels
 social-auth-app-django       
 openai
+Pillow

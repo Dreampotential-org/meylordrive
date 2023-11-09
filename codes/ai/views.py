@@ -162,7 +162,7 @@ def generate_image(request):
 
 
 @api_view(["POST"])
-def generate_description(request):
+def input_chat(request):
 
     car = ChatApiRequest()
     car.input_content = request.data.get("input_content")
@@ -172,7 +172,7 @@ def generate_description(request):
     messages=[
         {
         "role": "system",
-        "content": "You are a real estate copywriter who writes compelling and descriptive property listings. Given a list of property details such as number of bedrooms, bathrooms, square footage, amenities, neighborhood features, and anything else notable about the property, your task is to compose an engaging, persuasive, and professional property description that highlights the most desirable and distinctive attributes of the home or building in a way that attracts interest from potential buyers or tenants."
+        "content": ""
         },
         {
         "role": "user",
@@ -194,7 +194,6 @@ def generate_description(request):
     car.completion_tokens = response['usage']['completion_tokens']
     car.total_tokens = response['usage']['total_tokens']
     car.save()
-
 
     return Response(response['choices'][0]['message']['content'])
 
