@@ -62,7 +62,6 @@ INSTALLED_APPS = [
     'storage',
     'social_django',
     'authentication',
-
     'ai',
 ]
 
@@ -84,7 +83,6 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = False
 CORS_ORIGIN_ALLOW_ALL = True
 
-ROOT_URLCONF = 'web.urls'
 ROOT_URLCONF = 'web.urls'
 
 TEMPLATES = [
@@ -232,4 +230,5 @@ LOGOUT_REDIRECT_URL ='login'
 
 # SOCIAL_AUTH_GOOGLE_OAUTH2_KEY ='1080935805006-grv71s87oklr4eoos6h8m0no6rjtnrt7.apps.googleusercontent.com'
 # SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET='GOCSPX-Vn_olHbd6biA408Ky2UU5¡LHoU3x'
-SOCIAL_AUTH_REDIRECT_URI = 'http://localhost:8000/social-auth/complete/google-oauth2/'
+SOCIAL_AUTH_REDIRECT_URI = 'https://api.dreampotential.org/social-auth/complete/google-oauth2/'
+USE_X_FORWARDED_HOST = True

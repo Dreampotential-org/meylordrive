@@ -13,7 +13,7 @@ from utils.chirp import CHIRP
 from ai.models import ChatApiRequest
 
 stability_api_key = "sk-heMfVLMb0aM0y6VVHDOZJI2nzFppBcAEEkIoHSgC3rAqXReu"
-openai.api_key = "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"
+openai.api_key = "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"
 
 
 # Supported image sizes for cropping

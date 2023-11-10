@@ -41,5 +41,5 @@ psutil
 channels-redis
 #django-channels
 social-auth-app-django       
-openai
+openai==0.28
 Pillow
