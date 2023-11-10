@@ -60,6 +60,9 @@ INSTALLED_APPS = [
     'api',
     'server_websocket',
     'storage',
+    'social_django',
+    'authentication',
+
 ]
 
 MIDDLEWARE = [
@@ -81,11 +84,12 @@ CORS_ALLOW_CREDENTIALS = False
 CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'web.urls'
+ROOT_URLCONF = 'web.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -93,7 +97,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'social_django.context_processors.backends',
+                'django.template.context_processors.request',
 
             ],
         },

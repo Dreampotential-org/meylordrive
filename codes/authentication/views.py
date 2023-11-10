@@ -4,7 +4,7 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 
 def login(request):
-    if request.method == 'GET':
+    if request.method == 'POST':
         # Add your login logic here
         # If the login is successful, redirect to the desired URL
         return HttpResponseRedirect("https://voice.google.com/u/0/calls")
@@ -12,7 +12,8 @@ def login(request):
 
 @login_required
 def home(request):
-    return render(request, 'home.html')
+        
+        return HttpResponseRedirect("https://voice.google.com/u/0/calls")
 
 @login_required
 def logout_view(request):
