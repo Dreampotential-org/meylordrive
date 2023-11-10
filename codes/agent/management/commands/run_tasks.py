@@ -19,7 +19,7 @@ def configure_server(server):
     # required for service to work.
 
     # XXX clear nodes to clean state.
-    # run_log_ssh_command(make_ssh(server), "sudo bash kill-docker.sh")
+    run_log_ssh_command(make_ssh(server), "sudo bash kill-docker.sh")
     return finger_print
 
 
@@ -29,16 +29,19 @@ def get_repo(ssh, repo, project_log):
     CHIRP.info(repo)
 
     parsed_repo = repo.rsplit("/", 1)[1].split(".git")[0]
+
     response = run_log_ssh_command(
         ssh, f"cd {parsed_repo} && git pull origin main", project_log)
     if response == 0:
-        # run_log_ssh_command(ssh, "git pull", project_service_log)
-        pass
+        run_log_ssh_command(
+            ssh,
+            "eval `ssh-agent`; ssh-add server-key; GIT_SSH_COMMAND='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' git clone %s"
+            % repo, project_log)
     else:
         run_log_ssh_command(
             ssh,
-            "eval `ssh-agent`; ssh-add server-key; git checkout origin/main; GIT_SSH_COMMAND='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' git clone %s"
-            % repo, project_log)
+            "eval `ssh-agent`; ssh-add server-key; git checkout origin/main; GIT_SSH_COMMAND='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no' git pull origin main",
+            project_log)
 
 
 def run_log_ssh_command(ssh, command, project_log=None):
@@ -54,8 +57,9 @@ def run_log_ssh_command(ssh, command, project_log=None):
         os.makedirs(path)
 
     # XXX create logs dir if not here...
-    fileOut = open(f"./logs/{'out_'+str(project_log.id)}.txt", "a")
-    fileErr = open(f"./logs/{'err_'+str(project_log.id)}.txt", "a")
+    if project_log:
+        fileOut = open(f"./logs/{'out_'+str(project_log.id)}.txt", "a")
+        fileErr = open(f"./logs/{'err_'+str(project_log.id)}.txt", "a")
     CHIRP.info("STARTING OF LOOP")
     if len(stdout.read()) > 0:
         for line in stdout.read().splitlines():
@@ -71,6 +75,9 @@ def run_log_ssh_command(ssh, command, project_log=None):
     # file1.write(str(l) + "\n")
     # file1.close()
     CHIRP.info("ENDING OF LOOP")
+    if project_log:
+        fileOut.close()
+        fileErr.close()
     return int(exit_status)
 
 

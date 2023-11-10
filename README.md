@@ -14,6 +14,10 @@ Search, Dashboard, Explorer, Services and Commands
 # Linux
 sudo apt-get install cmake
 
+windows
+https://www.python.org/ftp/python/3.10.10/python-3.10.10-amd64.exe
+python -m venv
+.\venv\Scripts\activate
 
 virtualenv -p python3.10 venv
 source venv/bin/activate

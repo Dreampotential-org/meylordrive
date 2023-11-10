@@ -51,6 +51,8 @@ urlpatterns = [
     path('', views.home, name='home'),
   path('admin/', admin.site.urls),
   path("usersystem/", include('usersystem.urls')),
+    path("ai/", include('ai.urls')),
+
   path("storage/", include('storage.urls')),
   path("", include('api.urls')),
   path('ws/', include(websocket_urlpatterns)),
