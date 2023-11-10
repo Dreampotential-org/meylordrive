@@ -40,6 +40,8 @@ websockets
 psutil
 channels-redis
 #django-channels
-social-auth-app-django       
+social-auth-app-django
 openai==0.28
 Pillow
+ray[data,train,tune,serve]
+ray[default]
