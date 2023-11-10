@@ -15,7 +15,7 @@ logging.getLogger("paramiko").setLevel(logging.WARNING)
 
 server_prints = {}
 
-ray.init()
+ray.init(address='ray://127.0.0.1:6378')
 import time
 print("Waiting for ray")
 print("Starting")
@@ -100,7 +100,9 @@ def line_buffered(f):
 
 @ray.remote
 def run_project_command(project_command):
+    CHIRP.info("this is run project command:")
     server = get_server()
+    CHIRP.info("Server command: %s" % server)
     project_command_log = ProjectCommandLog()
     project_command_log.project_command = project_command
     project_command_log.save()

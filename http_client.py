@@ -7,8 +7,8 @@ body={
     'input_content': 'how to install python on windows'
 }
 req = requests.post(
-    "http://localhost:8000/ai/input-chat/", headers=headers, json=body)
-    #"https://api.dreampotential.org/ai/input-chat/", headers=headers, json=body)
+    #"http://localhost:8000/ai/input-chat/", headers=headers, json=body)
+    "https://api.dreampotential.org/ai/input-chat/", headers=headers, json=body)
 
 print(req.text)
 import os
