@@ -15,7 +15,7 @@ logging.getLogger("paramiko").setLevel(logging.WARNING)
 
 server_prints = {}
 
-ray.init(address='ray://127.0.0.1:6378')
+ray.init()
 import time
 print("Waiting for ray")
 print("Starting")
