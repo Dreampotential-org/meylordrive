@@ -9,12 +9,12 @@ class Org(models.Model):
                              null=True, blank=True, default=None)
     name = models.CharField(max_length=4096, blank=True, null=True)
 
-class ApiKey(models.Model):
-    key = models.CharField(max_length=255)
-    user = models.ForeignKey(get_user_model(),
-                             on_delete=models.CASCADE,
-                             null=True, blank=True,
-                             default=None)
+# class ApiKey(models.Model):
+#     key = models.CharField(max_length=255)
+#     user = models.ForeignKey(get_user_model(),
+#                              on_delete=models.CASCADE,
+#                              null=True, blank=True,
+#                              default=None)
 class SystemSpecs(models.Model):
     architecture = models.CharField(max_length=100)
     cpu_op_modes = models.CharField(max_length=100)
