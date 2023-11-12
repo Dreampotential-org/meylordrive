@@ -2,8 +2,8 @@
 
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-from django.contrib.auth.models import User
-
+# from django.contrib.auth.models import User
+from tasks.models import ApiKey
 
 class ServerAgentConsumer(AsyncWebsocketConsumer):
 
@@ -52,7 +52,7 @@ class ServerAgentConsumer(AsyncWebsocketConsumer):
         # Implement your authentication logic here
         # Return the authenticated user or None if authentication fails
         try:
-            user = User.objects.get(api_key=api_key)
+            user = ApiKey.objects.get(api_key=api_key)
             self.scope['user'] = user
             return user
         except User.DoesNotExist:
