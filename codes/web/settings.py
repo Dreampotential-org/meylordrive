@@ -103,8 +103,11 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'web.wsgi.application'
-ASGI_APPLICATION = "server_websocket.routing.application"
+# WSGI_APPLICATION = 'web.wsgi.application'
+# ASGI_APPLICATION = "server_websocket.routing.application"
+# settings.py
+ASGI_APPLICATION = 'server_websocket.routing.application'
+
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
