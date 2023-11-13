@@ -17,6 +17,8 @@ class ApiKey(models.Model):
                             default=None)
     name = models.CharField(max_length=4096, blank=True, null=True)
 
+
+
 class SystemSpecs(models.Model):
     architecture = models.CharField(max_length=100)
     cpu_op_modes = models.CharField(max_length=100)
@@ -46,6 +48,16 @@ class SystemSpecs(models.Model):
     def ___str__(self):
         return str(self.model_name)
 
+class Agent(models.Model):
+    api_key = models.ForeignKey(ApiKey, on_delete=models.CASCADE)
+    system_specs = models.ForeignKey(SystemSpecs, on_delete=models.CASCADE,
+                                     blank=True, null=True)                           
+    name = models.CharField(max_length=4096, blank=True, null=True)
+    error = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_active_at = models.DateTimeField(auto_now_add=True)
+    alive = models.BooleanField(default=False)
+    
 
 class Server(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,

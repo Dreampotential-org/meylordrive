@@ -6,7 +6,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from asgiref.sync import async_to_sync
 from utils.chirp import CHIRP
-from tasks.models import StatsEntry, ApiKey
+from tasks.models import StatsEntry, ApiKey, Agent
 from asgiref.sync import sync_to_async
 from django.db import transaction
 
@@ -25,7 +25,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # print("HERe are all the api keys: %s" % ApiKey.objects.filter().values())
         # print(ApiKey.objects.filter(key=str("7ee9132d-c84e-449e-9f91-50997e65f6cf")).first())
         # return ApiKey.objects.filter(key=api_key).first()
-        return ApiKey.objects.filter(key=str(api_key)).first()
+
+        # set this Agent as connected
+        agent = Agent()
+        agent.alive = True
+        agent.api_key = ApiKey.objects.filter(key=str(api_key)).first()
+        agent.save()
+        return agent.api_key
 
 
     async def connect(self):
