@@ -1,9 +1,11 @@
+import uuid 
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
 
 from tasks.models import Project, ProjectService
 from tasks.models import ProjectCommand, Org, Server, ServerGroup, StatsEntry
-from agent.models import ApiKey
+from tasks.models import ApiKey
+
 from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -332,7 +334,9 @@ def remove_member(request, member_id):
 @permission_classes([IsAuthenticated])
 def create_api_key(request):
     api_key = ApiKey()
+    api_key.name = request.data.get("name")
     api_key.user = request.user
+    api_key.key = str(uuid.uuid4())
     api_key.save()
 
     return Response({'id': api_key.id})
@@ -350,6 +354,6 @@ def list_api_keys(request):
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
 def delete_api_key(request, api_key_id):
-    ApiKey.objects.filter(id=api_key_id).delete()
+    ApiKey.objects.filter(id=api_key_id, user=request.user).delete()
 
     return Response({'status': "ok"})

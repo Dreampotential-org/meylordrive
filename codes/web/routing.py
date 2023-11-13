@@ -10,10 +10,3 @@ application = ProtocolTypeRouter({
         path("ws/some_path/", ServerAgentConsumer.as_asgi()),  # Define WebSocket paths and consumers here
     ]),
 })
-# application = ProtocolTypeRouter({
-#     "websocket": AuthMiddlewareStack(
-#         URLRouter(
-#             websocket_urlpatterns
-#         )
-#     ),
-# })

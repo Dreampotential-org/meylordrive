@@ -200,24 +200,30 @@ async def receive_task_data(websocket):
 
 async def main():
     uri = "ws://127.0.0.1:8000/ws/chat/"
-    async with websockets.connect(uri) as websocket:
-        # WebSocket connection is open
-        print(f"Connected Over {uri}")
-        # start some threads
-        # Start the tasks to send and receive data
-        tasks = [
-            asyncio.create_task(send_health_data(websocket)),
-            asyncio.create_task(receive_task_data(websocket)),
-        ]
+    
+    try:
+        async with websockets.connect(uri) as websocket:
+            # WebSocket connection is open
+            print(f"Connected Over {uri}")
+            
+            # start some threads
+            # Start the tasks to send and receive data
+            tasks = [
+                asyncio.create_task(send_health_data(websocket)),
+                asyncio.create_task(receive_task_data(websocket)),
+            ]
 
-        results = await asyncio.gather(*tasks)
-        command_data = results[1]
+            results = await asyncio.gather(*tasks)
+            command_data = results[1]
 
-        tasks_two = [
-            asyncio.create_task(main_loop(websocket, command_data)),
-        ]
+            tasks_two = [
+                asyncio.create_task(main_loop(websocket, command_data)),
+            ]
 
-        await asyncio.gather(*tasks_two)
+            await asyncio.gather(*tasks_two)
+
+    except websockets.exceptions.WebSocketException as e:
+        print(f"WebSocket connection error: {e}")
 
 
 

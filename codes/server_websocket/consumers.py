@@ -1,29 +1,41 @@
-# chat_app/consumers.py
+# server_websocket/consumers.py
 import datetime
+from gettext import translation
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-# from tasks.models import StatsEntry
 from channels.db import database_sync_to_async
-from django.db import transaction
 from asgiref.sync import async_to_sync
-from tasks.models import ProjectCommand, StatsEntry
-# from tasks.models import StatsEntry
-# from tasks.models import ProjectCommand
 from utils.chirp import CHIRP
+from tasks.models import StatsEntry
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
     """
-    A consumer that handles WebSocket connections for chat functionality.
+    A consumer 
+    that handles WebSocket connections for chat functionality.
     """
 
     async def connect(self):
-        await self.accept()
+
+        # Authenticate user from API key
+        print("Hello a client has connected")
+        api_key = self.scope.get(
+            'url_route', {}).get('kwargs', {}).get('api_key')
+        user = await self.authenticate_user(api_key)
+        if user is None:
+            await self.close()
+            return
+
+
+
+
+        # await self.accept()
 
     async def disconnect(self, close_code):
         pass
 
     async def receive(self, text_data):
+        print("We got something new... %s" % text_data)
         # Decoding the received JSON text data
         stats_json = json.loads(text_data)
         # Calling create_entry async function to create a new entry
@@ -57,7 +69,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     # Define synchronous method for getting project command
     def get_project_command(self):
-        with transaction.atomic():
+        from tasks.models import ProjectCommand  # Move import here
+        with translation.atomic():
 
             project_command = ProjectCommand.objects.select_for_update(
                 skip_locked=True
@@ -73,7 +86,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # Decorating the function to be run in a synchronous manner
     @database_sync_to_async
     def save_stats_entry(self, stats_json):
-        
         return StatsEntry.objects.create(
             system=stats_json['System'],
             node_name=stats_json['Node Name'],
@@ -95,6 +107,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @staticmethod
     async def print_stats_data(entry):
+        from tasks.models import StatsEntry  # Move import here
         stats_data = await database_sync_to_async(
             ChatConsumer.get_fields
         )(entry)

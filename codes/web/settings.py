@@ -63,7 +63,6 @@ INSTALLED_APPS = [
     'social_django',
     'authentication',
     'ai',
-    'server_agent',
 ]
 
 MIDDLEWARE = [
@@ -113,7 +112,7 @@ TEMPLATES = [
 ROOT_URLCONF = 'web.urls'
 
 # ASGI_APPLICATION = 'web.routing.application'
-ASGI_APPLICATION = "web.routing.application"
+ASGI_APPLICATION = "web.asgi.application"
 
 CHANNELS = {
     'default': {
@@ -252,4 +251,3 @@ LOGOUT_REDIRECT_URL ='login'
 # SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET='GOCSPX-Vn_olHbd6biA408Ky2UU5¡LHoU3x'
 SOCIAL_AUTH_REDIRECT_URI = 'https://api.dreampotential.org/social-auth/complete/google-oauth2/'
 USE_X_FORWARDED_HOST = True
-AUTH_USER_MODEL = 'server_agent.CustomUser'
