@@ -7,6 +7,7 @@ from channels.db import database_sync_to_async
 from asgiref.sync import async_to_sync
 from utils.chirp import CHIRP
 from tasks.models import StatsEntry, ApiKey
+from asgiref.sync import sync_to_async
 
 import django
 django.setup()
@@ -17,13 +18,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
     """
     async def authenticate_user(self, api_key):
         print("HERE is the api key from the agentwoot! %s" % api_key)
+        # users = ApiKey.objects.all()
+        print(type(api_key))
+        print("7ee9132d-c84e-449e-9f91-50997e65f6cf" == str(api_key))
+        print("HERe are all the api keys: %s" % ApiKey.objects.filter().values())
+        print(ApiKey.objects.filter(key=str("7ee9132d-c84e-449e-9f91-50997e65f6cf")).first())
         return ApiKey.objects.filter(key=api_key).first()
+
+
     async def connect(self):
 
         # Authenticate user from API key
         print("Hello a client has connected %s" % self.scope)
         api_key = str(self.scope.get("query_string", "")).split("api_key=")[1]
         api_key_obj = await self.authenticate_user(api_key)
+        print(api_key_obj)
         if api_key_obj is None:
             await self.close()
             return
