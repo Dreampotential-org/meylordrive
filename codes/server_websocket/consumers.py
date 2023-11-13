@@ -6,6 +6,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.db import transaction
 from asgiref.sync import async_to_sync
+from tasks.models import ProjectCommand, StatsEntry
 # from tasks.models import StatsEntry
 # from tasks.models import ProjectCommand
 from utils.chirp import CHIRP
@@ -72,7 +73,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # Decorating the function to be run in a synchronous manner
     @database_sync_to_async
     def save_stats_entry(self, stats_json):
-        return
+        
         return StatsEntry.objects.create(
             system=stats_json['System'],
             node_name=stats_json['Node Name'],

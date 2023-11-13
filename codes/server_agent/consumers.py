@@ -2,8 +2,13 @@
 
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from django.contrib.auth.models import User  # Import User model if used
+# from agent.models import ApiKey  
 # from django.contrib.auth.models import User
-from agent.models import ApiKey
+# from agent.models import ApiKey
+from channels.db import database_sync_to_async
+
+from server_agent.models import CustomUser
 
 class ServerAgentConsumer(AsyncWebsocketConsumer):
 
@@ -47,13 +52,17 @@ class ServerAgentConsumer(AsyncWebsocketConsumer):
                 'message': 'Command executed successfully',
             }))
 
-    async def authenticate_user(self, api_key):
-        print("HERE")
-        # Implement your authentication logic here
-        # Return the authenticated user or None if authentication fails
+    @database_sync_to_async
+    def authenticate_user(self, api_key):
         try:
-            user = ApiKey.objects.get(api_key=api_key)
+            user = CustomUser.objects.get(api_key=api_key)
             self.scope['user'] = user
             return user
-        except User.DoesNotExist:
+        except CustomUser.DoesNotExist as e:
+            print(f"User with api_key={api_key} does not exist. Error: {e}")
             return None
+        except Exception as e:
+            print(f"Error during user authentication: {e}")
+            return None
+  # Import ApiKey model
+

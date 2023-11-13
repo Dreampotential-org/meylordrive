@@ -27,6 +27,7 @@ from django.urls import path, include
 from django.contrib import admin
 from django.contrib.auth.views import LogoutView
 
+# from server_agent.routing import websocket_urlpatterns
 
 schema_view = get_schema_view(
    openapi.Info(

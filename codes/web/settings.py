@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'social_django',
     'authentication',
     'ai',
+    'server_agent',
 ]
 
 MIDDLEWARE = [
@@ -71,6 +72,9 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     #    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'channels',
+    # 'channels.auth.AuthenticationMiddleware',
+
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -83,7 +87,6 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = False
 CORS_ORIGIN_ALLOW_ALL = True
 
-ROOT_URLCONF = 'web.urls'
 
 TEMPLATES = [
     {
@@ -106,8 +109,22 @@ TEMPLATES = [
 # WSGI_APPLICATION = 'web.wsgi.application'
 # ASGI_APPLICATION = "server_websocket.routing.application"
 # settings.py
-ASGI_APPLICATION = 'server_websocket.routing.application'
+# ASGI_APPLICATION = 'server_websocket.routing.application'
+ROOT_URLCONF = 'web.urls'
 
+# ASGI_APPLICATION = 'web.routing.application'
+ASGI_APPLICATION = "web.routing.application"
+
+CHANNELS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            # other configurations...
+            "hosts": [('127.0.0.1', 6379)],
+        },
+        'ROUTING': 'web.routing.application',  # adjust based on your project structure
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -235,3 +252,4 @@ LOGOUT_REDIRECT_URL ='login'
 # SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET='GOCSPX-Vn_olHbd6biA408Ky2UU5¡LHoU3x'
 SOCIAL_AUTH_REDIRECT_URI = 'https://api.dreampotential.org/social-auth/complete/google-oauth2/'
 USE_X_FORWARDED_HOST = True
+AUTH_USER_MODEL = 'server_agent.CustomUser'

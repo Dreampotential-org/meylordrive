@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .serializer import ChangePasswordSerializer
 from .serializer import UserSerializer, RegisterSerializer
+from server_agent.models import CustomUser
 
 
 # Create your views here.
@@ -155,7 +156,7 @@ def password_reset_token_created(
 
 class UserView(generics.GenericAPIView):
     serializer_class = UserSerializer
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()
 
     def get(self, request, *args, **kwargs):
         serialiazer = self.get_serializer(self.get_queryset(), many=True)
@@ -164,7 +165,7 @@ class UserView(generics.GenericAPIView):
 
 class UserDetailView(generics.GenericAPIView):
     serializer_class = UserSerializer
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()
 
     def get(self, request, *args, **kwargs):
         try:
