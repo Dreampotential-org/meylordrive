@@ -8,20 +8,22 @@ from asgiref.sync import async_to_sync
 from utils.chirp import CHIRP
 from tasks.models import StatsEntry
 
-
+import django
+django.setup()
 class ChatConsumer(AsyncWebsocketConsumer):
     """
     A consumer 
     that handles WebSocket connections for chat functionality.
     """
+    def authenticate_user(self, api_key):
+        print("HERE is the api key from the agentwoot! %s" % api_key)
 
     async def connect(self):
 
         # Authenticate user from API key
-        print("Hello a client has connected")
-        api_key = self.scope.get(
-            'url_route', {}).get('kwargs', {}).get('api_key')
-        user = await self.authenticate_user(api_key)
+        print("Hello a client has connected %s" % self.scope)
+        api_key = str(self.scope.get("query_string", "")).split("api_key=")[1]
+        user = self.authenticate_user(api_key)
         if user is None:
             await self.close()
             return

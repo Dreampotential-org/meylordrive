@@ -199,7 +199,7 @@ async def receive_task_data(websocket):
 
 
 async def main():
-    uri = "ws://127.0.0.1:8000/ws/chat/"
+    uri = "ws://127.0.0.1:8000/ws/chat/?api_key=1234"
     
     try:
         async with websockets.connect(uri) as websocket:
