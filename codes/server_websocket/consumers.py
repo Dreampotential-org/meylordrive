@@ -6,7 +6,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from asgiref.sync import async_to_sync
 from utils.chirp import CHIRP
-from tasks.models import StatsEntry
+from tasks.models import StatsEntry, ApiKey
 
 import django
 django.setup()
@@ -15,23 +15,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
     A consumer 
     that handles WebSocket connections for chat functionality.
     """
-    def authenticate_user(self, api_key):
+    async def authenticate_user(self, api_key):
         print("HERE is the api key from the agentwoot! %s" % api_key)
-
+        return ApiKey.objects.filter(key=api_key).first()
     async def connect(self):
 
         # Authenticate user from API key
         print("Hello a client has connected %s" % self.scope)
         api_key = str(self.scope.get("query_string", "")).split("api_key=")[1]
-        user = self.authenticate_user(api_key)
-        if user is None:
+        api_key_obj = await self.authenticate_user(api_key)
+        if api_key_obj is None:
             await self.close()
             return
-
-
-
-
-        # await self.accept()
+        print("We have a connected person %s" % api_key_obj.user)
+        await self.accept()
 
     async def disconnect(self, close_code):
         pass

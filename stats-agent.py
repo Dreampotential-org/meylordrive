@@ -199,7 +199,9 @@ async def receive_task_data(websocket):
 
 
 async def main():
-    uri = "ws://127.0.0.1:8000/ws/chat/?api_key=1234"
+    # XXX we need to get from cmd arg or conf file
+    api_key = '7ee9132d-c84e-449e-9f91-50997e65f6cf'
+    uri = "ws://127.0.0.1:8000/ws/chat/?api_key=%s" % api_key
     
     try:
         async with websockets.connect(uri) as websocket:
