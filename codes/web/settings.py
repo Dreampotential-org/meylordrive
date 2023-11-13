@@ -119,7 +119,7 @@ CHANNELS = {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
             # other configurations...
-            "hosts": [('127.0.0.1', 6379)],
+            "hosts": [('agentstat.com', 6379)],
         },
         'ROUTING': 'web.routing.application',  # adjust based on your project structure
     },
@@ -183,7 +183,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('localhost', 6379)],
+            "hosts": [('agentstat.com', 6379)],
         },
     },
 }
