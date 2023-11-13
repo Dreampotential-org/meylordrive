@@ -9,6 +9,20 @@ class Org(models.Model):
                              null=True, blank=True, default=None)
     name = models.CharField(max_length=4096, blank=True, null=True)
 
+    image = models.CharField(max_length=500, blank = True,
+                            default='https://www.iconfinder.com/icons/636895/users_avatar_group_human_people_profile_team_icon')
+    address = models.CharField(max_length = 256,null=True, blank=True,
+                             default=None)  
+    phone_number=models.IntegerField(max_length = 10,null=True, blank=True,
+                             default=None ) 
+    about   = models.CharField(max_length = 256,null=True, blank=True,
+                             default=None)        
+    email=models.CharField(max_length = 256,null=True, blank=True,
+                             default=None)  
+    meta_attributes = models.CharField(max_length=256, unique=True)
+
+
+
 class ApiKey(models.Model):
     key = models.CharField(max_length=255)
     user = models.ForeignKey(get_user_model(),
@@ -57,7 +71,13 @@ class Agent(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     last_active_at = models.DateTimeField(auto_now_add=True)
     alive = models.BooleanField(default=False)
-    
+
+
+class AgentSession(models.Model):
+    agent = models.ForeignKey(Agent, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    ended_at = models.DateTimeField(auto_now_add=True)
+
 
 class Server(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
