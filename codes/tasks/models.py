@@ -24,7 +24,9 @@ class Org(models.Model):
 
 
 class ApiKey(models.Model):
-    key = models.CharField(max_length=255)
+    # key = models.CharField(max_length=255)
+    key = models.CharField(max_length=255, unique=True)
+
     user = models.ForeignKey(get_user_model(),
                             on_delete=models.CASCADE,
                             null=True, blank=True,
@@ -63,15 +65,15 @@ class SystemSpecs(models.Model):
         return str(self.model_name)
 
 class Agent(models.Model):
-    api_key = models.ForeignKey(ApiKey, on_delete=models.CASCADE, null=True, default=None)
+    # api_key = models.ForeignKey(ApiKey, on_delete=models.CASCADE, null=True, default=None)
     system_specs = models.ForeignKey(SystemSpecs, on_delete=models.CASCADE,
                                      blank=True, null=True)                           
     name = models.CharField(max_length=4096, blank=True, null=True)
     error = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     last_active_at = models.DateTimeField(auto_now_add=True)
-    alive = models.BooleanField(default=False)
-
+    api_key = models.ForeignKey(ApiKey, on_delete=models.CASCADE, default=1)  # Use the actual ID of your ApiKey instance
+    alive = models.BooleanField(default=True)
 
 class AgentSession(models.Model):
     agent = models.ForeignKey(Agent, on_delete=models.CASCADE)

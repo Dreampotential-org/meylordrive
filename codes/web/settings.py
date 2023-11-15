@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'social_django',
     'authentication',
     'ai',
+    'chat_websocket',
 ]
 
 MIDDLEWARE = [
