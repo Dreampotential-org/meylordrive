@@ -13,13 +13,13 @@ class Org(models.Model):
                             default='https://www.iconfinder.com/icons/636895/users_avatar_group_human_people_profile_team_icon')
     address = models.CharField(max_length = 256,null=True, blank=True,
                              default=None)  
-    phone_number=models.IntegerField(max_length = 10,null=True, blank=True,
+    phone_number=models.IntegerField(null=True, blank=True,
                              default=None ) 
     about   = models.CharField(max_length = 256,null=True, blank=True,
                              default=None)        
     email=models.CharField(max_length = 256,null=True, blank=True,
                              default=None)  
-    meta_attributes = models.CharField(max_length=256, unique=True)
+    meta_attributes = models.CharField(max_length=256, unique=True, default='some_default_value')
 
 
 
@@ -63,7 +63,7 @@ class SystemSpecs(models.Model):
         return str(self.model_name)
 
 class Agent(models.Model):
-    api_key = models.ForeignKey(ApiKey, on_delete=models.CASCADE)
+    api_key = models.ForeignKey(ApiKey, on_delete=models.CASCADE, null=True, default=None)
     system_specs = models.ForeignKey(SystemSpecs, on_delete=models.CASCADE,
                                      blank=True, null=True)                           
     name = models.CharField(max_length=4096, blank=True, null=True)
