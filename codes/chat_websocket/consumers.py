@@ -2,21 +2,43 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from .models import ChatRoom
+import asyncio
+
 
 class ChatRoomConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.room_group_name = f"chat_{self.room_name}"
+        self.room_name = None
+        room_name_param = self.scope['url_route'].get('kwargs', {}).get('room_name')
 
-        await self.accept()
+        if room_name_param:
+            self.room_name = room_name_param
+            self.room_group_name = f"chat_{self.room_name}"
 
+            api_key = self.scope["query_string"].decode("utf-8").split("api_key=")[1]
+            api_key_obj = await self.authenticate_user(api_key)
+
+            if api_key_obj:
+                await self.channel_layer.group_add(
+                    self.room_group_name,
+                    self.channel_name
+                )
+                await self.accept()
+        else:
+            # Handle the case where 'room_name' is not present in the URL
+            await self.close(code=4000)
     async def disconnect(self, close_code):
-        print(f"Disconnecting {self.channel_name} from {self.room_group_name}")
-        await self.channel_layer.group_discard(
-            self.room_group_name,
-            self.channel_name
-        )
-
+        try:
+            print(f"Disconnecting {self.channel_name} from {self.room_group_name}")
+            await self.channel_layer.group_discard(
+                self.room_group_name,
+                self.channel_name
+            )
+        except Exception as e:
+            print(f"Error disconnecting: {e}")
+        finally:
+            # Sleep for a short duration to ensure the disconnect process completes
+            await asyncio.sleep(0.1)
+            await super().disconnect(close_code)
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']

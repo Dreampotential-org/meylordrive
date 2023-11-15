@@ -16,7 +16,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     """
     A consumer 
     that handles WebSocket connections for chat functionality.
-        """
+            """
     async def authenticate_user(self, api_key):
         print("HERE is the api key from the agentwoot! %s" % api_key)
 
@@ -25,7 +25,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # Check if the ApiKey exists
         if api_key_instance is None:
-            # Invalid API key, return None
+            # Send an error message and close the connection
+            await self.send(text_data=json.dumps({'error': 'Invalid API key'}))
+            await self.close()  # Close the connection
             return None
 
         # Create a new Agent instance and set the api_key_id
@@ -35,19 +37,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return api_key_instance
 
     async def connect(self):
+        self.room_name = None
+        room_name_param = self.scope['url_route'].get('kwargs', {}).get('room_name')
 
-        # Authenticate user from API key
-        print("Hello a client has connected %s" % self.scope)
-        api_key = str(self.scope.get("query_string", "")).split("api_key=")[1].split("'")[0]
-        api_key_obj = await self.authenticate_user(api_key)
+        if room_name_param:
+            self.room_name = room_name_param
+            self.room_group_name = f"chat_{self.room_name}"
 
-        if api_key_obj is None:
-            return
+            api_key = self.scope["query_string"].decode("utf-8").split("api_key=")[1]
+            api_key_obj = await self.authenticate_user(api_key)
 
-        print("We have a connected person %s" % api_key_obj.user)
-        
-        # Accept the WebSocket connection only after authentication
-        await self.accept()
+            if api_key_obj:
+                await self.channel_layer.group_add(
+                    self.room_group_name,
+                    self.channel_name
+                )
+                await self.accept()
+        else:
+            # Handle the case where 'room_name' is not present in the URL
+            await self.close(code=4000)
 
     async def disconnect(self, close_code):
         pass
