@@ -54,6 +54,7 @@ urlpatterns = [
     path("ai/", include('ai.urls')),
 
   path("storage/", include('storage.urls')),
+  path("livestats/", include('livestats.urls')),
   path("", include('api.urls')),
   path('', include(websocket_urlpatterns)),
   path('swagger<format>', schema_view.without_ui(cache_timeout=0), name='schema-json'),

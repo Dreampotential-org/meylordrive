@@ -9,17 +9,19 @@ class Org(models.Model):
                              null=True, blank=True, default=None)
     name = models.CharField(max_length=4096, blank=True, null=True)
 
-    image = models.CharField(max_length=500, blank = True,
-                            default='https://www.iconfinder.com/icons/636895/users_avatar_group_human_people_profile_team_icon')
+    image = models.CharField(
+        max_length=500, blank = True,
+        default='https://www.iconfinder.com/icons/636895/users_avatar_group_human_people_profile_team_icon')
     address = models.CharField(max_length = 256,null=True, blank=True,
-                             default=None)  
+                             default=None)
     phone_number=models.IntegerField(null=True, blank=True,
-                             default=None ) 
+                             default=None )
     about   = models.CharField(max_length = 256,null=True, blank=True,
-                             default=None)        
+                             default=None)
     email=models.CharField(max_length = 256,null=True, blank=True,
-                             default=None)  
-    meta_attributes = models.CharField(max_length=256, unique=True, default='some_default_value')
+                             default=None)
+    meta_attributes = models.CharField(
+        max_length=256, unique=True, default='some_default_value')
 
 
 
@@ -67,12 +69,14 @@ class SystemSpecs(models.Model):
 class Agent(models.Model):
     # api_key = models.ForeignKey(ApiKey, on_delete=models.CASCADE, null=True, default=None)
     system_specs = models.ForeignKey(SystemSpecs, on_delete=models.CASCADE,
-                                     blank=True, null=True)                           
+                                     blank=True, null=True)
     name = models.CharField(max_length=4096, blank=True, null=True)
     error = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     last_active_at = models.DateTimeField(auto_now_add=True)
-    api_key = models.ForeignKey(ApiKey, on_delete=models.CASCADE, default=1)  # Use the actual ID of your ApiKey instance
+    api_key = models.ForeignKey(
+        ApiKey, on_delete=models.CASCADE, default=1)
+    # Use the actual ID of your ApiKey instance
     alive = models.BooleanField(default=True)
 
 class AgentSession(models.Model):
@@ -170,7 +174,8 @@ class ProjectCommand(models.Model):
     environment_variable = models.JSONField(blank=True, null=True,
                                             default=dict)
     project_service = models.ForeignKey(ProjectService,
-                                        on_delete=models.CASCADE, null=True, blank=True)
+                                        on_delete=models.CASCADE,
+                                        null=True, blank=True)
 
 
 class Project(models.Model):
@@ -207,27 +212,6 @@ class ProjectServiceLog(models.Model):
 
 
 class StatsEntry(models.Model):
-    """
-    Represents a database entry of system statistics.
-
-    Attributes:
-        system (str): The operating system name.
-        node_name (str): The name of the node.
-        release (str): The release name of the operating system.
-        version (str): The version of the operating system.
-        machine (str): The type of machine, e.g., 'x86_64'.
-        processor (str): The type of processor, e.g., 'x86_64'.
-        ip_address (str): The IP address of the system.
-        mac_address (str): The MAC address of the system.
-        total_swap (str): The total swap memory in a human-readable format, e.g., '2.00GB'.
-        swap_free (str): The available free swap memory in a human-readable format.
-        used_swap (str): The used swap memory in a human-readable format.
-        swap_percentage (float): The percentage of swap memory used.
-        total_bytes_sent (str): The total number of bytes sent in a human-readable format.
-        total_bytes_received (str): The total number of bytes received in a human-readable format.
-        total_read (str): The total disk read in a human-readable format.
-        total_write (str): The total disk write in a human-readable format.
-    """
     system = models.CharField(max_length=100)
     node_name = models.CharField(max_length=100)
     release = models.CharField(max_length=100)
@@ -235,7 +219,7 @@ class StatsEntry(models.Model):
     machine = models.CharField(max_length=100)
     processor = models.CharField(max_length=100)
     ip_address = models.GenericIPAddressField()
-    mac_address = models.CharField(max_length=100)  # assuming you will store MAC addresses as strings
+    mac_address = models.CharField(max_length=100)
     total_swap = models.CharField(max_length=100)
     swap_free = models.CharField(max_length=100)
     used_swap = models.CharField(max_length=100)

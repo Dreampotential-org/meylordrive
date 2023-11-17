@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'authentication',
     'ai',
     'chat_websocket',
+    'livestats',
 ]
 
 MIDDLEWARE = [
