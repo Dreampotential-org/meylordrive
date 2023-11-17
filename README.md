@@ -18,9 +18,10 @@ windows
 https://www.python.org/ftp/python/3.10.10/python-3.10.10-amd64.exe
 python -m venv
 .\venv\Scripts\activate
-
+source deactivate
 virtualenv -p python3.10 venv
 source venv/bin/activate
+
 pip install -r requirements.txt
 ```
 
@@ -40,4 +41,4 @@ python codes/manage.py  runserver
 
 `daphne web.asgi:application`
 
-
+'source deactivate'

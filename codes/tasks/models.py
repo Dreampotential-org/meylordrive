@@ -34,6 +34,12 @@ class ApiKey(models.Model):
     name = models.CharField(max_length=4096, blank=True, null=True)
 
 
+class ChatRoom(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
 
 class SystemSpecs(models.Model):
     architecture = models.CharField(max_length=100)
