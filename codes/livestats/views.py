@@ -1,21 +1,18 @@
 from django.shortcuts import render
+from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from livestats.models import JsError
 
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import permission_classes
-
-@api_view(["DELETE"])
-@permission_classes([IsAuthenticated])
+@api_view(["POST"])
 def jserror(request):
 
     print(request.data)
     je = JsError()
-    js.message = request.data.get("message")
-    js.url = request.data.get("url")
-    js.lineNo = request.data.get("lineNo")
-    js.columnNo = request.data.get("columnNo")
-    js.error_msg = request.data.get("error_msg")
-    js.save()
+    je.message = request.data.get("message")
+    je.url = request.data.get("url")
+    je.lineNo = request.data.get("lineNo")
+    je.columnNo = request.data.get("columnNo")
+    je.error_msg = request.data.get("error_msg")
+    je.save()
 
     return Response({'message': "Okay"})
