@@ -32,14 +32,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # Create a new Agent instance and set the api_key_id
         agent = Agent(api_key=api_key_instance)
+        agent.api_key = api_key_instance
         agent.alive = True
         agent.save()
+
+        # start a new agent Session
+        from tasks.models import AgentSession
+        agent_session = AgentSession()
+        agent_session.agent = agent
+        agent_session.save()
+
         return api_key_instance
 
     async def connect(self):
+        print("Connect api was called here...")
         self.room_name = None
         room_name_param = self.scope['url_route'].get('kwargs', {}).get('room_name')
-
+        # ??? Where is 
+        #it was not working i was trying for some thing please abort this changes 
         if room_name_param:
             self.room_name = room_name_param
             self.room_group_name = f"chat_{self.room_name}"

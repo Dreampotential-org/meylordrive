@@ -4,7 +4,6 @@ from channels.db import database_sync_to_async
 from .models import ChatRoom
 import asyncio
 
-
 class ChatRoomConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = None
