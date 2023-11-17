@@ -20,7 +20,6 @@ import time
 print("Waiting for ray")
 print("Starting")
 
-@ray.remote
 def configure_server(server):
     CHIRP.info("Run job server: %s %s" % (server.username, server.ip_address))
     finger_print = configure_node(server)
@@ -297,18 +296,19 @@ class Command(BaseCommand):
         # get all servers and configure them
         servers = Server.objects.filter()
         CHIRP.info("NUMBER OF SERVERS: %s" % len(servers))
-        configured_servers = [
-           configure_server.remote(server)
-           for server in servers
-        ]
+        # configured_servers = [
+        #   configure_server.remote(server)
+        #    for server in servers
+        # ]
 
-            # t = threading.Thread(target=configure_server.remote, args=[server])
-            # t.start()
-            # threads.append(t)
+        for server in servers:
+            t = threading.Thread(target=configure_server, args=[server])
+            t.start()
+            threads.append(t)
 
         # wait for all threads
-        # for t in threads:
-        #    t.join()
+        for t in threads:
+            t.join()
 
         # populate server fingerprint in db
         for server_print in server_prints.keys():
