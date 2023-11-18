@@ -7,6 +7,7 @@ from tasks.models import ServerGroup
 from utils.us_states import states
 
 
+
 class Command(BaseCommand):
     help = 'run the tasks'
 
@@ -66,30 +67,27 @@ class Command(BaseCommand):
             'repo': 'git@gitlab.com:a4496/django-zillow.git'})
 
 
-        for i in range(60):
+        for state in states:
             configs.append({
                 'domain': '',
-                'start': 'sudo COMMAND=get_redfin_cvs_fails scripts/batch.sh',
-                'name': 'sync_data',
+                'start': 'sudo STATE=%s COMMAND=get_redfin_cvs_fails scripts/batch.sh' % state,
+                'name': 'refresh data',
                 'repo': 'git@gitlab.com:a4496/django-zillow.git'})
 
         for i in range(7):
+            continue
             configs.append({
                 'domain': '',
                  'start': 'sudo COMMAND=get_agent_photos scripts/batch.sh',
                 'name': 'get_homes',
                 'repo': 'git@gitlab.com:a4496/django-zillow.git'})
 
-
-        for i in range(7):
             configs.append({
                 'domain': '',
-                 'start': 'sudo COMMAND=get_homes scripts/batch.sh',
+                'start': 'sudo COMMAND=get_homes scripts/batch.sh',
                 'name': 'get_homes',
                 'repo': 'git@gitlab.com:a4496/django-zillow.git'})
 
-
-        for i in range(7):
             configs.append({
                 'domain': '',
                 'start': 'sudo COMMAND=sync_homes scripts/batch.sh',

@@ -20,7 +20,6 @@ import time
 print("Waiting for ray")
 print("Starting")
 
-@ray.remote
 def configure_server(server):
     CHIRP.info("Run job server: %s %s" % (server.username, server.ip_address))
     finger_print = configure_node(server)
@@ -98,7 +97,7 @@ def line_buffered(f):
             yield line_buf
             line_buf = ''
 
-@ray.remote
+#@ray.remote
 def run_project_command(project_command):
     CHIRP.info("this is run project command:")
     server = get_server()
@@ -263,7 +262,8 @@ def populate_system_specs(server, system_spec):
 
 
 def get_server():
-    servers = Server.objects.filter().exclude().order_by("?")
+    servers = Server.objects.filter(error=False).exclude().order_by("?")
+    print(servers[0])
     return servers[0]
     if len(servers) == 0:
         CHIRP.info("No servers available")
@@ -290,6 +290,7 @@ class Command(BaseCommand):
         servers = Server.objects.filter().exclude(system_specs=None)
         for server in servers:
             server.in_use = False
+            server.error = False
             server.save()
 
         threads = []
@@ -297,18 +298,19 @@ class Command(BaseCommand):
         # get all servers and configure them
         servers = Server.objects.filter()
         CHIRP.info("NUMBER OF SERVERS: %s" % len(servers))
-        configured_servers = [
-           configure_server.remote(server)
-           for server in servers
-        ]
+        # configured_servers = [
+        #   configure_server.remote(server)
+        #    for server in servers
+        # ]
 
-            # t = threading.Thread(target=configure_server.remote, args=[server])
-            # t.start()
-            # threads.append(t)
+        for server in servers:
+            t = threading.Thread(target=configure_server, args=[server])
+            t.start()
+            threads.append(t)
 
         # wait for all threads
-        # for t in threads:
-        #    t.join()
+        for t in threads:
+            t.join()
 
         # populate server fingerprint in db
         for server_print in server_prints.keys():
@@ -320,20 +322,20 @@ class Command(BaseCommand):
 
         project_commands = ProjectCommand.objects.filter()
         CHIRP.info("NUmber of commands: %s" % len(project_commands))
-        [
-         run_project_command.remote(project_command)
-         for project_command in project_commands
-        ]
-        #for project_command in project_commands:
+        #[
+        # run_project_command.remote(project_command)
+        # for project_command in project_commands
+        #]
+        for project_command in project_commands:
             # start_project_service(project_service)
-            # t = threading.Thread(target=run_project_command,
-            #                     args=[server, project_command])
-            # t.start()
-            # threads.append(t)
+            t = threading.Thread(target=run_project_command,
+                                 args=[project_command])
+            t.start()
+            threads.append(t)
 
         # wait for complete
-        # for t in threads:
-        #    t.join()
+        for t in threads:
+            t.join()
 
         # XXX should keep looping find more tasks that
         # have been created since...

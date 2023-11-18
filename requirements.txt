@@ -45,3 +45,6 @@ openai==0.28
 Pillow
 ray[data,train,tune,serve]
 ray[default]
+selenium
+xvfbwrapper
+webdriver-manager
