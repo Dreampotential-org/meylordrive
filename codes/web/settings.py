@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'daphne',
     'channels',
 
+
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -66,8 +68,17 @@ INSTALLED_APPS = [
     'ai',
     'livestats',
 ]
-LOGIN_REDIRECT_URL = "home"
-LOGOUT_REDIRECT_URL = "/accounts/login/" 
+
+# from django.middleware.clickjacking import XFrameOptionsMiddleware
+
+# class CustomXFrameOptionsMiddleware(XFrameOptionsMiddleware):
+#     def process_response(self, request, response):
+#         # Check if it's a WebSocket request and exclude it from X-Frame-Options
+#         if "websocket" in request.path_info:
+#             response['X-Frame-Options'] = 'None'
+
+#         return super().process_response(request, response)
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -115,7 +126,7 @@ TEMPLATES = [
 ROOT_URLCONF = 'web.urls'
 
 # ASGI_APPLICATION = 'web.routing.application'
-ASGI_APPLICATION = "web.asgi.application"
+ASGI_APPLICATION = "web.routing.application"
 
 # CHANNELS = {
 #     'default': {
@@ -260,3 +271,5 @@ LOGOUT_REDIRECT_URL ='login'
 SOCIAL_AUTH_REDIRECT_URI = 'https://api.dreampotential.org/social-auth/complete/google-oauth2/'
 USE_X_FORWARDED_HOST = True
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+X_FRAME_OPTIONS_EXEMPT = [r"^/ws/"]
+
