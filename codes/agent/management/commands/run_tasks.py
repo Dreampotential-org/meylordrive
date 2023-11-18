@@ -97,7 +97,7 @@ def line_buffered(f):
             yield line_buf
             line_buf = ''
 
-@ray.remote
+#@ray.remote
 def run_project_command(project_command):
     CHIRP.info("this is run project command:")
     server = get_server()
@@ -262,7 +262,8 @@ def populate_system_specs(server, system_spec):
 
 
 def get_server():
-    servers = Server.objects.filter().exclude().order_by("?")
+    servers = Server.objects.filter(error=False).exclude().order_by("?")
+    print(servers[0])
     return servers[0]
     if len(servers) == 0:
         CHIRP.info("No servers available")
@@ -289,6 +290,7 @@ class Command(BaseCommand):
         servers = Server.objects.filter().exclude(system_specs=None)
         for server in servers:
             server.in_use = False
+            server.error = False
             server.save()
 
         threads = []
@@ -320,20 +322,20 @@ class Command(BaseCommand):
 
         project_commands = ProjectCommand.objects.filter()
         CHIRP.info("NUmber of commands: %s" % len(project_commands))
-        [
-         run_project_command.remote(project_command)
-         for project_command in project_commands
-        ]
-        #for project_command in project_commands:
+        #[
+        # run_project_command.remote(project_command)
+        # for project_command in project_commands
+        #]
+        for project_command in project_commands:
             # start_project_service(project_service)
-            # t = threading.Thread(target=run_project_command,
-            #                     args=[server, project_command])
-            # t.start()
-            # threads.append(t)
+            t = threading.Thread(target=run_project_command,
+                                 args=[project_command])
+            t.start()
+            threads.append(t)
 
         # wait for complete
-        # for t in threads:
-        #    t.join()
+        for t in threads:
+            t.join()
 
         # XXX should keep looping find more tasks that
         # have been created since...
