@@ -41,13 +41,15 @@ CSRF_COOKIE_HTTPONLY = False
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
+    'channels',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'channels',
     'drf_yasg',
     'tasks',
     'agent',
@@ -61,12 +63,11 @@ INSTALLED_APPS = [
     'server_websocket',
     'storage',
     'social_django',
-    'authentication',
     'ai',
-    'chat_websocket',
     'livestats',
 ]
-
+LOGIN_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "/accounts/login/" 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -89,10 +90,12 @@ CORS_ALLOW_CREDENTIALS = False
 CORS_ORIGIN_ALLOW_ALL = True
 
 
+import os
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'codes', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -100,8 +103,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.request',
-
             ],
         },
     },
@@ -116,15 +117,20 @@ ROOT_URLCONF = 'web.urls'
 # ASGI_APPLICATION = 'web.routing.application'
 ASGI_APPLICATION = "web.asgi.application"
 
-CHANNELS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            # other configurations...
-            "hosts": [('agentstat.com', 6379)],
-        },
-        'ROUTING': 'web.routing.application',  # adjust based on your project structure
-    },
+# CHANNELS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             # other configurations...
+#             "hosts": [('agentstat.com', 6379)],
+#         },
+#         'ROUTING': 'web.routing.application',  # adjust based on your project structure
+#     },
+# }
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
 }
 
 # Database

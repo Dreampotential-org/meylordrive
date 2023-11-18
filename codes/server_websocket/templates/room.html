@@ -1,0 +1,93 @@
+
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+  Hi {{ user.username }}!
+  <p><a href="{% url 'logout' %}">Log Out</a></p>
+  <div
+  class="chat__item__container"
+  id="id_chat_item_container"
+  style="font-size: 20px"
+>
+  <br />
+  <input type="text" id="id_message_send_input" />
+  <button type="submit" id="id_message_send_button">Send </button>
+  <br />
+  <br />
+</div>
+{{slug|json_script:"room_slug"}}
+<script>
+
+
+
+//    function connect_dreampotential() {
+//       socket = io("ws://locahost:8000/livestats/pagesession")
+//       socket.send({"page_start": window.location.href})
+
+//       setInterval(function() {
+//         socket.send({"alive": "true"})
+
+//       }, 3000)
+
+//    }
+//    conect_dreampotential();
+
+
+
+//     window.onerror = function (msg, url, lineNo, columnNo, error) {
+//   var string = msg.toLowerCase();
+//   var substring = "script error";
+//   var url = " http://127.0.0.1:8000/";
+
+//   if (string.indexOf(substring) > -1) {
+//   } else {
+//     console.log("POSTING: " + url)
+//     $.post(url, JSON.stringify({message: msg,
+//                                 url: url,
+//                                 lineNo: lineNo,
+//                                 columnNo: columnNo,
+//                                 error_msg: JSON.stringify(error)}), function () {});
+//   }
+//   return false;
+// };
+  const roomSlug= JSON.parse(document.getElementById('room_slug').textContent);
+  // alert(roomSlug)
+  const chatSocket = new WebSocket("ws://" + window.location.host +"/ws/"+roomSlug+"/");
+  chatSocket.onopen = function (e) {
+    console.log("The connection was setup successfully !");
+  };
+  chatSocket.onclose = function (e) {
+    console.log("Something unexpected happened !");
+  };
+  document.querySelector("#id_message_send_input").focus();
+  document.querySelector("#id_message_send_input").onkeyup = function (e) {
+    if (e.keyCode == 13) {
+      document.querySelector("#id_message_send_button").click();
+    }
+  };
+  document.querySelector("#id_message_send_button").onclick = function (e) {
+    var messageInput = document.querySelector(
+      "#id_message_send_input"
+    ).value;
+    chatSocket.send(JSON.stringify({ message: messageInput, username : "{{request.user.username}}"}));
+  };
+  chatSocket.onmessage = function (e) {
+    const data = JSON.parse(e.data);
+    var div = document.createElement("div");
+    div.innerHTML = data.username + " : " + data.message;
+    document.querySelector("#id_message_send_input").value = "";
+    document.querySelector("#id_chat_item_container").appendChild(div);
+  };
+</script>
+</body>
+{% else %}
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">Log In</a>
+
+
+{% endif %}
+{% endblock %}
+

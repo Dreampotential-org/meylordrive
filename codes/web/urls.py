@@ -1,7 +1,8 @@
-"""web URL Configuration
+"""
+URL configuration for wechatapp project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/2.2/topics/http/urls/
+    https://docs.djangoproject.com/en/4.2/topics/http/urls/
 Examples:
 Function views
     1. Add an import:  from my_app import views
@@ -14,51 +15,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
-from django.conf import settings
-from django.conf.urls.static import static
-from authentication import views
-from django.urls import re_path
-from rest_framework import permissions
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
-from server_websocket.routing import websocket_urlpatterns
-from django.urls import path, include
-from django.contrib import admin
-from django.contrib.auth.views import LogoutView
+from django.urls import path,include
+from django.views.generic.base import TemplateView  # new
 
-# from server_agent.routing import websocket_urlpatterns
-
-schema_view = get_schema_view(
-   openapi.Info(
-      title="Meylorci API",
-      default_version='v1',
-      description="Meylorci description",
-      terms_of_service="",
-      contact=openapi.Contact(email="meylorci@gmail.com"),
-      license=openapi.License(name="BSD License"),
-   ),
-   public=True,
-   permission_classes=(permissions.AllowAny,),
-)
 
 urlpatterns = [
-    path('login/', views.login, name='login'),
-    path('signup/', views.signup, name='signup'),
-    path('logout/', views.logout_view, name='logout'),
-    path('social-auth/', include('social_django.urls', namespace='social')), 
+    path('admin/', admin.site.urls),
+    path("accounts/", include("django.contrib.auth.urls")),  # new
+    path("", include("server_websocket.urls")),
 
-    path('', views.home, name='home'),
-  path('admin/', admin.site.urls),
-  path("usersystem/", include('usersystem.urls')),
-    path("ai/", include('ai.urls')),
 
-  path("storage/", include('storage.urls')),
-  path("livestats/", include('livestats.urls')),
-  path("", include('api.urls')),
-  path('', include(websocket_urlpatterns)),
-  path('swagger<format>', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-  path('swagger', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-  path('redoc', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(
-    settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
