@@ -193,7 +193,7 @@ def make_ssh(server):
         # else:
         CHIRP.info("Connecting %s@%s" % (server.username, server.ip_address))
         ssh.connect(server.ip_address, username=server.username)
-    except paramiko.ssh_exception.NoValidConnectionsError as e:
+    except Exception:
         server.error = True
         server.save()
         raise e
