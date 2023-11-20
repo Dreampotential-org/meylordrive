@@ -3,6 +3,7 @@ import json
 import time
 import uuid
 import re
+import sys
 import socket
 import platform
 import psutil
@@ -198,16 +199,16 @@ async def receive_task_data(websocket):
         return received_data
 
 
-async def main():
+async def main(room_slug):
     # XXX we need to get from cmd arg or conf file
     api_key = '7ee9132d-c84e-449e-9f91-50997e65f6cf'
-    uri = "ws://127.0.0.1:8000/ws/chat/?api_key=%s" % api_key
-    
+    uri = f"ws://127.0.0.1:8000/ws/{room_slug}/?api_key={api_key}"
+
     try:
         async with websockets.connect(uri) as websocket:
             # WebSocket connection is open
             print(f"Connected Over {uri}")
-            
+
             # start some threads
             # Start the tasks to send and receive data
             tasks = [
@@ -227,7 +228,16 @@ async def main():
     except websockets.exceptions.WebSocketException as e:
         print(f"WebSocket connection error: {e}")
 
-
-
 if __name__ == "__main__":
-    asyncio.get_event_loop().run_until_complete(main())
+    if len(sys.argv) < 2:
+        print("Usage: python stats-agent.py <room_slug>")
+        sys.exit(1)
+
+    room_slug = sys.argv[1]
+
+    # Option 1: Use asyncio.run() if you are using Python 3.7+
+    # asyncio.run(main(room_slug))
+
+    # Option 2: Use an existing event loop
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main(room_slug))

@@ -43,9 +43,6 @@ CSRF_COOKIE_HTTPONLY = False
 INSTALLED_APPS = [
     'daphne',
     'channels',
-
-
-    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -119,23 +116,20 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = 'web.wsgi.application'
-# ASGI_APPLICATION = "server_websocket.routing.application"
-# settings.py
-# ASGI_APPLICATION = 'server_websocket.routing.application'
+
 ROOT_URLCONF = 'web.urls'
 
-# ASGI_APPLICATION = 'web.routing.application'
 ASGI_APPLICATION = "web.routing.application"
 
-# CHANNELS = {
-#     'default': {
-#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
-#         'CONFIG': {
-#             # other configurations...
-#             "hosts": [('agentstat.com', 6379)],
+
+
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [('localhost', 6379)],
 #         },
-#         'ROUTING': 'web.routing.application',  # adjust based on your project structure
+#         "name": "websocket",
 #     },
 # }
 CHANNEL_LAYERS = {

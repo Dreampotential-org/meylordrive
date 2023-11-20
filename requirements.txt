@@ -4,6 +4,7 @@ boto3==1.24.9
 botocore==1.27.9
 cffi==1.15.0
 cryptography==37.0.2
+daphne
 Django==4.0.5
 django-cors-headers==3.11.0
 django-rest-knox==4.2.0
