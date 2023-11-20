@@ -9,3 +9,5 @@ services:
         ports:
             - 8021:8000
         command: bash -c "/usr/local/bin/gunicorn --bind :8000 --timeout 999 --workers 8 --env DJANGO_SETTINGS_MODULE=web.settings  web.wsgi:application"
+        environment:
+            - OPEN_AI_KEY=$OPEN_AI_KEY
