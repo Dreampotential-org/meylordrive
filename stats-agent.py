@@ -199,10 +199,11 @@ async def receive_task_data(websocket):
         return received_data
 
 
-async def main(room_slug):
-    # XXX we need to get from cmd arg or conf file
-    api_key = '7ee9132d-c84e-449e-9f91-50997e65f6cf'
-    uri = f"ws://127.0.0.1:8000/ws/{room_slug}/?api_key={api_key}"
+async def main(api_key=None):
+    if not api_key:
+        api_key = '7ee9132d-c84e-449e-9f91-50997e65f6cf'
+
+    uri = f"ws://127.0.0.1:8000/ws/stat-agents/?api_key={api_key}"
 
     try:
         async with websockets.connect(uri) as websocket:
@@ -230,14 +231,9 @@ async def main(room_slug):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python stats-agent.py <room_slug>")
+        print("Usage: python stats-agent.py <api-key>")
         sys.exit(1)
 
-    room_slug = sys.argv[1]
-
-    # Option 1: Use asyncio.run() if you are using Python 3.7+
-    # asyncio.run(main(room_slug))
-
-    # Option 2: Use an existing event loop
+    api_key = sys.argv[1]
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main(room_slug))
+    loop.run_until_complete(main(api_key))
