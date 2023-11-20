@@ -30,11 +30,12 @@ class Command(BaseCommand):
         next_button.click()
         time.sleep(2)
 
-        driver.find_elements(
-            by='css selector', value='input').send_keys("AgentStat123!")
+        driver.find_element(
+            by='css selector', value='input[type="password"]'
+        ).send_keys("AgentStat123!")
 
         next_button = driver.find_element(
-            by='xpath', value='//*[@id="identifierNext"]/div/button/span')
+            by='css selector', value='#passwordNext')
         next_button.click()
         time.sleep(2)
 

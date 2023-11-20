@@ -83,7 +83,7 @@ def get_driver_firefox(platform=None, proxy=None):
     if (
         socket.gethostname()
         in [
-            "node.arosen-161263.rethinkdb-pg0.clemson.cloudlab.us",
+            "afb2624ad6c6",
             "jj-HP-Laptop-15-dy2xxx",
             "arosen-laptop",
             "merih.local",
@@ -123,6 +123,11 @@ def get_driver_firefox(platform=None, proxy=None):
                 "/data/mozilla-unified/obj-x86_64-pc-linux-gnu/dist/bin/firefox"
             )
             options.add_argument("--headless")
+
+        if "afb2624ad6c6" in socket.gethostname():
+            options.binary_location = (
+                "/data/mozilla-unified/obj-x86_64-pc-linux-gnu/dist/bin/firefox"
+            )
 
         driver = webdriver.Firefox(options=options)
         return driver
