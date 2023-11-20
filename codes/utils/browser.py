@@ -70,8 +70,8 @@ def alive(url):
 
 def get_driver_firefox(platform=None, proxy=None):
     options = Options()
-    options.set_preference("permission.default.microphone", 1)
-
+    options.set_preference(
+        "profile.default_content_setting_values.media_stream_mic", 1)
     caps = desired_capabilities.DesiredCapabilities.FIREFOX.copy()
     # caps['marionette'] = False
     caps.update(options.to_capabilities())
