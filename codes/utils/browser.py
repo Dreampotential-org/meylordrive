@@ -149,7 +149,7 @@ def get_driver_firefox(platform=None, proxy=None):
         fp.set_preference("network.proxy.socks_port", int(port))
 
     options.add_argument("--headless")
-    driver = webdriver.Firefox(options=options, firefox_profile=fp)
+    driver = webdriver.Firefox(options=options)
 
     return driver
 
