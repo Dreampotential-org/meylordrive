@@ -13,30 +13,26 @@ from django.db import transaction
 import django
 django.setup()
 class ChatConsumer(AsyncWebsocketConsumer):
-    """
-    A consumer 
-    that handles WebSocket connections for chat functionality.
-            """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
     async def authenticate_user(self, api_key):
-        print("HERE is the api key from the agentwoot! %s" % api_key)
+        print("Authenticating user with API Key:", api_key)
+
+        # Remove leading/trailing whitespaces from the API key
+        api_key = api_key.strip()
 
         # Retrieve the ApiKey instance
-        api_key_instance = ApiKey.objects.filter(key=str(api_key)).first()
+        api_key_instance = ApiKey.objects.filter(key=api_key).first()
 
-        # Check if the ApiKey exists
         if api_key_instance is None:
-            # Send an error message and close the connection
-            await self.send(text_data=json.dumps({'error': 'Invalid API key'}))
-            await self.close()  # Close the connection
+            print("Invalid API Key.")
             return None
 
-        # Create a new Agent instance and set the api_key_id
         agent = Agent(api_key=api_key_instance)
         agent.api_key = api_key_instance
         agent.alive = True
         agent.save()
 
-        # start a new agent Session
         from tasks.models import AgentSession
         agent_session = AgentSession()
         agent_session.agent = agent
@@ -48,13 +44,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
         print("Connect api was called here...")
         self.room_name = None
         room_name_param = self.scope['url_route'].get('kwargs', {}).get('room_name')
-        # ??? Where is 
-        #it was not working i was trying for some thing please abort this changes 
+
         if room_name_param:
             self.room_name = room_name_param
             self.room_group_name = f"chat_{self.room_name}"
 
+            # Extract API key from query string
             api_key = self.scope["query_string"].decode("utf-8").split("api_key=")[1]
+            print(f"Raw API Key: {api_key}")
+
+            # Call authenticate_user and check if it returns a valid ApiKey instance
             api_key_obj = await self.authenticate_user(api_key)
 
             if api_key_obj:
@@ -63,12 +62,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     self.channel_name
                 )
                 await self.accept()
+                print("WebSocket connection accepted.")
+            else:
+                # Send a rejection message to the client
+                await self.send(text_data=json.dumps({'error': 'Authentication failed.'}))
+                # Close the connection with a 403 status code
+                await self.close(code=403)
         else:
             # Handle the case where 'room_name' is not present in the URL
+            print("Room name not provided.")
             await self.close(code=4000)
 
     async def disconnect(self, close_code):
-        pass
+        print(f"WebSocket disconnected with code: {close_code}")
 
     async def receive(self, text_data):
         print("We got something new... %s" % text_data)

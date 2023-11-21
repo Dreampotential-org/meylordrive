@@ -41,13 +41,15 @@ CSRF_COOKIE_HTTPONLY = False
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
+    'daphne',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'channels',
     'drf_yasg',
     'tasks',
     'agent',
@@ -116,6 +118,7 @@ ROOT_URLCONF = 'web.urls'
 
 # ASGI_APPLICATION = 'web.routing.application'
 ASGI_APPLICATION = "web.asgi.application"
+
 
 CHANNELS = {
     'default': {

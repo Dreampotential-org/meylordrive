@@ -22,7 +22,7 @@ from django.urls import re_path
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-from server_websocket.routing import websocket_urlpatterns
+from server_websocket.routing import application as websocket_application
 from django.urls import path, include
 from django.contrib import admin
 from django.contrib.auth.views import LogoutView
@@ -56,7 +56,7 @@ urlpatterns = [
   path("storage/", include('storage.urls')),
   path("livestats/", include('livestats.urls')),
   path("", include('api.urls')),
-  path('', include(websocket_urlpatterns)),
+    path("ws/", websocket_application),
   path('swagger<format>', schema_view.without_ui(cache_timeout=0), name='schema-json'),
   path('swagger', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
   path('redoc', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
