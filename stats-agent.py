@@ -76,12 +76,14 @@ def convert_sets_to_lists(obj):
         return obj
 
 
-async def send_health_data(websocket):
+async def send_health_data(websocket, username):
     while True:
         print("Task 1")
         stats_json = convert_sets_to_lists(get_stats())
+        # Add 'username' key to the JSON data
+        data = {'message': 'health_data', 'username': username, 'stats': stats_json}
         print(f"Stats Json: {stats_json}")
-        stats_string = json.dumps(stats_json)
+        stats_string = json.dumps(data)
         # Send a message to the server
         await websocket.send(stats_string)
         await asyncio.sleep(5)
@@ -197,11 +199,32 @@ async def receive_task_data(websocket):
         # Add your processing logic for received data here
         received_data.append(json_data)
         return received_data
+    
+# async def receive_task_data(websocket):
+#     received_data = []
+#     while True:
+#         data = await websocket.recv()
+#         json_data = json.loads(data)
+#         # Handle the received data here
+#         print(f"Received data: {data}")
+#         # Add your processing logic for received data here
+#         received_data.append(json_data)
 
+import asyncio
+import websockets
+import json
 
-async def main(room_slug):
+# async def send_data():
+#     uri = "ws://127.0.0.1:8000/ws/chat_1/?api_key=7ee9132d-c84e-449e-9f91-506cf"
+#     async with websockets.connect(uri) as websocket:
+#         data = {'message': 'Your message here', 'other_key': 'other_value'}
+#         await websocket.send(json.dumps(data))
+
+# asyncio.get_event_loop().run_until_complete(send_data())
+
+async def main(room_slug,username):
     # XXX we need to get from cmd arg or conf file
-    api_key = '7ee9132d-c84e-449e-9f91-50997e65f6cf'
+    api_key = '7ee9132d-c84e-449e-9f91-506cf'
     uri = f"ws://127.0.0.1:8000/ws/{room_slug}/?api_key={api_key}"
 
     try:
@@ -212,7 +235,7 @@ async def main(room_slug):
             # start some threads
             # Start the tasks to send and receive data
             tasks = [
-                asyncio.create_task(send_health_data(websocket)),
+                asyncio.create_task(send_health_data(websocket, username)),
                 asyncio.create_task(receive_task_data(websocket)),
             ]
 
@@ -229,15 +252,12 @@ async def main(room_slug):
         print(f"WebSocket connection error: {e}")
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python stats-agent.py <room_slug>")
+    if len(sys.argv) < 3:
+        print("Usage: python stats-agent.py <room_slug> <username>")
         sys.exit(1)
 
     room_slug = sys.argv[1]
+    username = sys.argv[2]
 
-    # Option 1: Use asyncio.run() if you are using Python 3.7+
-    # asyncio.run(main(room_slug))
-
-    # Option 2: Use an existing event loop
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main(room_slug))
+    loop.run_until_complete(main(room_slug, username))
