@@ -48,3 +48,14 @@ ray[default]
 selenium
 xvfbwrapper
 webdriver-manager
+ffmpeg
+transformers
+sentencepiece
+datasets
+soundfile
+pydub
+pyttsx3
+whisper
+tensorflow
+whisper_mic
+torch

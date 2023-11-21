@@ -98,7 +98,7 @@ def get_driver_firefox(platform=None, proxy=None):
         or "rethinkdb" in socket.gethostname()
     ):
         fp = webdriver.FirefoxProfile(
-            # '/home/arosen/.mozilla/firefox/'
+        # '~/.mozilla/firefox/'
         )
 
         fp.set_preference(
