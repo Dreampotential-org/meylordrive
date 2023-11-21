@@ -22,11 +22,13 @@ def callback(indata, frames, time, status):
 
 async def run_test():
 
-    with sd.RawInputStream(samplerate=args.samplerate, blocksize = 4000, device=args.device, dtype='int16',
+    print(args.device)
+    return
+    with sd.RawInputStream(samplerate=16000, blocksize = 4000, device=args.device, dtype='int16',
                            channels=1, callback=callback) as device:
 
-        async with websockets.connect(args.uri) as websocket:
-            await websocket.send('{ "config" : { "sample_rate" : %d } }' % (device.samplerate))
+        async with websockets.connect('ws://agentstat.com:2700') as websocket:
+            await websocket.send('{ "config" : { "sample_rate" : %d } }' % (16000))
 
             while True:
                 data = await audio_queue.get()
@@ -53,7 +55,7 @@ async def main():
                                      formatter_class=argparse.RawDescriptionHelpFormatter,
                                      parents=[parser])
     parser.add_argument('-u', '--uri', type=str, metavar='URL',
-                        help='Server URL', default='ws://localhost:2700')
+                        help='Server URL', default='ws://agentstat.com:2700')
     parser.add_argument('-d', '--device', type=int_or_str,
                         help='input device (numeric ID or substring)')
     parser.add_argument('-r', '--samplerate', type=int, help='sampling rate', default=16000)

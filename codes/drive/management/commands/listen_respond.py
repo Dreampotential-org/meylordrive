@@ -81,13 +81,54 @@ def other():
     # export sound file
     soundfile.export("output.mp3", format="mp3")
 
+#!/usr/bin/env python3
 
-def do_mic_work():
-    mic = WhisperMic()
-    while True:
-        print("Mick listen")
-        result = mic.listen()
-        print("Mick rsponse: %s" % result)
+import json
+import os
+import sys
+import asyncio
+import websockets
+import logging
+import sounddevice as sd
+import argparse
+
+def int_or_str(text):
+    """Helper function for argument parsing."""
+    try:
+        return int(text)
+    except ValueError:
+        return text
+
+def callback(indata, frames, time, status):
+    """This is called (from a separate thread) for each audio block."""
+    loop.call_soon_threadsafe(audio_queue.put_nowait, bytes(indata))
+
+async def run_test():
+
+    async with websockets.connect('ws://agentstat.com:2700') as websocket:
+        with sd.RawInputStream(samplerate=16000, blocksize=4000, device=None, dtype='int16',
+                               channels=1, callback=callback) as device:
+            await websocket.send('{ "config" : { "sample_rate" : %d } }'
+                                 % (16000))
+
+            while True:
+                data = await audio_queue.get()
+                await websocket.send(data)
+                print (await websocket.recv())
+
+            await websocket.send('{"eof" : 1}')
+            await websocket.recv()
+
+async def main():
+
+    global loop
+    global audio_queue
+
+    loop = asyncio.get_running_loop()
+    audio_queue = asyncio.Queue()
+
+    logging.basicConfig(level=logging.INFO)
+    await run_test()
 
 
 class Command(BaseCommand):
@@ -97,4 +138,4 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
-        do_mic_work()
+        asyncio.run(main())
