@@ -106,6 +106,16 @@ def convert_and_save_video(myfile, request):
 
     return upload
 
+
+from rest_framework.response import Response
+
+@api_view(['GET'])
+def list_files(request):
+    return Response(Upload.objects.create(
+        user=request.user,
+    ).values())
+
+
 from django.views.decorators.csrf import csrf_exempt
 
 
