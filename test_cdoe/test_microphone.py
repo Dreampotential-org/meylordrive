@@ -23,7 +23,6 @@ def callback(indata, frames, time, status):
 async def run_test():
 
     print(args.device)
-    return
     with sd.RawInputStream(samplerate=16000, blocksize = 4000, device=args.device, dtype='int16',
                            channels=1, callback=callback) as device:
 

@@ -4,6 +4,14 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 
+class AudioChunk(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None)
+    text = models.CharField(max_length=4096, blank=True, null=True)
+    soundfile = models.CharField(max_length=4096, blank=True, null=True)
+
+
+
 class Org(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
                              null=True, blank=True, default=None)

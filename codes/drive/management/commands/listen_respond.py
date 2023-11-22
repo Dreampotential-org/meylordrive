@@ -103,18 +103,21 @@ def callback(indata, frames, time, status):
     """This is called (from a separate thread) for each audio block."""
     loop.call_soon_threadsafe(audio_queue.put_nowait, bytes(indata))
 
-async def run_test():
+async def read_audio():
 
-    async with websockets.connect('ws://agentstat.com:2700') as websocket:
-        with sd.RawInputStream(samplerate=16000, blocksize=4000, device=None, dtype='int16',
-                               channels=1, callback=callback) as device:
+    with sd.RawInputStream(samplerate=16000, blocksize=4000, device=None, dtype='int16',
+                            channels=1, callback=callback) as device:
+
+        async with websockets.connect('ws://agentstat.com:2700') as websocket:
             await websocket.send('{ "config" : { "sample_rate" : %d } }'
                                  % (16000))
 
             while True:
                 data = await audio_queue.get()
                 await websocket.send(data)
-                print (await websocket.recv())
+                response_data = await websocket.recv()
+                print(response_data.get("partial"))
+
 
             await websocket.send('{"eof" : 1}')
             await websocket.recv()
@@ -128,7 +131,7 @@ async def main():
     audio_queue = asyncio.Queue()
 
     logging.basicConfig(level=logging.INFO)
-    await run_test()
+    await read_audio()
 
 
 class Command(BaseCommand):
