@@ -16,6 +16,7 @@ import string
 import soundfile as sf
 from pydub import AudioSegment
 from whisper_mic.whisper_mic import WhisperMic
+from utils import google as google_utils
 
 
 
@@ -99,47 +100,7 @@ class Command(BaseCommand):
         # playsound("/config/Downloads/taunt.wav")
         print("here is the start")
         driver = init_driver("firefox")
-        driver.get('https://voice.google.com/u/0/about')
-
-        cookies_path = 'cookies.txt'
-        if os.path.exists(cookies_path):
-            with open(cookies_path, 'r')as file:             
-                cookies=eval(file.read())
-                for cookie in cookies:
-                    try:
-                        driver.add_cookie(cookie)
-                        print("Added cookie")
-                    except selenium.common.exceptions.InvalidCookieDomainException:
-                        pass
-
-        driver.get('https://voice.google.com/')
-
-        sign_up_links = driver.find_elements(
-            by='css selector', value='.signUpLink')
-        if sign_up_links:
-            sign_up_links[0].click()
-            time.sleep(2)
-            # Locate the email input field and enter the email
-            email_input = driver.find_element(
-                by='xpath', value='//*[@id="identifierId"]')
-            email_input.send_keys('realtorstat')
-
-            next_button = driver.find_element(
-                by='xpath', value='//*[@id="identifierNext"]/div/button/span')
-            next_button.click()
-            time.sleep(2)
-
-            driver.find_element(
-                by='css selector', value='input[type="password"]'
-            ).send_keys("AgentStat123!")
-
-            next_button = driver.find_element(
-                by='css selector', value='#passwordNext')
-            next_button.click()
-            time.sleep(2)
-            with open(cookies_path,'w') as file:
-                file.write(str(driver.get_cookies()))
-        
+        google_utils.init_google_voice()
 
         while True:
             incoming_call = driver.find_elements(

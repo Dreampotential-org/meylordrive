@@ -16,6 +16,8 @@ import string
 import soundfile as sf
 from pydub import AudioSegment
 from whisper_mic.whisper_mic import WhisperMic
+from utils import google as google_utils
+from utils.chirp import CHIRP
 
 
 
@@ -91,50 +93,29 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
-        # playsound("/config/Downloads/taunt.wav")
-        print("here is the start")
+        CHIRP.info("here is the start")
         driver = init_driver("firefox")
-        driver.get('https://voice.google.com/')
+        google_utils.init_google_voice(driver)
+        google_utils.send_sms(driver, '8434259777', "hello")
 
-        sign_up_links = driver.find_elements(
-            by='css selector', value='.signUpLink')
-        if sign_up_links:
-            sign_up_links[0].click()
-            time.sleep(2)
-            # Locate the email input field and enter the email
-            email_input = driver.find_element(
-                by='xpath', value='//*[@id="identifierId"]')
-            email_input.send_keys('realtorstat')
-
-            next_button = driver.find_element(
-                by='xpath', value='//*[@id="identifierNext"]/div/button/span')
-            next_button.click()
-            time.sleep(2)
-
-            driver.find_element(
-                by='css selector', value='input[type="password"]'
-            ).send_keys("AgentStat123!")
-
-            next_button = driver.find_element(
-                by='css selector', value='#passwordNext')
-            next_button.click()
-            time.sleep(2)
-        
 
         # dial phone number
         driver.find_element(
-            by='css selector', value='.input-container input').send_keys("18434259777")
-        
+            by='css selector', value='.input-container input'
+        ).send_keys("18434259777")
 
         while True:
             unanswered = driver.find_elements(
                 by='css selector',
                 value=".in-call-status")
-            print(len(incoming_call))
+            CHIRP.info(len(incoming_call))
             if unanswered:
-                print("in bound call")
-                remote_name = driver.find_element(by="css selector", value=".remote-display-name").text
-                phone_number = driver.find_element(by="css selector", value=".phone-number").text
+                CHIRP.info("in bound call")
+
+                remote_name = driver.find_element(
+                    by="css selector", value=".remote-display-name").text
+                phone_number = driver.find_element(
+                    by="css selector", value=".phone-number").text
 
                 print("%s %s" % (remote_name, phone_number))
 
