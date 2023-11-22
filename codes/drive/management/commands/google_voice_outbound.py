@@ -93,63 +93,12 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
-        CHIRP.info("here is the start")
         driver = init_driver("firefox")
         google_utils.init_google_voice(driver)
         google_utils.send_sms(driver, '8434259777', "hello")
-
-
-        # dial phone number
-        driver.find_element(
-            by='css selector', value='.input-container input'
-        ).send_keys("18434259777")
+        google_utils.dial_number(driver, '8434259777')
+        google_utils.monitor_call(driver)
+        # google_utils.answer_call(driver)
 
         while True:
-            unanswered = driver.find_elements(
-                by='css selector',
-                value=".in-call-status")
-            CHIRP.info(len(incoming_call))
-            if unanswered:
-                CHIRP.info("in bound call")
 
-                remote_name = driver.find_element(
-                    by="css selector", value=".remote-display-name").text
-                phone_number = driver.find_element(
-                    by="css selector", value=".phone-number").text
-
-                print("%s %s" % (remote_name, phone_number))
-
-                answer_button = driver.find_elements(
-                    by='css selector',
-                    value=".pickup-call-button-container")
-
-                print(answer_button)
-                # answer the call right away
-                if answer_button:
-                    print("We are answering an incoming call")
-                    driver.execute_script("arguments[0].click()", answer_button[0])
-
-                import wave
-                import pyaudio
-
-                chunk = 1023
-                f = wave.open(r"/config/Downloads/BabyElephantWalk60.wav")
-                p = pyaudio.PyAudio()
-                stream = p.open(format = p.get_format_from_width(f.getsampwidth()),
-                        channels = f.getnchannels(),
-                        rate = f.getframerate(),
-                        output = True)
-
-                data = f.readframes(chunk)
-                while data:
-                    stream.write(data)
-                    data = f.readframes(chunk)
-
-                stream.stop_stream()
-                stream.close()
-                p.terminate()
-
-            time.sleep(1)
-            print("Polling for inbound call event")
-
-            # call-end-button
