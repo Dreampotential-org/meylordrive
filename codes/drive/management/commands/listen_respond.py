@@ -12,6 +12,15 @@ from datasets import load_dataset
 import torch
 import random
 import string
+import json
+import os
+import sys
+import asyncio
+import websockets
+import logging
+import sounddevice as sd
+import argparse
+
 import soundfile as sf
 from pydub import AudioSegment
 from whisper_mic.whisper_mic import WhisperMic
@@ -81,16 +90,6 @@ def other():
     # export sound file
     soundfile.export("output.mp3", format="mp3")
 
-#!/usr/bin/env python3
-
-import json
-import os
-import sys
-import asyncio
-import websockets
-import logging
-import sounddevice as sd
-import argparse
 
 def int_or_str(text):
     """Helper function for argument parsing."""
@@ -116,11 +115,16 @@ async def read_audio():
                 data = await audio_queue.get()
                 await websocket.send(data)
                 response_data = await websocket.recv()
-                print(response_data.get("partial"))
+                # print(response_data.get("partial"))
+                print(response_data)
 
 
             await websocket.send('{"eof" : 1}')
             await websocket.recv()
+
+
+import pyaudio
+import wave
 
 async def main():
 
@@ -141,4 +145,25 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
+        """
+        chunk = 1023
+        f = wave.open(r"/config/Downloads/BabyElephantWalk60.wav")
+        p = pyaudio.PyAudio()
+        stream = p.open(format = p.get_format_from_width(f.getsampwidth()),
+                channels = f.getnchannels(),
+                rate = f.getframerate(),
+                output = True)
+
+        data = f.readframes(chunk)
+        while data:
+            stream.write(data)
+            data = f.readframes(chunk)
+
+        stream.stop_stream()
+        stream.close()
+
+        p.terminate()
+        """
+
+
         asyncio.run(main())

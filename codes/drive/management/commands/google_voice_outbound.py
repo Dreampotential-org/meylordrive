@@ -83,11 +83,6 @@ def other():
     soundfile.export("output.mp3", format="mp3")
 
 
-def do_mic_work():
-    mic = WhisperMic()
-    result = mic.listen()
-    print(result)
-
 
 class Command(BaseCommand):
     help = 'Import address extra'
@@ -99,19 +94,6 @@ class Command(BaseCommand):
         # playsound("/config/Downloads/taunt.wav")
         print("here is the start")
         driver = init_driver("firefox")
-        driver.get('https://voice.google.com/u/0/about')
-
-        cookies_path = 'cookies.txt'
-        if os.path.exists(cookies_path):
-            with open(cookies_path, 'r')as file:             
-                cookies=eval(file.read())
-                for cookie in cookies:
-                    try:
-                        driver.add_cookie(cookie)
-                        print("Added cookie")
-                    except selenium.common.exceptions.InvalidCookieDomainException:
-                        pass
-
         driver.get('https://voice.google.com/')
 
         sign_up_links = driver.find_elements(
@@ -137,16 +119,19 @@ class Command(BaseCommand):
                 by='css selector', value='#passwordNext')
             next_button.click()
             time.sleep(2)
-            with open(cookies_path,'w') as file:
-                file.write(str(driver.get_cookies()))
+        
+
+        # dial phone number
+        driver.find_element(
+            by='css selector', value='.input-container input').send_keys("18434259777")
         
 
         while True:
-            incoming_call = driver.find_elements(
+            unanswered = driver.find_elements(
                 by='css selector',
                 value=".in-call-status")
             print(len(incoming_call))
-            if incoming_call:
+            if unanswered:
                 print("in bound call")
                 remote_name = driver.find_element(by="css selector", value=".remote-display-name").text
                 phone_number = driver.find_element(by="css selector", value=".phone-number").text
@@ -162,6 +147,27 @@ class Command(BaseCommand):
                 if answer_button:
                     print("We are answering an incoming call")
                     driver.execute_script("arguments[0].click()", answer_button[0])
+
+                import wave
+                import pyaudio
+
+                chunk = 1023
+                f = wave.open(r"/config/Downloads/BabyElephantWalk60.wav")
+                p = pyaudio.PyAudio()
+                stream = p.open(format = p.get_format_from_width(f.getsampwidth()),
+                        channels = f.getnchannels(),
+                        rate = f.getframerate(),
+                        output = True)
+
+                data = f.readframes(chunk)
+                while data:
+                    stream.write(data)
+                    data = f.readframes(chunk)
+
+                stream.stop_stream()
+                stream.close()
+                p.terminate()
+
             time.sleep(1)
             print("Polling for inbound call event")
 
