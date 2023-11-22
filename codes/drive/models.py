@@ -24,10 +24,10 @@ class Call(models.Model):
 class Contact(models.Model):
     name = models.CharField(max_length=100, blank=True, null=True)
     phone_number = models.CharField(max_length=100, blank=True, null=True)
-    owner_name = models.CharField(max_length=100, blank=True, null=True)
-    owner_phone = models.CharField(max_length=100, blank=True, null=True)
+    owner_phone_other = models.CharField(max_length=100, blank=True, null=True)
     url = models.CharField(max_length=100, blank=True, null=True)
     state = models.CharField(max_length=100, blank=True, null=True)
     city = models.CharField(max_length=100, blank=True, null=True)
     address = models.CharField(max_length=100, blank=True, null=True)
     price = models.CharField(max_length=100, blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
