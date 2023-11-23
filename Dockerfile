@@ -11,6 +11,7 @@ RUN apt-get update --fix-missing && \
 COPY ./requirements.txt /tmp/requirements.txt
 
 RUN pip3 install -r /tmp/requirements.txt
+RUN apt install portaudio19-dev python-pyaudio python3-pyaudio
 
 COPY entrypoint.sh /entrypoint.sh
 # RUN eval `ssh-agent -s`

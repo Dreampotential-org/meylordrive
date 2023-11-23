@@ -48,7 +48,7 @@ ray[default]
 selenium
 xvfbwrapper
 webdriver-manager
-ffmpeg
+#ffmpeg
 transformers
 sentencepiece
 datasets

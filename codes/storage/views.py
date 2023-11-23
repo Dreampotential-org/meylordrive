@@ -14,7 +14,8 @@ from storage import video_utils
 import mimetypes
 from django.http.response import StreamingHttpResponse
 from wsgiref.util import FileWrapper
-
+from rest_framework.response import Response
+from django.views.decorators.csrf import csrf_exempt
 
 @api_view(['POST'])
 def add_comment(request):
@@ -107,26 +108,28 @@ def convert_and_save_video(myfile, request):
     return upload
 
 
-from rest_framework.response import Response
 
 @api_view(['GET'])
 def list_files(request):
-    return Response(Upload.objects.create(
-        user=request.user,
-    ).values())
+    try:
+        key = request.user.email
+        user = User.objects.get(id=request.user.id)
+    except AttributeError:
+        user = None
 
+    # XXX pagination api
+    res = Upload.objects.filter(
+        user=user,
+    ).values()
+    return Response(res)
 
-from django.views.decorators.csrf import csrf_exempt
-
-
-# Create your views here.
-# @permission_classes([IsAuthenticated])
 @api_view(['POST'])
 @csrf_exempt
 def video_upload(request):
     CHIRP.error(request.FILES)
     CHIRP.error(request.data)
     video = request.data.get('video')
+
     # XXX should not be called video
     if not video:
         CHIRP.error("no video file found")
@@ -141,7 +144,7 @@ def stream_video(request, video_id):
     upload = Upload.objects.filter(id=int(video_id)).first()
     if not upload:
         return Response("Not Found")
-    print(upload.id)
+
     # XXX We need to detect the type of file a upload is and do
     # different behav based on content
     path = "/data" + upload.Url
