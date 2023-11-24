@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+  Hi {{ user.username }}!
+  <p><a href="{% url 'logout' %}">Log Out</a></p>
+  {% for i in rooms %}
+  <div class="card" style="width: 18rem;">
+    <div class="card-body">
+      <h5 class="card-title">{{i.name}}</h5>
+      <a href="{{i.slug}}" class="btn btn-primary">Go to Rooms</a>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">Log In</a>
+
+
+{% endif %}
+{% endblock %}

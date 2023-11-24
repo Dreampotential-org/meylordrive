@@ -63,9 +63,7 @@ INSTALLED_APPS = [
     'server_websocket',
     'storage',
     'social_django',
-    'authentication',
     'ai',
-    'chat_websocket',
     'livestats',
     'drive',
 ]
@@ -117,20 +115,24 @@ TEMPLATES = [
 ROOT_URLCONF = 'web.urls'
 
 # ASGI_APPLICATION = 'web.routing.application'
-ASGI_APPLICATION = "web.asgi.application"
+ASGI_APPLICATION = "web.routing.application"
 
 
-CHANNELS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            # other configurations...
-            "hosts": [('agentstat.com', 6379)],
-        },
-        'ROUTING': 'web.routing.application',  # adjust based on your project structure
-    },
+# CHANNELS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             # other configurations...
+#             "hosts": [('agentstat.com', 6379)],
+#         },
+#         'ROUTING': 'web.routing.application',  # adjust based on your project structure
+#     },
+# }
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
 }
-
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 

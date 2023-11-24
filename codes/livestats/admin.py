@@ -1,3 +1,5 @@
-from django.contrib import admin
+# # admin.py in the 'livestats' app
+# from django.contrib import admin
+# from .models import WebSocketConnection
 
-# Register your models here.
+# admin.site.register(WebSocketConnection)

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+  {% if user.is_authenticated %}
+    Hi {{ user.username }}!
+    <p><a href="{% url 'logout' %}">Log Out</a></p>
+    <div
+      class="chat__item__container"
+      id="id_chat_item_container"
+      style="font-size: 20px"
+    >
+      <br />
+      <input type="text" id="id_message_send_input" />
+      <button type="submit" id="id_message_send_button">Send </button>
+      <br />
+      <br />
+    </div>
+    {{ slug|json_script:"room_slug" }}
+    {{ csrf_token|json_script:"csrf_token" }}
+
+    <script>
+      const roomSlug = JSON.parse(document.getElementById('room_slug').textContent);
+      const csrfToken = JSON.parse(document.getElementById('csrf_token').textContent);
+      const chatSocket = new WebSocket(
+        `ws://${window.location.host}/ws/${roomSlug}/?api_key=your_api_key_here&csrfmiddlewaretoken=${csrfToken}`
+      );
+
+      chatSocket.onopen = function (e) {
+        console.log("The connection was set up successfully!");
+      };
+
+      chatSocket.onerror = function (error) {
+        console.error("WebSocket Error: ", error);
+      };
+
+      document.querySelector("#id_message_send_input").focus();
+      document.querySelector("#id_message_send_input").onkeyup = function (e) {
+        if (e.keyCode == 13) {
+          document.querySelector("#id_message_send_button").click();
+        }
+      };
+
+      document.querySelector("#id_message_send_button").onclick = function (e) {
+        var messageInput = document.querySelector("#id_message_send_input").value;
+        chatSocket.send(JSON.stringify({ message: messageInput, username: "{{request.user.username}}" }));
+      };
+
+      const chatContainer = document.querySelector("#id_chat_item_container");
+
+      chatSocket.onmessage = function (e) {
+        const data = JSON.parse(e.data);
+        var div = document.createElement("div");
+        div.innerHTML = data.username + " : " + data.message;
+        chatContainer.appendChild(div);
+
+        // Scroll to the bottom
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      };
+    </script>
+  {% else %}
+    <p>You are not logged in</p>
+    <a href="{% url 'login' %}">Log In</a>
+  {% endif %}
+{% endblock %}
