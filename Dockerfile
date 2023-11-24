@@ -4,7 +4,7 @@ ENV PYTHONIOENCODING=utf-8
 
 RUN apt-get update --fix-missing && \
     apt-get install -y python3 libpq-dev && \
-    apt-get install -y python3-pip ssh git portaudio19-dev python3-pyaudio
+    apt-get install -y python3-pip ssh git portaudio19-dev python3-pyaudio alsa-utils
 
 
 
