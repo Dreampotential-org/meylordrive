@@ -58,7 +58,7 @@ def convert_file(uploaded_file_url):
     return outfile
 
 
-def convert_and_save_video(myfile, request):
+def convert_and_save_file(myfile, request):
     user = request.user
     fs = FileSystemStorage()
     no_user = False
@@ -98,6 +98,7 @@ def convert_and_save_video(myfile, request):
     else:
         user = None
 
+    # XXX TODO need to make Upload know about other metadata like video length
     upload = Upload.objects.create(
         Url=uploaded_file_url, user=user,
         source=request.data.get("source")
@@ -123,20 +124,22 @@ def list_files(request):
     ).values()
     return Response(res)
 
+
+
 @api_view(['POST'])
 @csrf_exempt
-def video_upload(request):
+def file_upload(request):
     CHIRP.error(request.FILES)
     CHIRP.error(request.data)
-    video = request.data.get('video')
+    file = request.data.get('file')
 
     # XXX should not be called video
-    if not video:
-        CHIRP.error("no video file found")
-        return Response({'message': 'video is required'}, 400)
+    if not file:
+        CHIRP.error("no file found")
+        return Response({'message': 'file is required'}, 400)
 
-    video = convert_and_save_video(video, request)
-    return Response({'id': video.id})
+    file = convert_and_save_file(file, request)
+    return Response({'id': file.id})
 
 
 @api_view(['GET'])
