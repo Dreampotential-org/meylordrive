@@ -31,3 +31,4 @@ class Contact(models.Model):
     address = models.CharField(max_length=100, blank=True, null=True)
     price = models.CharField(max_length=100, blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
+    home_type = models.TextField(blank=True, null=True)

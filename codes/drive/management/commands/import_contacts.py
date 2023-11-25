@@ -9,20 +9,25 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
+
+        # ['id', 'owner_name', 'owner_phone', 'owner_phone_other', 'url', 'city', 'state', 'address_text', 'home_type', 'price', 'crawled']
         with open("leads.csv", newline='', encoding='utf-8') as csvfile:
             leadsreader = csv.reader(csvfile)
+            Contact.objects.filter().delete()
             for row in leadsreader:
+                print(row)
                 try:
                     contact = Contact()
-                    Contact.notes=row[0],
-                    Contact.price=row[1],
-                    Contact.name=row[2],
-                    Contact.phone=row[3],
-                    Contact.phone_other=row[4],
-                    Contact.url=row[5],
-                    Contact.city=row[6],
-                    Contact.state=row[7],
-                    Contact.none_field=row[8],
+                    Contact.price=row[9]
+                    Contact.name=row[1]
+                    Contact.phone=row[2]
+                    Contact.phone_other=row[3]
+                    Contact.url=row[4]
+                    Contact.city=row[5]
+                    Contact.state=row[6]
+                    Contact.home_type=row[8]
+                    Contact.address=row[7]
                     contact.save()
+                    print("Adding contact %s" % Contact.address)
                 except (ValueError, IndexError) as e:
                     print(f"Error processing row: {row}. {e}")
