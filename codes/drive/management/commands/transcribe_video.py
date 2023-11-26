@@ -1,8 +1,10 @@
 import subprocess, sys, os, json
+import pprint
 
 from datetime import datetime, timedelta
 
 from vosk import Model, KaldiRecognizer
+from django.core.management.base import BaseCommand
 
 SAMPLE_RATE = 16000
 CHUNK_SIZE = 4000
@@ -73,13 +75,17 @@ class Transcriber():
             "transcription": transcription,
         }
 
-import pprint
+class Command(BaseCommand):
+    help = 'Import address extra'
 
-filename = "AgentStat.m4a"
-model_path = "vosk-model-small-en-in-0.4"
+    def add_arguments(self, parser):
+        pass
 
-transcriber = Transcriber(model_path)
-transcription = transcriber.transcribe(filename)
+    def handle(self, *args, **options):
+        filename = "AgentStat.m4a"
+        model_path = "vosk-model-small-en-in-0.4"
 
-pprint.pprint(transcription)
+        transcriber = Transcriber(model_path)
+        transcription = transcriber.transcribe(filename)
 
+        pprint.pprint(transcription)

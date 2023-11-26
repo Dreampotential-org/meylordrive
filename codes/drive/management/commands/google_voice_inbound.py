@@ -109,8 +109,10 @@ class Command(BaseCommand):
             print(len(incoming_call))
             if incoming_call:
                 print("in bound call")
-                remote_name = driver.find_element(by="css selector", value=".remote-display-name").text
-                phone_number = driver.find_element(by="css selector", value=".phone-number").text
+                remote_name = driver.find_element(
+                    by="css selector", value=".remote-display-name").text
+                phone_number = driver.find_element(
+                    by="css selector", value=".phone-number").text
 
                 print("%s %s" % (remote_name, phone_number))
 
@@ -122,7 +124,8 @@ class Command(BaseCommand):
                 # answer the call right away
                 if answer_button:
                     print("We are answering an incoming call")
-                    driver.execute_script("arguments[0].click()", answer_button[0])
+                    driver.execute_script("arguments[0].click()",
+                                          answer_button[0])
 
                 import wave
                 import pyaudio
