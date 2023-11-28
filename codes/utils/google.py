@@ -4,6 +4,7 @@ import time
 from selenium.webdriver.common.keys import Keys
 import wave
 import pyaudio
+from drive.models import Contact, Call, SMS
 
 
 def play_sound():
@@ -66,8 +67,9 @@ def send_sms(driver, to_number, message):
 
     while True:
         try:
-            driver.find_element(by="css selector",
-                                value=".gvMessagingView-conversationListHeader"
+            driver.find_element(
+                by="css selector",
+                value=".gvMessagingView-conversationListHeader"
             ).click()
             break
         except selenium.common.exceptions.ElementClickInterceptedException:
@@ -97,13 +99,17 @@ def send_sms(driver, to_number, message):
     driver.find_element(by="css selector",
                         value="button[aria-label='Send message']").click()
 
+    sms = SMS()
+    sms.msg = message
+    sms.number = to_number
+
+    sms.save()
 
 def monitor_call(driver):
     # we will monitor the status of the call
     while True:
 
         # we need to check for some condition to allow virtual mic
-
         if driver.find_elements(
             by='css selector',
             value='span[gv-test-id="in-call-callduration"]'
@@ -120,29 +126,35 @@ def monitor_call(driver):
             break
 
 
-def dial_number(driver, number):
+def dial_number(driver, contact):
     driver.get("https://voice.google.com/u/0/calls")
 
     while not driver.find_elements(
-        by='css selector', value='input[placeholder="Enter a name or number"]'
+        by='css selector',
+        value='input[placeholder="Enter a name or number"]'
     ):
         CHIRP.info("Waiting for page to load...")
         time.sleep(1)
 
-
     time.sleep(1)
     element = driver.find_element(
-        by='css selector', value='input[placeholder="Enter a name or number"]'
+        by='css selector',
+        value='input[placeholder="Enter a name or number"]'
     )
-    driver.execute_script("arguments[0].value = ''", number)
-    element.send_keys(number)
+    driver.execute_script("arguments[0].value = ''", contact.phone_number)
+    element.send_keys(contact.phone_number)
 
     driver.find_element(
         by='css selector', value='.call-button'
     ).click()
 
+    call = Call()
+    call.contact = contact
+    call.save()
 
-def answer_call(driver):
+    return call
+
+def answer_call(driver, call):
     unanswered = driver.find_elements(
         by='css selector', value=".in-call-status")
     CHIRP.info(len(unanswered))
@@ -168,4 +180,4 @@ def answer_call(driver):
 
         google_utils.play_sound()
     time.sleep(1)
-    CHIRP.info("Polling for inbound call event")
+    kCHIRP.info("Polling for inbound call event")

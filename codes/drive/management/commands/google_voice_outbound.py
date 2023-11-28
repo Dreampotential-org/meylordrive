@@ -18,6 +18,7 @@ from pydub import AudioSegment
 from whisper_mic.whisper_mic import WhisperMic
 from utils import google as google_utils
 from utils.chirp import CHIRP
+from drive.models import Contact
 
 
 
@@ -138,17 +139,17 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
-        play_other()
+        # play_other()
         # other()
-
-        """
         driver = init_driver("firefox")
-        google_utils.init_google_voice(driver)
-        google_utils.send_sms(driver, '8434259777', "hello")
-        google_utils.dial_number(driver, '8434259777')
-        google_utils.monitor_call(driver)
-        # google_utils.answer_call(driver)
+        contacts = Contact.objects.filter()
+        for contact in contacts:
+            google_utils.init_google_voice(driver)
+            google_utils.send_sms(
+                driver, contact, get_message(contact)
+            )
+            call = google_utils.dial_number(driver, contact)
+            google_utils.monitor_call(driver, call)
+            # google_utils.answer_call(driver)
 
         # while True:
-        """
-

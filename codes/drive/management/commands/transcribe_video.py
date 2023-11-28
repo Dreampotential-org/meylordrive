@@ -53,7 +53,7 @@ class Transcriber():
 
         with subprocess.Popen(ffmpeg_command, stdout=subprocess.PIPE) as process:
 
-            start_time = datetime.now() 
+            start_time = datetime.now()
             while True:
                 data = process.stdout.read(4000)
                 if len(data) == 0:
