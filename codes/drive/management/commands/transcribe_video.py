@@ -36,44 +36,20 @@ class Transcriber():
         transcription = []
 
         ffmpeg_command = [
-                "ffmpeg",
-                "-nostdin",
-                "-loglevel",
-                "quiet",
-                "-i",
+                "whisper",
                 filename,
-                "-ar",
-                str(SAMPLE_RATE),
-                "-ac",
-                "1",
-                "-f",
-                "s16le",
-                "-",
+                "--model",
+                "small",
+                "--language",
+                "English",
             ]
 
         with subprocess.Popen(ffmpeg_command, stdout=subprocess.PIPE) as process:
+            print("completed")
 
-            start_time = datetime.now()
-            while True:
-                data = process.stdout.read(4000)
-                if len(data) == 0:
-                    break
+    def add_cc_to_video(self, filename):
+        print(filename)
 
-                if rec.AcceptWaveform(data):
-                    transcription.append(self.fmt(rec.Result()))
-
-            transcription.append(self.fmt(rec.FinalResult()))
-            end_time = datetime.now()
-
-            time_elapsed = end_time - start_time
-            print(f"Time elapsed  {time_elapsed}")
-
-        return {
-            "start_time": start_time.isoformat(),
-            "end_time": end_time.isoformat(),
-            "elapsed_time": time_elapsed,
-            "transcription": transcription,
-        }
 
 class Command(BaseCommand):
     help = 'Import address extra'
@@ -82,10 +58,9 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
-        filename = "AgentStat.m4a"
+        filename = "/data/meylordrive-youtube-videos/RePicture.mp4"
         model_path = "vosk-model-small-en-in-0.4"
 
         transcriber = Transcriber(model_path)
-        transcription = transcriber.transcribe(filename)
-
-        pprint.pprint(transcription)
+        transcriber.transcribe(filename)
+        transcriber.add_cc_to_video(filename)

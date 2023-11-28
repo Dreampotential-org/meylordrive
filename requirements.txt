@@ -63,3 +63,4 @@ sounddevice
 daphne
 playsound
 vosk
+pytube

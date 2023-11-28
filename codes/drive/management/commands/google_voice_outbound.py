@@ -139,8 +139,6 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
-        # play_other()
-        # other()
         driver = init_driver("firefox")
         contacts = Contact.objects.filter()
         for contact in contacts:
