@@ -18,7 +18,7 @@ class SMS(models.Model):
 class Contact(models.Model):
     name = models.CharField(max_length=100, blank=True, null=True)
     phone_number = models.CharField(max_length=100, blank=True, null=True)
-    owner_phone_other = models.CharField(
+    phone_other = models.CharField(
         max_length=100, blank=True, null=True)
     url = models.CharField(max_length=100, blank=True, null=True)
     state = models.CharField(max_length=100, blank=True, null=True)

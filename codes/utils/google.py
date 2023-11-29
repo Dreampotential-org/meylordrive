@@ -57,7 +57,7 @@ def init_google_voice(driver):
         time.sleep(2)
 
 
-def send_sms(driver, to_number, message):
+def send_sms(driver, contact, message):
     driver.get("https://voice.google.com/u/0/messages")
     while not driver.find_elements(by="css selector",
                 value=".gvMessagingView-conversationListHeader"):

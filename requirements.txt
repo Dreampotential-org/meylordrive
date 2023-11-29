@@ -64,3 +64,4 @@ daphne
 playsound
 vosk
 pytube
+pyvirtualdisplay

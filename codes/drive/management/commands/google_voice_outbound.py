@@ -132,6 +132,9 @@ def play_other():
     engine.runAndWait()
 
 
+def get_message(contact):
+    return "Hello test"
+
 class Command(BaseCommand):
     help = 'Import address extra'
 
@@ -142,6 +145,7 @@ class Command(BaseCommand):
         driver = init_driver("firefox")
 
         contacts = Contact.objects.filter()
+        print("this is the number of contacts in the database %s" % len(contacts))
         for contact in contacts:
             google_utils.init_google_voice(driver)
             google_utils.send_sms(
@@ -149,7 +153,7 @@ class Command(BaseCommand):
             )
             call = google_utils.dial_number(driver, contact)
             google_utils.monitor_call(driver, call)
-            contact.contacted = True
+            # contact.contacted = True
             contact.save()
             # google_utils.answer_call(driver)
 

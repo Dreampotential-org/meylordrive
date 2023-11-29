@@ -84,7 +84,7 @@ def get_driver_firefox(platform=None, proxy=None):
     if (
         socket.gethostname()
         in [
-            "afb2624ad6c6",
+            "2473aa293ae6",
             "jj-HP-Laptop-15-dy2xxx",
             "arosen-laptop",
             "merih.local",
@@ -125,7 +125,7 @@ def get_driver_firefox(platform=None, proxy=None):
             )
             options.add_argument("--headless")
 
-        if "afb2624ad6c6" in socket.gethostname():
+        if "2473aa293ae6" in socket.gethostname():
             options.binary_location = (
                 "/data/mozilla-unified/obj-x86_64-pc-linux-gnu/dist/bin/firefox"
             )

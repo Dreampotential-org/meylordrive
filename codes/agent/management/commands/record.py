@@ -11,22 +11,22 @@ from selenium.webdriver.chrome.service import Service
 import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-import File_3_1
 
 from pyvirtualdisplay import Display
 
 display = Display(visible=0, size=(800, 600))
 display.start()
 
+from utils.browser import init_driver
+
+xvfb = None
 
 def set_up():
     global browser
     global xvfb
-
-    browser = webdriver.Chrome(
-        service=Service(ChromeDriverManager().install()),
-    )
-    print(browser.title)
+    xvfb = Xvfb(width=1280, height=720, colordepth=24)
+    xvfb.start()
+    browser = init_driver("firefox")
 
 def login_realtorstat():
     global info
@@ -34,6 +34,7 @@ def login_realtorstat():
     global xvfb
     global platforms
     browser.get("https://live.realtorstat.com/meeting")
+
 
 
 
@@ -69,6 +70,7 @@ def netflix_fullscreen():
 def stream():
     global xvfb
     global info
+    print(xvfb)
     ffmpeg_stream = 'ffmpeg -f x11grab -s 1280x720 -r 24 -i :%d+nomouse -c:v libx264 -preset superfast -pix_fmt yuv420p -s 1280x720 -threads 0 -f flv "%s"' % (xvfb.display,
                                                                                                                                                                "/tmp/video3")
     args = shlex.split(ffmpeg_stream)
