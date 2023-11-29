@@ -8,6 +8,8 @@ class View(models.Model):
 
 class Upload(models.Model):
     Url = models.CharField(max_length=500)
+    file_type = models.CharField(max_length=500)
+    filename = models.CharField(max_length=4000)
     path = models.CharField(max_length=500)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
                              null=True, blank=True, default=None)

@@ -80,7 +80,9 @@ def convert_and_save_file(myfile, request):
     except FileExistsError:
         pass
     uploaded_name = (
-        "/data/meylor-uploads/%s/%s" % (user_hash, uuid.uuid4())
+        "/data/meylor-uploads/%s/%s.%s" % (user_hash,
+                                           uuid.uuid4(),
+                                           myfile.name.split(".")[-1])
     ).lower()
 
     filename = fs.save(uploaded_name, myfile)
@@ -101,8 +103,9 @@ def convert_and_save_file(myfile, request):
     # XXX TODO need to make Upload know about other metadata like video length
     upload = Upload.objects.create(
         Url=uploaded_file_url, user=user,
-        source=request.data.get("source")
-    )
+        source=request.data.get("source"),
+        filename=myfile.name,
+        file_type=myfile.name.split(".")[-1])
 
     CHIRP.info("upload response is: %s" % upload.id)
 
