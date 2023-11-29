@@ -140,6 +140,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         driver = init_driver("firefox")
+
         contacts = Contact.objects.filter()
         for contact in contacts:
             google_utils.init_google_voice(driver)
@@ -148,6 +149,8 @@ class Command(BaseCommand):
             )
             call = google_utils.dial_number(driver, contact)
             google_utils.monitor_call(driver, call)
+            contact.contacted = True
+            contact.save()
             # google_utils.answer_call(driver)
 
         # while True:

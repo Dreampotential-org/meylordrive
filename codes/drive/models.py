@@ -33,7 +33,7 @@ class Call(models.Model):
                                default=None)
     phone_number = models.ForeignKey(
         to=Phone, on_delete=models.CASCADE,
-        default="")
+        default="", related_name="call_phone_number")
     number = models.CharField(max_length=20,blank=True,null=True)
     created_at = models.DateTimeField(auto_now=True)
     time_duration = models.IntegerField(default=0)
