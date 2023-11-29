@@ -24,27 +24,13 @@ class Command(BaseCommand):
         Domain.objects.filter().delete()
         Server.objects.filter().delete()
 
-        ips = [
-            'clnode144.clemson.cloudlab.us',
-            'clnode138.clemson.cloudlab.us',
-            'clnode157.clemson.cloudlab.us',
-
-            'clnode225.clemson.cloudlab.us',
-            'clnode252.clemson.cloudlab.us',
-            'clnode227.clemson.cloudlab.us',
-
-            'clnode307.clemson.cloudlab.us',
-            'clnode293.clemson.cloudlab.us',
-            'clnode302.clemson.cloudlab.us',
-
-            'clnode149.clemson.cloudlab.us',
-            'clnode162.clemson.cloudlab.us',
-            'clnode145.clemson.cloudlab.us',
-            'clnode143.clemson.cloudlab.us',
-
-        ]
-
         username = 'arosen'
+        domain = "dreampotential.org"
+        nodes = 4
+        ips = []
+        for i in range(nodes):
+            ips.append("%s.%s" % (i, domain))
+
 
         for ip in ips:
             server = Server()
