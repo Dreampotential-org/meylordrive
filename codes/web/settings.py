@@ -138,8 +138,8 @@ CHANNEL_LAYERS = {
 
 db_password = os.environ.get('db_password', 'EhB4bINnDFmzI0Bg')
 db_user = os.environ.get('db_user', 'postgres')
-#db_host = os.environ.get('db_user', '0.dreampotential.org')
-db_host = os.environ.get('db_user', 'localhost')
+db_host = os.environ.get('db_user', '0.dreampotential.org')
+# db_host = os.environ.get('db_user', 'localhost')
 
 DATABASES = {
     'default': {

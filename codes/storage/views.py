@@ -65,6 +65,7 @@ def convert_and_save_file(myfile, request):
 
     try:
         key = user.email
+        CHIRP.info("Uploading file as user %s" % user.email)
     except AttributeError:
         key = "anonymous_user"
         no_user = True
@@ -100,6 +101,8 @@ def convert_and_save_file(myfile, request):
     else:
         user = None
 
+    CHIRP.info("the user for this uploaded file is %s" % user)
+
     # XXX TODO need to make Upload know about other metadata like video length
     upload = Upload.objects.create(
         Url=uploaded_file_url, user=user,
@@ -121,6 +124,8 @@ def list_files(request):
     except AttributeError:
         user = None
 
+
+    CHIRP.info("listing files as %s" % user)
     # XXX pagination api
     res = Upload.objects.filter(
         user=user,
