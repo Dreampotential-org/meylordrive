@@ -1,5 +1,15 @@
 from django.contrib import admin
-from .models import Room,Message
+from .models import Message, Thread
 
-admin.site.register(Room)
-admin.site.register(Message)
+
+class MessageInline(admin.StackedInline):
+    model = Message
+    fields = ('sender', 'text')
+    readonly_fields = ('sender', 'text')
+
+
+class ThreadAdmin(admin.ModelAdmin):
+    model = Thread
+    inlines = (MessageInline,)
+
+admin.site.register(Thread, ThreadAdmin)

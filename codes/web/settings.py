@@ -132,11 +132,11 @@ ASGI_APPLICATION = "web.routing.application"
 #         "name": "websocket",
 #     },
 # }
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
-    }
-}
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels.layers.InMemoryChannelLayer"
+#     }
+# }
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -192,15 +192,22 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',),
 }
 
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             "hosts": [('agentstat.com', 6379)],
+#         },
+#     },
+# }
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('agentstat.com', 6379)],
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
         },
     },
 }
-
 # KNOX
 REST_KNOX = {
     'USER_SERIALIZER': 'usersystem.serializer.UserSerializer',
@@ -255,10 +262,10 @@ AUTHENTICATION_BACKENDS = (
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '1080935805006-grv71s87oklr4eoos6h8m0no6rjtnrt7.apps.googleusercontent.com'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 
-LOGIN_URL='login'
-LOGIN_REDIRECT_URL='home'
-LOGOUT_URL='logout'
-LOGOUT_REDIRECT_URL ='login'
+# LOGIN_URL='login'
+# LOGIN_REDIRECT_URL='home'
+# LOGOUT_URL='logout'
+# LOGOUT_REDIRECT_URL ='login'
 
 # SOCIAL_AUTH_GOOGLE_OAUTH2_KEY ='1080935805006-grv71s87oklr4eoos6h8m0no6rjtnrt7.apps.googleusercontent.com'
 # SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET='GOCSPX-Vn_olHbd6biA408Ky2UU5¡LHoU3x'
