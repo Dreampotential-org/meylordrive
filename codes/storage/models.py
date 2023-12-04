@@ -2,10 +2,6 @@ from django.db import models
 from django.contrib.auth import get_user_model
 
 
-class View(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-
-
 class Upload(models.Model):
     Url = models.CharField(max_length=500)
     file_type = models.CharField(max_length=500, default="")
@@ -28,5 +24,12 @@ class Comment(models.Model):
                              null=True, blank=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
 
+
+class View(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None)
+    upload = models.ForeignKey(Upload(), on_delete=models.CASCADE,
+                               null=True, blank=True, default=None)
 
 

@@ -23,12 +23,31 @@ print("Starting")
 def configure_server(server):
     CHIRP.info("Run job server: %s %s" % (server.username, server.ip_address))
     finger_print = configure_node(server)
+    configure_ray_cluster(server)
+
     # XXX this kills all containers on host so need to exclude containers
     # required for service to work.
 
     # XXX clear nodes to clean state.
-    run_log_ssh_command(make_ssh(server), "sudo bash kill-docker.sh")
+    # run_log_ssh_command(make_ssh(server), "sudo bash kill-docker.sh")
     return finger_print
+
+
+def configure_ray_cluster(server):
+    CHIRP.info(server.ip_address)
+    run_log_ssh_command(make_ssh(server),
+                       "sudo pip install -U 'ray[default]'")
+    if server.ip_address.split(".")[0] == "0":
+        # start the head node on server that is 0 index other wise make a worker
+        command = "ray start --head --port=6300 --storage='/data/ray' --dashboard-host '0.0.0.0'"
+    else:
+        command = "ray start --address='0.dreampotential.org:6300' --storage='/data/ray'"
+
+    # first stop ray
+    run_log_ssh_command(make_ssh(server), "ray stop --force")
+
+    # then start it
+    run_log_ssh_command(make_ssh(server), command)
 
 
 def get_repo(ssh, repo, project_log):
@@ -316,6 +335,7 @@ class Command(BaseCommand):
         for server_print in server_prints.keys():
             populate_system_specs(server, server_prints[server_print])
 
+        return
         # now we can progress tasks
         CHIRP.info("Running the tasks")
         # find list of status which do not have a status

@@ -3,6 +3,7 @@ from storage import views
 
 urlpatterns = [
     path('file-upload/', views.file_upload, name='file_upload'),
+    path('add_view/<int:upload_id>', views.add_view, name='add-view'),
     path('stream-video/<int:video_id>', views.stream_video, name='stream-video'),
     path('add_comment/', views.add_comment, name='add_comment'),
     path('list_files/', views.list_files, name='list_files'),

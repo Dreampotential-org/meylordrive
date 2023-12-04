@@ -9,13 +9,33 @@ import hashlib
 import uuid
 from utils.chirp import CHIRP
 
-from storage.models import Upload, Comment
+from storage.models import Upload, Comment, View
 from storage import video_utils
 import mimetypes
 from django.http.response import StreamingHttpResponse
 from wsgiref.util import FileWrapper
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
+
+
+
+@api_view(['GET'])
+def add_view(request, upload_id):
+    view = View()
+    try:
+        view.user = request.user
+    except (AttributeError, ValueError):
+        pass
+
+    upload = Upload.objects.filter(
+        id=upload_id).first()
+
+    if not upload:
+        return Response({
+            'error': "no id %s" % request.data.get("upload_id")})
+    view.upload = upload
+    view.save()
+    return Response({'status': 'okay'})
 
 @api_view(['POST'])
 def add_comment(request):
@@ -184,5 +204,3 @@ def stream_video(request, video_id):
         resp['Content-Length'] = str(size)
     resp['Accept-Ranges'] = 'bytes'
     return resp
-
-
