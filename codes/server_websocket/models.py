@@ -1,11 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# Create your models here.
 class Room(models.Model):
-    name = models.CharField(max_length=20)
-    slug = models.SlugField(max_length=100)
-
+    # Your fields go here
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True)
 
     def __str__(self):
         return "Room : "+ self.name + " | Id : " + self.slug
@@ -17,15 +16,16 @@ class Message(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     created_on = models.DateTimeField(auto_now_add=True)
 
-
     def __str__(self):
-        return "Message is :- "+ self.content
+        return "Message: " + self.content
+
+class UserRoomActivity(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    entry_time = models.DateTimeField(auto_now_add=True)
+    exit_time = models.DateTimeField(null=True, blank=True)
+    duration = models.FloatField(null=True, blank=True)
 
 
-class WebSocketConnection(models.Model):
-    room_group = models.CharField(max_length=255)
-    connection_time = models.DateTimeField()
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-
-    # def __str__(self):
-        # return f"Connection for {self.room_group} at {self.connection_time} - User: {self.username}, User ID: {self.user_id}"
+def __str__(self):
+    return f"{self.user.username} in {self.room.name} | Entry: {self.entry_time}, Exit: {self.exit_time}"

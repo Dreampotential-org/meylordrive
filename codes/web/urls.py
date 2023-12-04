@@ -23,6 +23,7 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 # from server_websocket.routing import application as websocket_application
+
 from django.urls import path, include
 from django.contrib import admin
 from django.contrib.auth.views import LogoutView
@@ -47,11 +48,13 @@ urlpatterns = [
 
     # path('', views.home, name='home'),
   path('admin/', admin.site.urls),
+  
   path("usersystem/", include('usersystem.urls')),
     path("ai/", include('ai.urls')),
     path("accounts/", include("django.contrib.auth.urls")),  # new
     path("", include("server_websocket.urls")),
-
+    path("accounts/", include("django.contrib.auth.urls")),
+    path('',include('server_websocket.urls')),
   path("storage/", include('storage.urls')),
   # path("livestats/", include('livestats.urls')),
   path("", include('api.urls')),
