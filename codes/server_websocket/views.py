@@ -8,5 +8,7 @@ def rooms(request):
 def room(request,slug):
     room_name=Room.objects.get(slug=slug).name
     messages=Message.objects.filter(room=Room.objects.get(slug=slug))
-    
-    return render(request, "room.html",{"room_name":room_name,"slug":slug,'messages':messages})
+
+    return render(request, "room.html",
+                  {"room_name": room_name, "slug": slug,
+                   'messages':messages})

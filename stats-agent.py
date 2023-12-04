@@ -80,9 +80,9 @@ async def send_health_data(websocket):
         print("Task 1")
         stats_json = convert_sets_to_lists(get_stats())
         print(f"Stats Json: {stats_json}")
-        stats_string = json.dumps(stats_json)
         # Send a message to the server
-        await websocket.send(stats_string)
+        await websocket.send(json.dumps({"message_type": "health_status",
+                                         "message": stats_json}))
         await asyncio.sleep(5)
 
 
@@ -199,15 +199,12 @@ async def receive_task_data(websocket):
 
 
 async def main():
-    # XXX we need to get from cmd arg or conf file
     api_key = '7ee9132d-c84e-449e-9f91-50997e65f6cf'
-    uri = "ws://127.0.0.1:8000/ws/chat/?api_key=%s" % api_key
-    
+    uri = "ws://127.0.0.1:8000/ws/ar/?api_key=%s" % api_key
     try:
         async with websockets.connect(uri) as websocket:
             # WebSocket connection is open
             print(f"Connected Over {uri}")
-            
             # start some threads
             # Start the tasks to send and receive data
             tasks = [

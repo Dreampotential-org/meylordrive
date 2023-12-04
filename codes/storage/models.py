@@ -31,5 +31,5 @@ class View(models.Model):
                              null=True, blank=True, default=None)
     upload = models.ForeignKey(Upload(), on_delete=models.CASCADE,
                                null=True, blank=True, default=None)
-
+    exit_time = models.DateTimeField(null=True, blank=True)
 
