@@ -63,7 +63,7 @@ const chatbox = document.querySelector("#chatbox");
 
  
     const roomName= JSON.parse(document.getElementById('room_slug').textContent);
-    const chatSocket = new WebSocket("ws://" + window.location.host + "/ws/"+ roomName +"/");
+    const chatSocket = new WebSocket("wss://" + window.location.host + "/ws/"+ roomName +"/");
     // const chatSocket = new WebSocket("ws://127.0.0.1:8000/ws/"+ roomName +"/");
     // alert(chatSocket);
     chatSocket.onopen = function (e) {

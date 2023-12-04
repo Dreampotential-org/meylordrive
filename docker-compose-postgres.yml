@@ -6,7 +6,7 @@ services:
         ports:
             - 5775:5432
         volumes:
-            - /data/postgres-meylorCI2:/var/lib/postgresql/data
+            - /data/postgres-meylorCI3:/var/lib/postgresql/data
         environment:
             POSTGRES_DB: postgres
             POSTGRES_USER: postgres

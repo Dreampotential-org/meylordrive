@@ -21,7 +21,7 @@ BASE_DIR='/data'
 MEDIA_ROOT='/data'
 CSRF_TRUSTED_ORIGINS = ['http://localhost',
                         'http://127.0.0.1',
-                        'https://mapi.dreampotential.org',
+                        'https://api.dreampotential.org',
                         'https://api.alt-r.world']
 
 # Quick-start development settings - unsuitable for production
