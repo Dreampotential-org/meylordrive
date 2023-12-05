@@ -82,10 +82,11 @@ class Agent(models.Model):
     error = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     last_active_at = models.DateTimeField(auto_now_add=True)
-    api_key = models.ForeignKey(
-        ApiKey, on_delete=models.CASCADE, default=1)
+    # api_key = models.ForeignKey(
+    #    ApiKey, on_delete=models.CASCADE, default=1)
     # Use the actual ID of your ApiKey instance
     alive = models.BooleanField(default=True)
+
 
 class AgentSession(models.Model):
     agent = models.ForeignKey(Agent, on_delete=models.CASCADE)
@@ -220,6 +221,8 @@ class ProjectServiceLog(models.Model):
 
 
 class StatsEntry(models.Model):
+    agent = models.ForeignKey(Agent, on_delete=models.CASCADE,
+                              blank=True, null=True)
     system = models.CharField(max_length=100)
     node_name = models.CharField(max_length=100)
     release = models.CharField(max_length=100)

@@ -42,6 +42,7 @@ def get_stats():
         pass
 
     stats = {
+        "agent_id": uuid.getnode(),
         "System": uname.system + str(datetime.datetime.utcnow()),
         "Node Name": uname.node,
         "Release": uname.release,
@@ -200,7 +201,9 @@ async def receive_task_data(websocket):
 
 async def main():
     api_key = '7ee9132d-c84e-449e-9f91-50997e65f6cf'
-    uri = "ws://127.0.0.1:8000/ws/ar/?api_key=%s" % api_key
+    uri = (
+        "ws://127.0.0.1:8000/ws/ar/?api_key=%s&agent_id=%s" % (api_key,
+                                                               uuid.getnode()))
     try:
         async with websockets.connect(uri) as websocket:
             # WebSocket connection is open

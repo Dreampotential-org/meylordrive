@@ -11,12 +11,18 @@ from django.core.exceptions import ObjectDoesNotExist
 from utils.chirp import CHIRP
 
 
-from tasks.models import StatsEntry
+from tasks.models import StatsEntry, Agent
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
+
+        self.agent_id = self.scope["query_string"].decode(
+            "utf-8").split("&agent_id=")[1]
+        print(self.agent_id)
+        await self.set_agent_active(self.agent_id)
+
         self.room_name = self.scope['url_route']['kwargs']['room_slug']
         self.room_group_name = 'chat_%s' % self.room_name
         self.user = self.scope['user']
@@ -30,7 +36,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
         # Save user activity entry time
-        print(self.user)
         if str(self.user) != "AnonymousUser":
             await self.save_user_activity(entry=True)
 
@@ -50,6 +55,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 tz(timedelta(hours=5, minutes=30))
             )  # Convert to IST
             print(f"User {self.user} disconnected from room {self.room_name} at {ist_exit_time}")
+
+        if self.agent_id:
+            await self.set_agent_not_active(self.agent_id)
 
     async def receive(self, text_data):
         CHIRP.info("We recieved message: %s" % text_data)
@@ -87,7 +95,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     # @database_sync_to_async
     async def get_or_create_user_activity(self, user, room):
-        user_activities = await database_sync_to_async(UserRoomActivity.objects.filter)(
+        user_activities = await database_sync_to_async(
+                UserRoomActivity.objects.filter
+        )(
             user=user,
             room=room,
             exit_time__isnull=True
@@ -122,15 +132,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         try:
             if entry:
-                user_activity, created = await self.get_or_create_user_activity(self.user, room)
+                user_activity, created = await self.get_or_create_user_activity(
+                    self.user, room)
                 user_activity.entry_time = timezone.now()
             else:
-                user_activity = await database_sync_to_async(UserRoomActivity.objects.get)(
-                    user=self.user,
-                    room=room,
-                    exit_time__isnull=True
-                )
-                user_activity.exit_time = datetime.now(tz=pytz.utc).astimezone(pytz.timezone('Asia/Kolkata'))  # Convert to IST
+                user_activity = await database_sync_to_async(
+                    UserRoomActivity.objects.get)(
+                        user=self.user,
+                        room=room,
+                        exit_time__isnull=True
+                    )
+                user_activity.exit_time = datetime.now(tz=pytz.utc).astimezone(
+                    pytz.timezone('Asia/Kolkata'))  # Convert to IST
 
                 # Calculate and save duration
                 if user_activity.entry_time and user_activity.exit_time:
@@ -149,7 +162,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user = User.objects.get(username=username)
 
         # Get or create the room
-        room, created = Room.objects.get_or_create(slug=room_name, defaults={'name': room_name})
+        room, created = Room.objects.get_or_create(
+            slug=room_name, defaults={'name': room_name})
         Message.objects.create(user=user, room=room, content=message)
 
     @sync_to_async
@@ -161,10 +175,39 @@ class ChatConsumer(AsyncWebsocketConsumer):
             slug=room_name, defaults={'name': room_name})
         Message.objects.create(user=user, room=room, content=message)
 
+
+    @sync_to_async
+    def set_agent_active(self, agent_id):
+        agent = Agent.objects.filter(id=agent_id).first()
+        if not agent:
+            agent = Agent()
+            agent.id = agent_id
+        agent.alive = True
+        agent.save()
+
+    @sync_to_async
+    def set_agent_not_active(self, agent_id):
+        agent = Agent.objects.filter(id=agent_id).first()
+        if not agent:
+            agent = Agent()
+            agent.id = agent_id
+        
+        agent.alive = False
+        agent.save()
+
+
     @sync_to_async
     def save_stats_entry(self, stats_json):
-        CHIRP.info("Save sats entry: %s" % stats_json)
+        agent_id = stats_json.pop('agent_id')
+        agent = Agent.objects.filter(id=agent_id).first()
+        if not Agent:
+            agent = Agent()
+            agent.id = agent_id
+            agent.save()
+
+        CHIRP.info("Save entry: %s" % stats_json)
         return StatsEntry.objects.create(
+            agent=agent,
             system=stats_json['System'],
             node_name=stats_json['Node Name'],
             release=stats_json['Release'],
