@@ -45,16 +45,13 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-
-    # path('', views.home, name='home'),
   path('admin/', admin.site.urls),
-  
+  path("ai/", include('ai.urls')),
+  path("", include("server_websocket.urls")),
+  path("accounts/", include("django.contrib.auth.urls")),
+  path('',include('server_websocket.urls')),
   path("usersystem/", include('usersystem.urls')),
-    path("ai/", include('ai.urls')),
-    path("accounts/", include("django.contrib.auth.urls")),  # new
-    path("", include("server_websocket.urls")),
-    path("accounts/", include("django.contrib.auth.urls")),
-    path('',include('server_websocket.urls')),
+  path("checkout/", include('checkout.urls')),
   path("storage/", include('storage.urls')),
   # path("livestats/", include('livestats.urls')),
   path("", include('api.urls')),
