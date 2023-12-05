@@ -43,7 +43,7 @@ CSRF_COOKIE_HTTPONLY = False
 INSTALLED_APPS = [
     'channels',
     'daphne',
-
+    'mailapi',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
