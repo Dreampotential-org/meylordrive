@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'ai',
     'livestats',
     'drive',
+    'checkout',
 ]
 
 MIDDLEWARE = [
