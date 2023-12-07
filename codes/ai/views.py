@@ -164,6 +164,16 @@ def generate_image(request):
 @api_view(["POST"])
 def input_chat(request):
 
+    # Check if we have already seen this input_content
+    car = ChatApiRequest.objects.filter(
+        input_content=request.data.get("input_content")
+    ).first()
+
+    if car:
+        car.asked_amount += 1
+        car.save()
+        return Response(response_content)
+
     car = ChatApiRequest()
     car.input_content = request.data.get("input_content")
 

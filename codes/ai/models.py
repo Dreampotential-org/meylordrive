@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class ChatApiRequest(models.Model):
     input_content = models.TextField()
     response_content = models.TextField()
@@ -9,4 +10,4 @@ class ChatApiRequest(models.Model):
     prompt_tokens = models.IntegerField(default=0)
     completion_tokens = models.IntegerField(default=0)
     total_tokens = models.IntegerField(default=0)
-
+    asked_amount = models.IntegerField(default=0)
