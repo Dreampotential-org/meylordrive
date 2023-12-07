@@ -1,6 +1,45 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from mailapi.models import Mail, Account
+from utils.email_utils import send_raw_email
+
+
+@api_view(["POST"])
+def send_email(request):
+
+    account = Account.objects.filter(
+        email=request.data.get("mail_to")
+    ).first()
+
+    if not account:
+        return Response({
+            "status": 'error account not found'
+        })
+
+
+    mail = Mail()
+
+    send_raw_email(
+        request.data.get("mail_from"),
+        request.data.get("mail_to"),
+        request.data.get("reply_to"),
+        request.data.get("subject"),
+        request.data.get("message_text"),
+        request.data.get("message_html")
+    )
+
+
+    mail = Mail()
+    mail.account = account
+    mail.mail_from = request.data.get("mail_from")
+    mail.mail_to = request.data.get("mail_to")
+    mail.subject = request.data.get("subject")
+    mail.message = request.data.get("message_text")
+
+    mail.save()
+
+
+    return Response({"status": 'okay'})
 
 
 @api_view(["GET"])
