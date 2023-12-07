@@ -9,6 +9,7 @@ body={
     'message_text': 'Hello sir this is aaron this is the text section of the email i am sending to you.',
 }
 req = requests.post(
-    "http://localhost:8000/mailapi/send-email/", headers=headers, json=body)
+    "https://api.dreampotential.org/mailapi/send-email/",
+    headers=headers, json=body)
 
 print(req.json())
