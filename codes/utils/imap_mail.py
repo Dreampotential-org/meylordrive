@@ -5,6 +5,7 @@ import email
 import email.header
 import imaplib
 import sys
+from utils.chirp import CHIRP
 
 EMAIL_ACCOUNT = "test2@postgecko.com"
 EMAIL_PASSWORD = "test"
@@ -32,10 +33,11 @@ def connect(email_address, password):
 
 
 def get_all_mails():
-    accounts = Account.objects.filter(active_on_server=True)
+    accounts = Account.objects.filter()
     print("There is this amount of accoutns: %s" % len(accounts))
     mails = []
     for account in accounts:
+        CHIRP.info("checking account %s" % account.email)
         mails = mails + get_mails(
             account.email, account.password, account.id
         )
@@ -47,18 +49,18 @@ def get_mails(email_address, password, account_id):
     mail_client = connect(email_address, password)
     if not mail_client:
         print("Not able to login accout")
-        return
+        return []
     rv, data = mail_client.search(None, "ALL")
     if rv != 'OK':
         print("No messages found!")
-        return
+        return []
 
     mails = []
     for num in data[0].split():
         rv, data = mail_client.fetch(num, '(RFC822)')
         if rv != 'OK':
             print("ERROR getting message", num)
-            return
+            return []
 
         msg = email.message_from_bytes(data[0][1])
         hdr = email.header.make_header(
