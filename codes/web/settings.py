@@ -237,9 +237,9 @@ ALLOWED_HOSTS = ['*', "api.dreampotential.org"]
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.office365.com'
-EMAIL_HOST_USER = 'aaron@realtorstat.com'
-EMAIL_HOST_PASSWORD = 'Sha1nesor@'
+EMAIL_HOST = 'smtp.email.us-chicago-1.oci.oraclecloud.com'
+EMAIL_HOST_USER = 'ocid1.user.oc1..aaaaaaaae4z6ngwxbkxg6qn6z3ogpsyt4pryvcqp4aq76tgr5b6zijkglrnq@ocid1.tenancy.oc1..aaaaaaaasq5eo5hshbwevjpvqk52wwb35l4vh4lwwp3rzuxq5f2x4m3pji6a.2j.com'
+EMAIL_HOST_PASSWORD = '&.)S_hq6r)RSZZ<hHXI-'
 EMAIL_PORT = 587
 
 STATIC_URL = '/static/'

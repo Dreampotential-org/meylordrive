@@ -6,6 +6,7 @@ app_name = 'mailapi'
 
 
 urlpatterns = [
+    path('send-email/', views.send_email),
     path('get-emails/<str:to_email>/', views.get_emails),
     path('get-accounts/', views.get_accounts),
     path('set-read/<int:email_id>/', views.set_read),
