@@ -19,6 +19,7 @@ class Mail(models.Model):
     mail_to = models.EmailField()
     subject = models.CharField(max_length=512)
     message = models.TextField()
+    body = models.TextField(blank=True, null=True)
     local_date = models.CharField(max_length=128)
     row_date = models.CharField(max_length=128)
 
