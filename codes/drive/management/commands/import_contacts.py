@@ -20,7 +20,7 @@ class Command(BaseCommand):
                     contact = Contact()
                     Contact.price=row[9]
                     Contact.name=row[1]
-                    Contact.phone=row[2]
+                    Contact.phone_number=row[2]
                     Contact.phone_other=row[3]
                     Contact.url=row[4]
                     Contact.city=row[5]

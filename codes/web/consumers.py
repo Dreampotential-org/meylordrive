@@ -4,6 +4,8 @@ from asgiref.sync import sync_to_async
 from datetime import datetime, timedelta, timezone as tz
 from django.utils import timezone
 import pytz
+from drive.models import Contact
+
 
 from server_websocket.models import Room, Message, User, UserRoomActivity
 from channels.db import database_sync_to_async
@@ -18,10 +20,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
 
-        self.agent_id = self.scope["query_string"].decode(
-            "utf-8").split("&agent_id=")[1]
-        print(self.agent_id)
-        await self.set_agent_active(self.agent_id)
+        query_string = self.scope["query_string"].decode("utf-8")
+        if "&agent_id=" in query_string:
+            self.agent_id = query_string.split("&agent_id=")[1]
+            print(self.agent_id)
+            await self.set_agent_active(self.agent_id)
+        else:
+            self.agent_id = None  # Set a default value or handle the absence of agent_id
 
         self.room_name = self.scope['url_route']['kwargs']['room_slug']
         self.room_group_name = 'chat_%s' % self.room_name
@@ -39,8 +44,39 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if str(self.user) != "AnonymousUser":
             await self.save_user_activity(entry=True)
 
+        # Print details of Contact with ID 1
+        contact_id = 232
+        try:
+            contact = Contact.objects.get(pk=contact_id)
+            print(f"Contact ID: {contact.id}, Name: {contact.name}, Phone: {contact.phone_number}")
+        except Contact.DoesNotExist:
+            print(f"Contact with ID {contact_id} does not exist.")
+
         await self.accept()
 
+    # async def print_contact_details(self):
+    #     contact_id = 1
+    #     try:
+    #         contact = Contact.objects.get(pk=contact_id)
+    #         print(f"Contact ID: {contact.id}, Name: {contact.name}, Email: {contact.email}")
+    #         # Use self.stdout.write if you have access to it in this context
+    #     except Contact.DoesNotExist:
+    #         print(f"Contact with ID {contact_id} does not exist.")
+    # def print_contact_details():
+    #     # Assuming 'Contact' is the model class in drive.models
+    #     contact_id = 1
+    #     try:
+    #         contact = Contact.objects.get(pk=contact_id)
+    #         print(f"Contact ID: {contact.id}, Name: {contact.name}, Email: {contact.email}")
+    #     except Contact.DoesNotExist:
+    #         print(f"Contact with ID {contact_id} does not exist.")
+
+    # async def main():
+    #     # First, send a message to the WebSocket server
+    #     await send_websocket_message()
+
+    #     # Then, print details of Contact with ID 1
+    #     print_contact_details()
     async def disconnect(self, close_code):
         # Remove the user from the room group
         await self.channel_layer.group_discard(
@@ -166,14 +202,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
             slug=room_name, defaults={'name': room_name})
         Message.objects.create(user=user, room=room, content=message)
 
-    @sync_to_async
-    def save_message(self, message, username, room_name):
-        user = User.objects.get(username=username)
+    # @sync_to_async
+    # def save_message(self, message, username, room_name):
+    #     user = User.objects.get(username=username)
 
-        # Get or create the room
-        room, created = Room.objects.get_or_create(
-            slug=room_name, defaults={'name': room_name})
-        Message.objects.create(user=user, room=room, content=message)
+    #     # Get or create the room
+    #     room, created = Room.objects.get_or_create(
+    #         slug=room_name, defaults={'name': room_name})
+    #     Message.objects.create(user=user, room=room, content=message)
 
 
     @sync_to_async

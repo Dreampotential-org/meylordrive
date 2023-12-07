@@ -203,9 +203,9 @@ async def main():
     SERVER = 'ws://127.0.0.1:8000'
     api_key = '7ee9132d-c84e-449e-9f91-50997e65f6cf'
 
-    SERVER = 'ws://api.dreampotential.org'
+    # SERVER = 'ws://api.dreampotential.org'
     uri = (
-        "%s/ws/ar/?api_key=%s&agent_id=%s" % (SERVER, api_key,
+        "%s/ws/contact/?api_key=%s&agent_id=%s" % (SERVER, api_key,
                                               uuid.getnode()))
     try:
         async with websockets.connect(uri) as websocket:

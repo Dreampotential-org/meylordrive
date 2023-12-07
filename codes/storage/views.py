@@ -136,6 +136,24 @@ def convert_and_save_file(myfile, request):
 
 
 
+# @api_view(['GET'])
+# def list_files(request):
+#     try:
+#         key = request.user.email
+#         user = User.objects.get(id=request.user.id)
+#     except AttributeError:
+#         user = None
+
+
+#     CHIRP.info("listing files as %s" % user)
+#     # XXX pagination api
+#     res = Upload.objects.filter(
+#         user=user,
+#     ).values()
+#     return Response(res)
+
+from django.db.models import Count
+
 @api_view(['GET'])
 def list_files(request):
     try:
@@ -144,13 +162,18 @@ def list_files(request):
     except AttributeError:
         user = None
 
-
     CHIRP.info("listing files as %s" % user)
-    # XXX pagination api
-    res = Upload.objects.filter(
+
+    # Annotate each upload with the count of associated comments
+    uploads_with_comments_count = Upload.objects.filter(
         user=user,
-    ).values()
-    return Response(res)
+    ).annotate(comments_count=Count('comment')).values()
+    print(uploads_with_comments_count)
+    return Response(uploads_with_comments_count)
+
+
+
+
 
 
 
