@@ -172,7 +172,7 @@ def input_chat(request):
     if car:
         car.asked_amount += 1
         car.save()
-        return Response(response_content)
+        return Response(car.response_content)
 
     car = ChatApiRequest()
     car.input_content = request.data.get("input_content")

@@ -22,6 +22,8 @@ class Mail(models.Model):
     body = models.TextField(blank=True, null=True)
     local_date = models.CharField(max_length=128)
     row_date = models.CharField(max_length=128)
+    read = models.BooleanField(default=False)
+    deleted = models.BooleanField(default=False)
 
     def gen_message_id(self):
         val = self.account.email + self.subject + '-' + self.row_date
