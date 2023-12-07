@@ -1,24 +1,16 @@
-from rest_framework import viewsets
-from rest_framework.authentication import SessionAuthentication
-from rest_framework.authentication import BasicAuthentication
-from rest_framework.permissions import IsAuthenticated
-
-from mailapi.serializers import MailSerializer, AccountSerializer
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from mailapi.models import Mail, Account
 
 
-class MailViewSet(viewsets.ModelViewSet):
-    authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)
-
-    queryset = Mail.objects.all().order_by('-id')
-    serializer_class = MailSerializer
-    http_method_names = ['get', 'head', 'post']
+@api_view(["GET"])
+def get_emails(request, to_email):
+    account = Account.objects.filter(email=to_email).first()
+    return Response(Mail.objects.filter(account=account).values())
 
 
-class AccountViewSet(viewsets.ModelViewSet):
-    authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = (IsAuthenticated,)
+@api_view(["GET"])
+def get_accounts(request):
+    accounts = Account.objects.filter().values("email")
+    return Response(accounts)
 
-    queryset = Account.objects.all().order_by('-id')
-    serializer_class = AccountSerializer

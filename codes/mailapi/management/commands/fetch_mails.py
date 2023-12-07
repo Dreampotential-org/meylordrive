@@ -11,6 +11,7 @@ class Command(BaseCommand):
         messages = imap_mail.get_all_mails()
         print("Number of messages %s" % len(messages))
         for message in messages:
+            print(message)
             print("Got a mail subject: %s" % message['subject'])
             mail = models.Mail()
             mail.subject = message['subject']

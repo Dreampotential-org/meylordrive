@@ -53,6 +53,7 @@ urlpatterns = [
   path("usersystem/", include('usersystem.urls')),
   path("checkout/", include('checkout.urls')),
   path("storage/", include('storage.urls')),
+  path("mailapi/", include('mailapi.urls')),
   # path("livestats/", include('livestats.urls')),
   path("", include('api.urls')),
     # path("ws/", websocket_application),
