@@ -5,8 +5,7 @@ from mailapi.models import Mail, Account
 
 @api_view(["GET"])
 def get_emails(request, to_email):
-    account = Account.objects.filter(email=to_email).first()
-    return Response(Mail.objects.filter(account=account).values())
+    return Response(Mail.objects.filter(mail_to=to_email).values())
 
 
 @api_view(["GET"])
