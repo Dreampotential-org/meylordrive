@@ -68,6 +68,8 @@ INSTALLED_APPS = [
     'drive',
     'checkout',
     'clickads',
+    'ashe',
+    'awipu',
 ]
 
 MIDDLEWARE = [
