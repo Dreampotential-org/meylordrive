@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'ashe',
     'awipu',
     'dappx',
+    'configs',
 ]
 
 MIDDLEWARE = [
