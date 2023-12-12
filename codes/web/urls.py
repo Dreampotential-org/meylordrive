@@ -52,6 +52,8 @@ urlpatterns = [
   path('',include('server_websocket.urls')),
   path("usersystem/", include('usersystem.urls')),
   path("checkout/", include('checkout.urls')),
+  path("awipu/", include('awipu.urls')),
+  path("ashe/", include('ashe.urls')),
   path("storage/", include('storage.urls')),
   path("mailapi/", include('mailapi.urls')),
   # path("livestats/", include('livestats.urls')),

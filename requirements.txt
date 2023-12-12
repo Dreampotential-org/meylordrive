@@ -66,3 +66,6 @@ vosk
 pytube
 pyvirtualdisplay
 stripe
+django-phonenumber-field
+phonenumbers
+

@@ -10,7 +10,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 
-from api.serializers import (
+from awipu.serializers import (
     UserSerializer, UserProfileSerializer, GpsCheckinSerializer,
     VideoUploadSerializer
 )
@@ -27,7 +27,7 @@ from dappx import constants
 from dappx import utils
 from common import config
 
-from magic_link.models import MagicLink
+# from magic_link.models import MagicLink
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 

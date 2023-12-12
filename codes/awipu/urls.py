@@ -2,12 +2,12 @@ from django.urls import include, path
 from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 
-from api import views
-from api import views_admin
-from api import views_stripe
-from api import views_orgs
+from awipu import views
+from awipu import views_admin
+from awipu import views_stripe
+from awipu import views_orgs
 
-app_name = 'api'
+app_name = 'awipu'
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)

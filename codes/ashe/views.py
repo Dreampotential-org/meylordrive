@@ -9,18 +9,16 @@ from rest_framework.decorators import api_view
 from rest_framework.decorators import authentication_classes
 from rest_framework.decorators import permission_classes
 
-from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.core.serializers import serialize
 from .serializer import *
 
 from django.http import HttpResponse
-from push_notifications.models import GCMDevice
+# from push_notifications.models import GCMDevice
 import requests
 import json
 
 @api_view(['POST'])
-@authentication_classes([JWTAuthentication])
 def set_profile_info(request):
     pass
 
@@ -43,7 +41,6 @@ def get_distance(lat1, lon1, lat2, lon2):
 
 
 @api_view(['POST'])
-@authentication_classes([JWTAuthentication])
 def get_distances(request):
 
     # here we calculate on server side..
@@ -179,7 +176,6 @@ def get_miles_points(session_points):
     return session_response
 
 @api_view(['GET'])
-@authentication_classes([JWTAuthentication])
 def get_session_stats(request):
 
     total_session_points = SessionPoint.objects.filter().count()
@@ -212,7 +208,6 @@ def get_session_stats(request):
 
 
 @api_view(['POST'])
-@authentication_classes([JWTAuthentication])
 def start(request):
     session = Session.objects.create()
     session.save()
@@ -237,7 +232,6 @@ def start(request):
 
 
 @api_view(['POST'])
-@authentication_classes([JWTAuthentication])
 def session_point(request):
 
     # XXX optimize this lookup.
@@ -262,7 +256,6 @@ def session_point(request):
 
 
 @api_view(['POST'])
-@authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def stop(request):
     session_create = Session.objects.filter().last()
@@ -272,7 +265,6 @@ def stop(request):
 
 
 @api_view(['POST'])
-@authentication_classes([JWTAuthentication])
 def bulk_sync_motions(request):
     device_id = request.data.get("device_id")
     source = request.data.get("source")
@@ -303,7 +295,6 @@ from django.http import HttpResponse
 User = get_user_model()
 
 @api_view(['POST'])
-@authentication_classes([JWTAuthentication])
 def gsm_Add(request):
     user = User.objects.get(id= request.data['user'])
     fcm_registration_id = request.data['fcm_registration_id']
@@ -335,7 +326,6 @@ def send_notification(registration_ids , message_title , message_desc):
     print(result.json())
 
 @api_view(['POST'])
-@authentication_classes([JWTAuthentication])
 def gsm_send(request):
     username = "TestUser"
     body = f"{username} is Leading this week..."

@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'drf_yasg',
     'tasks',
     'agent',
@@ -70,6 +71,7 @@ INSTALLED_APPS = [
     'clickads',
     'ashe',
     'awipu',
+    'dappx',
 ]
 
 MIDDLEWARE = [

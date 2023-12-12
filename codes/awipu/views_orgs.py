@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from api.serializers import (
+from awipu.serializers import (
     OrganizationMemberSerializer
 )
 from rest_framework import response, status
@@ -16,7 +16,7 @@ from dappx.models import OrganizationMember, OrganizationMemberMonitor
 from dappx.models import Organization
 from dappx.notify_utils import notify_monitor
 from dappx.views import upload_org_logo
-from api.serializers import UserMonitorSerializer
+from awipu.serializers import UserMonitorSerializer
 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
