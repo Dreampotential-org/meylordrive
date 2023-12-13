@@ -16,17 +16,20 @@ class SMS(models.Model):
 
 
 class Contact(models.Model):
-    name = models.CharField(max_length=100, blank=True, null=True)
+    id = models.IntegerField(primary_key=True)  # Assuming 'id' is an integer
+    name = models.CharField(max_length=1000, blank=True, null=True)
     phone_number = models.CharField(max_length=100, blank=True, null=True)
-    phone_other = models.CharField(
-        max_length=100, blank=True, null=True)
-    url = models.CharField(max_length=100, blank=True, null=True)
-    state = models.CharField(max_length=100, blank=True, null=True)
-    city = models.CharField(max_length=100, blank=True, null=True)
-    address = models.CharField(max_length=100, blank=True, null=True)
-    price = models.CharField(max_length=100, blank=True, null=True)
+    phone_other = models.CharField(max_length=100, blank=True, null=True)
+    url = models.CharField(max_length=1000, blank=True, null=True)
+    state = models.CharField(max_length=1000, blank=True, null=True)
+    city = models.CharField(max_length=1000, blank=True, null=True)
+    address = models.CharField(max_length=2550)  # Adjust the length as needed
+    price = models.CharField(max_length=1000, blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
     home_type = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.id} - {self.name}"
 
 class Call(models.Model):
     contact = models.ForeignKey(to=Contact, on_delete=models.CASCADE,

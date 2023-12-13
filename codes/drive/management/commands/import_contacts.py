@@ -18,16 +18,17 @@ class Command(BaseCommand):
                 print(row)
                 try:
                     contact = Contact()
-                    Contact.price=row[9]
-                    Contact.name=row[1]
-                    Contact.phone_number=row[2]
-                    Contact.phone_other=row[3]
-                    Contact.url=row[4]
-                    Contact.city=row[5]
-                    Contact.state=row[6]
-                    Contact.home_type=row[8]
-                    Contact.address=row[7]
+                    contact.id = int(row[0])  # Assuming 'id' is in the first column
+                    contact.price = row[9]
+                    contact.name = row[1]
+                    contact.phone_number = row[2]
+                    contact.phone_other = row[3]
+                    contact.url = row[4]
+                    contact.city = row[5]
+                    contact.state = row[6]
+                    contact.home_type = row[8]
+                    contact.address = row[7]
                     contact.save()
-                    print("Adding contact %s" % Contact.address)
+                    print("Adding contact %s" % contact.address)
                 except (ValueError, IndexError) as e:
                     print(f"Error processing row: {row}. {e}")

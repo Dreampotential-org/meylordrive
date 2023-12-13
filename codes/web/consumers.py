@@ -1,4 +1,5 @@
 import json
+from urllib.parse import parse_qs
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
 from datetime import datetime, timedelta, timezone as tz
@@ -17,6 +18,7 @@ from tasks.models import StatsEntry, Agent
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
+
 
     async def connect(self):
 

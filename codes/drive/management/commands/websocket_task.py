@@ -1,34 +1,35 @@
+# drive/management/commands/websocket_task.py
+
 import asyncio
-import sys
-from django.core.management import execute_from_command_line
+import websockets
 from django.core.management.base import BaseCommand
 from drive.models import Contact
 
 class Command(BaseCommand):
-    help = 'Your command description here'
+    help = 'Perform a task involving WebSocket and Contact model'
 
     async def send_websocket_message(self):
-        uri = "ws://agentstat.com?contract=1"
-        # Your WebSocket message sending logic here
+        uri = "wss://agentstat.com?contract=1"
+        async with websockets.connect(uri) as websocket:
+            message = "YourWebSocketMessageHere"
+            await websocket.send(message)
+            response = await websocket.recv()
+            self.stdout.write(self.style.SUCCESS(f"Received response from WebSocket server: {response}"))
 
     def print_contact_details(self):
+        # Assuming 'Contact' is the model class in drive.models
         contact_id = 1
         try:
-            contact = Contact.objects.get(pk=contact_id, phone_number__isnull=False)
-            self.stdout.write(self.style.SUCCESS(f"Contact ID: {contact.id}, Phone: {contact.phone_number}"))
+            contact = Contact.objects.get(pk=contact_id)
+            self.stdout.write(self.style.SUCCESS(
+                f"Contact ID: {contact.id}, Name: {contact.name}, Email: {contact.email}")
+            )
         except Contact.DoesNotExist:
             self.stdout.write(self.style.ERROR(f"Contact with ID {contact_id} does not exist."))
 
-    async def run_task(self):
+    async def handle(self, *args, **options):
         # First, send a message to the WebSocket server
         await self.send_websocket_message()
 
+        # Then, print details of Contact with ID 1
         self.print_contact_details()
-
-    def handle(self, *args, **options):
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.run_task())
-        loop.close()
-
-if __name__ == '__main__':
-    execute_from_command_line(sys.argv)
