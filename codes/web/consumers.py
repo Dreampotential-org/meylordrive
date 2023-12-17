@@ -15,13 +15,13 @@ from utils.chirp import CHIRP
 
 
 from tasks.models import StatsEntry, Agent
+from management.commands.google_voice_outbound import init_driver, google_utils
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
 
 
     async def connect(self):
-
         query_string = self.scope["query_string"].decode("utf-8")
         if "&agent_id=" in query_string:
             self.agent_id = query_string.split("&agent_id=")[1]
@@ -46,39 +46,28 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if str(self.user) != "AnonymousUser":
             await self.save_user_activity(entry=True)
 
-        # Print details of Contact with ID 1
-        contact_id = 232
+        # Retrieve contact details dynamically based on the user or room information
+        contact_id = 232  # Replace with your dynamic logic to get contact_id
         try:
             contact = Contact.objects.get(pk=contact_id)
-            print(f"Contact ID: {contact.id}, Name: {contact.name}, Phone: {contact.phone_number}")
+            contact_name = contact.name
+            contact_phone = contact.phone_number
+
+            # Initiate the call if both contact name and phone number are available
+            if contact_name and contact_phone:
+                driver = init_driver("firefox")  # Adjust the browser as needed
+                google_utils.init_google_voice(driver)
+                call = google_utils.dial_number(driver, contact_phone)
+
+                # Additional logic to monitor or handle the call as needed
+                google_utils.monitor_call(driver, call)
         except Contact.DoesNotExist:
             print(f"Contact with ID {contact_id} does not exist.")
 
         await self.accept()
 
-    # async def print_contact_details(self):
-    #     contact_id = 1
-    #     try:
-    #         contact = Contact.objects.get(pk=contact_id)
-    #         print(f"Contact ID: {contact.id}, Name: {contact.name}, Email: {contact.email}")
-    #         # Use self.stdout.write if you have access to it in this context
-    #     except Contact.DoesNotExist:
-    #         print(f"Contact with ID {contact_id} does not exist.")
-    # def print_contact_details():
-    #     # Assuming 'Contact' is the model class in drive.models
-    #     contact_id = 1
-    #     try:
-    #         contact = Contact.objects.get(pk=contact_id)
-    #         print(f"Contact ID: {contact.id}, Name: {contact.name}, Email: {contact.email}")
-    #     except Contact.DoesNotExist:
-    #         print(f"Contact with ID {contact_id} does not exist.")
 
-    # async def main():
-    #     # First, send a message to the WebSocket server
-    #     await send_websocket_message()
 
-    #     # Then, print details of Contact with ID 1
-    #     print_contact_details()
     async def disconnect(self, close_code):
         # Remove the user from the room group
         await self.channel_layer.group_discard(
