@@ -40,7 +40,8 @@ def get_distance(lat1, lon1, lat2, lon2):
     return distance
 
 
-@api_view(['POST'])
+@api_view(['GET', 'POST'])
+
 def get_distances(request):
 
     # here we calculate on server side..

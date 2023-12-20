@@ -1,4 +1,3 @@
-from playsound import playsound
 import selenium
 import time
 import os

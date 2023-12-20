@@ -15,7 +15,9 @@ from utils.chirp import CHIRP
 
 
 from tasks.models import StatsEntry, Agent
-from management.commands.google_voice_outbound import init_driver, google_utils
+from drive.management.commands.google_voice_outbound import init_driver, google_utils
+
+
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
