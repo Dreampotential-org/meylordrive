@@ -1,3 +1,4 @@
+from rest_framework.pagination import PageNumberPagination
 from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -168,12 +169,30 @@ def list_files(request):
     uploads_with_comments_count = Upload.objects.filter(
         user=user,
     ).annotate(comments_count=Count('comment')).values()
-    print(uploads_with_comments_count)
-    return Response(uploads_with_comments_count)
+
+    paginator = PageNumberPagination()
+    paginator.page_size = 25
+
+    page = paginator.paginate_queryset(uploads_with_comments_count, request)
+    if page is not None:
+        return paginator.get_paginated_response(page)
 
 
 
 
+@api_view(['GET'])
+def get_activity(request):
+    # XXX We need to add pagination into db
+    # XXX we need to add some way to filter and control sorting
+    uploads_with_comments_count = Upload.objects.filter(
+    ).annotate(comments_count=Count('comment')).values()
+
+    paginator = PageNumberPagination()
+    paginator.page_size = 25
+
+    page = paginator.paginate_queryset(uploads_with_comments_count, request)
+    if page is not None:
+        return paginator.get_paginated_response(page)
 
 
 
