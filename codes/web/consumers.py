@@ -7,12 +7,10 @@ from django.utils import timezone
 import pytz
 from drive.models import Contact
 
-
 from server_websocket.models import Room, Message, User, UserRoomActivity
 from channels.db import database_sync_to_async
 from django.core.exceptions import ObjectDoesNotExist
 from utils.chirp import CHIRP
-
 
 from tasks.models import StatsEntry, Agent
 from drive.management.commands.google_voice_outbound import init_driver, google_utils
