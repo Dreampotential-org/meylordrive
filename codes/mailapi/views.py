@@ -84,7 +84,7 @@ def delete_email(request, email_id):
 def undelete_email(request, email_id):
     mail = Mail.objects.filter(id=email_id).first()
     if mail:
-        mail.deleted = True
+        mail.deleted = False
         mail.save()
     return Response({
         "status": 'okay'
