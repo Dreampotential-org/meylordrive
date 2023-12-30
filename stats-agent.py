@@ -200,7 +200,7 @@ async def receive_task_data(websocket):
 
 
 async def main():
-    SERVER = 'ws://127.0.0.1:8000'
+    SERVER = 'ws://127.0.0.1:8021'
     api_key = '7ee9132d-c84e-449e-9f91-50997e65f6cf'
 
     # SERVER = 'ws://api.dreampotential.org'

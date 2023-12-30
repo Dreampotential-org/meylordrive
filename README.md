@@ -14,19 +14,22 @@ Search, Dashboard, Explorer, Services and Commands
 # Linux
 sudo apt-get install cmake
 
-windows
-https://www.python.org/ftp/python/3.10.10/python-3.10.10-amd64.exe
-python -m venv
-.\venv\Scripts\activate
+windows (Might be working on latest version of python and can be deleted)
 
-virtualenv -p python3.10 venv
+# https://www.python.org/ftp/python/3.10.10/python-3.10.10-amd64.exe
+
+Create Virtual prog
+# python -m pye
+.\pye\Scripts\activate
+
+virtualenv -p python3.10 pye
 source venv/bin/activate
 pip install -r requirements.txt
 ```
 
 ### Setup database
 ```
-./scripts/local_db.sh
+./scripts/start-db.sh
 python codes/manage.py  migrate
 
 ```
@@ -39,5 +42,4 @@ python codes/manage.py  runserver
 ## running asgi server
 
 `daphne web.asgi:application`
-
 
