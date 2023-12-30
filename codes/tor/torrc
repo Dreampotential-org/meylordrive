@@ -1,0 +1,4 @@
+GeoIPFile "codes/tor/geoip"
+EntryNodes {us} StrictNodes 1
+ExitNodes {us} StrictNodes 1
+
