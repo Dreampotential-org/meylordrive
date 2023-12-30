@@ -46,6 +46,28 @@ def send_email(request):
 def get_emails(request, to_email):
     return Response(Mail.objects.filter(mail_to=to_email).values())
 
+@api_view(["GET"])
+def get_cemails(request, to_email):
+    return Response(Mail.objects.filter(mail_from=to_email).values())
+
+
+@api_view(["GET"])
+def set_draft(request, email_id):
+    mail = Mail.objects.filter(id=email_id).first()
+    if mail:
+        mail.draft = True
+        mail.save()
+    return Response({"status": 'okay'})
+
+
+@api_view(["GET"])
+def set_undraft(request, email_id):
+    mail = Mail.objects.filter(id=email_id).first()
+    if mail:
+        mail.draft = False
+        mail.save()
+    return Response({"status": 'okay'})
+
 
 @api_view(["GET"])
 def get_accounts(request):
