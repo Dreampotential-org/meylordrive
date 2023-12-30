@@ -1,3 +1,4 @@
+import uuid
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from mailapi.models import Mail, Account, Site
@@ -23,6 +24,27 @@ def add_site(request, site):
 
     return Response({"status": 'okay'})
 
+
+@api_view(["POST"])
+def add_email(request, email):
+
+    account = Account.objects.filter(
+        email=email
+    ).first()
+
+    if account:
+        return Response({
+            "status": 'site already in ddb'
+        })
+
+    account = Account()
+    account.email = email
+    account.password = str(uuid.uuid4())
+    account.save()
+
+    # XXX?
+
+    return Response({"status": 'okay'})
 
 
 @api_view(["POST"])
