@@ -1,7 +1,28 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from mailapi.models import Mail, Account
+from mailapi.models import Mail, Account, Site
 from utils.email_utils import send_raw_email
+
+
+@api_view(["POST"])
+def add_site(request, site):
+
+    site = Site.objects.filter(
+        name=site
+    ).first()
+
+    if site:
+        return Response({
+            "status": 'site already in ddb'
+        })
+
+
+    site = Site()
+    site.name = site
+    site.save()
+
+    return Response({"status": 'okay'})
+
 
 
 @api_view(["POST"])

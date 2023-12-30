@@ -6,6 +6,7 @@ app_name = 'mailapi'
 
 
 urlpatterns = [
+    path('add-site/<str:site>/', views.add_site),
     path('send-email/', views.send_email),
     path('get-emails/<str:to_email>/', views.get_emails),
     path('get-cemails/<str:to_email>/', views.get_cemails),

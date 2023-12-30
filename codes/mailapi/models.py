@@ -1,5 +1,12 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 import hashlib
+
+
+class Site(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None)
+    name = models.TextField(blank=True, null=True)
 
 
 class Account(models.Model):
