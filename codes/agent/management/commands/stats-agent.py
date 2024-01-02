@@ -10,11 +10,20 @@ import asyncio
 import threading
 import websockets
 import subprocess
+from drive.models import Contact
 # from codes.agent.management.commands.run_tasks import run_project_command
-from codes.utils.chirp import CHIRP
+from utils.chirp import CHIRP
 
+
+# from django.conf import settings
+
+# settings.configure()
+
+
+from drive.management.commands.google_voice_outbound import call_contact
 
 # from codes.agent.management.commands.run_tasks import run_log_ssh_command
+
 
 # from django.contrib.auth.models import User
 
@@ -77,15 +86,23 @@ def convert_sets_to_lists(obj):
 
 
 async def send_health_data(websocket):
-    while True:
-        print("Task 1")
-        stats_json = convert_sets_to_lists(get_stats())
-        print(f"Stats Json: {stats_json}")
-        # Send a message to the server
-        await websocket.send(json.dumps({"message_type": "health_status",
-                                         "message": stats_json}))
-        await asyncio.sleep(5)
+    try:
+        while True:
+            print("Task 1")
+            stats_json = convert_sets_to_lists(get_stats())
+            print(f"Stats Json: {stats_json}")
 
+            # Send a message to the server
+            await websocket.send(json.dumps({
+                "message_type": "health_status",
+                "message": stats_json
+            }))
+
+            await asyncio.sleep(5)
+    except websockets.exceptions.ConnectionClosedError as e:
+        print(f"WebSocket connection closed with error: {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
 
 async def main_loop(websocket, project_command):
     # Handle the received data here
@@ -188,41 +205,46 @@ def run_project_command(project_command):
 
 
 async def receive_task_data(websocket):
-    received_data = []
     while True:
         data = await websocket.recv()
         json_data = json.loads(data)
         # Handle the received data here
         print(f"Received data: {data}")
-        # Add your processing logic for received data here
-        received_data.append(json_data)
-        return received_data
+        contact = Contact.objects.filter(id=1).first()
+        import threading
+        t = threading.Thread(target=call_contact, args=[contact])
+        t.start()
+        threads.append(t)
+        # Check if the received data contains contact details
+        if "message_type" in json_data and json_data["message_type"] == "contact_details":
+            # Extract the contact phone number
+            contact_phone = json_data.get("message", {}).get("contact_phone", None)
+
+
 
 
 async def main():
     SERVER = 'ws://127.0.0.1:8021'
     api_key = '7ee9132d-c84e-449e-9f91-50997e65f6cf'
 
-    # SERVER = 'ws://api.dreampotential.org'
-    uri = (
-        "%s/ws/contact/?api_key=%s&agent_id=%s" % (SERVER, api_key,
-                                              uuid.getnode()))
+    uri = f"{SERVER}/ws/contact/?api_key={api_key}&agent_id={uuid.getnode()}"
+    
     try:
         async with websockets.connect(uri) as websocket:
-            # WebSocket connection is open
             print(f"Connected Over {uri}")
-            # start some threads
+
             # Start the tasks to send and receive data
             tasks = [
-                asyncio.create_task(send_health_data(websocket)),
-                asyncio.create_task(receive_task_data(websocket)),
+                send_health_data(websocket),
+                receive_task_data(websocket),
             ]
 
             results = await asyncio.gather(*tasks)
             command_data = results[1]
 
+            # Start another task
             tasks_two = [
-                asyncio.create_task(main_loop(websocket, command_data)),
+                main_loop(websocket, command_data),
             ]
 
             await asyncio.gather(*tasks_two)
@@ -231,6 +253,15 @@ async def main():
         print(f"WebSocket connection error: {e}")
 
 
+from django.core.management.base import BaseCommand
+import requests
 
-if __name__ == "__main__":
-    asyncio.get_event_loop().run_until_complete(main())
+
+class Command(BaseCommand):
+    help = 'run the tasks'
+
+    def add_arguments(self, parser):
+        pass
+
+    def handle(self, *args, **options):
+        asyncio.run(main())

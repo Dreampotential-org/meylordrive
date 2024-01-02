@@ -20,7 +20,6 @@ from drive.management.commands.google_voice_outbound import init_driver, google_
 
 class ChatConsumer(AsyncWebsocketConsumer):
 
-
     async def connect(self):
         query_string = self.scope["query_string"].decode("utf-8")
         if "&agent_id=" in query_string:
@@ -30,8 +29,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
         else:
             self.agent_id = None  # Set a default value or handle the absence of agent_id
 
-        self.room_name = self.scope['url_route']['kwargs']['room_slug']
-        self.room_group_name = 'chat_%s' % self.room_name
+        try:
+            # Try to get 'room_slug' from the URL route parameters
+            self.room_name = self.scope['url_route']['kwargs']['room_slug']
+        except KeyError:
+            # Handle the absence of 'room_slug' (set a default or log a warning)
+            self.room_name = 'contact'
+            # Log a warning or provide a default value based on your requirements
+            print("Warning: 'room_slug' not found in URL route. Using default room name.")
+
+        self.room_group_name = self.room_name
         self.user = self.scope['user']
         self.entry_time = datetime.now()
         print(f"User {self.user} connected to room {self.room_name} at {self.entry_time}")
@@ -47,25 +54,45 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.save_user_activity(entry=True)
 
         # Retrieve contact details dynamically based on the user or room information
-        contact_id = 232  # Replace with your dynamic logic to get contact_id
+        # You can replace the following line with your dynamic logic to get contact_id
+        contact_id = 232
+
         try:
             contact = Contact.objects.get(pk=contact_id)
             contact_name = contact.name
             contact_phone = contact.phone_number
 
-            # Initiate the call if both contact name and phone number are available
-            if contact_name and contact_phone:
-                driver = init_driver("firefox")  # Adjust the browser as needed
-                google_utils.init_google_voice(driver)
-                call = google_utils.dial_number(driver, contact_phone)
+            # Print the contact details
+            print(f"Contact ID: {contact_id}")
+            print(f"Contact Name: {contact_name}")
+            print(f"Contact Phone Number: {contact_phone}")
 
-                # Additional logic to monitor or handle the call as needed
-                google_utils.monitor_call(driver, call)
+            # Send the contact details to the stats agent
+            await self.send_contact_details_to_stats_agent(contact_phone)
+
         except Contact.DoesNotExist:
             print(f"Contact with ID {contact_id} does not exist.")
 
         await self.accept()
 
+    # Add this method to send contact details to the stats agent
+    async def send_contact_details_to_stats_agent(self, contact_phone):
+        # Formulate the message to be sent to the stats agent
+        message = {
+            "message_type": "contact_details",
+            "message": {
+                "contact_phone": contact_phone,
+            }
+        }
+
+        # Use the channel layer to send the message to the stats agent
+        await self.channel_layer.send(
+            self.channel_name,
+            {
+                "type": "send.message",
+                "message": message,
+            },
+        )
 
 
     async def disconnect(self, close_code):
@@ -111,8 +138,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
             )
 
     async def send_message(self, event):
-        message = event["message"]
-        username = event["username"]
+        # Check if 'username' key is present in the event dictionary
+        if 'username' in event:
+            username = event["username"]
+        else:
+            # If 'username' key is not present, set it to a default value or handle it as needed
+            username = "DefaultUsername"
+
+        # Similarly, check if 'message' key is present
+        message = event.get("message", "DefaultMessage")
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
