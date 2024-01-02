@@ -15,5 +15,6 @@ urlpatterns = [
     path('stats', views.get_session_stats, name="get_session_stats"),
     path('gsm_Add', views.gsm_Add, name="gsm_Add"),
     path('gsm_send', views.gsm_send, name="gsm_send"),
+    
 
 ]

@@ -204,7 +204,10 @@ def get_session_stats(request):
         'meters': calcs['distance_meters'],
         "session_id": session.id,
         "points_count": len(session_points),
-        "session_time": session.started_at
+        "session_time": session.started_at,
+        "session_time": session.started_at,
+        "session_time": session.started_at,
+
     }, safe=False)
 
 

@@ -210,11 +210,12 @@ async def receive_task_data(websocket):
         json_data = json.loads(data)
         # Handle the received data here
         print(f"Received data: {data}")
-        contact = Contact.objects.filter(id=1).first()
-        import threading
-        t = threading.Thread(target=call_contact, args=[contact])
-        t.start()
-        threads.append(t)
+        
+        #contact = Contact.objects.filter(id=1).first()
+        # import threading
+        # t = threading.Thread(target=call_contact, args=[contact])
+        # t.start()
+        # threads.append(t)
         # Check if the received data contains contact details
         if "message_type" in json_data and json_data["message_type"] == "contact_details":
             # Extract the contact phone number
