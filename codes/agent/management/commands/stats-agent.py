@@ -1,3 +1,5 @@
+from django.core.management.base import BaseCommand
+import requests
 import datetime
 import json
 import time
@@ -222,6 +224,27 @@ async def receive_task_data(websocket):
             contact_phone = json_data.get("message", {}).get("contact_phone", None)
 
 
+async def connect_server(uri):
+    CHIRP.info("connecting to....%s" % uri)
+    async with websockets.connect(uri) as websocket:
+        print(f"Connected Over {uri}")
+
+        # Start the tasks to send and receive data
+        tasks = [
+            send_health_data(websocket),
+            receive_task_data(websocket),
+        ]
+
+        results = await asyncio.gather(*tasks)
+        command_data = results[1]
+
+        # Start another task
+        tasks_two = [
+            main_loop(websocket, command_data),
+        ]
+
+        await asyncio.gather(*tasks_two)
+
 
 
 async def main():
@@ -229,33 +252,15 @@ async def main():
     api_key = '7ee9132d-c84e-449e-9f91-50997e65f6cf'
 
     uri = f"{SERVER}/ws/contact/?api_key={api_key}&agent_id={uuid.getnode()}"
-    
-    try:
-        async with websockets.connect(uri) as websocket:
-            print(f"Connected Over {uri}")
-
-            # Start the tasks to send and receive data
-            tasks = [
-                send_health_data(websocket),
-                receive_task_data(websocket),
-            ]
-
-            results = await asyncio.gather(*tasks)
-            command_data = results[1]
-
-            # Start another task
-            tasks_two = [
-                main_loop(websocket, command_data),
-            ]
-
-            await asyncio.gather(*tasks_two)
-
-    except websockets.exceptions.WebSocketException as e:
-        print(f"WebSocket connection error: {e}")
-
-
-from django.core.management.base import BaseCommand
-import requests
+    while True:
+        try:
+            await connect_server(uri)
+        except ConnectionRefusedError as e:
+            CHIRP.info("connection error... %s" % e)
+            time.sleep(5)
+        except websockets.exceptions.WebSocketException as e:
+            print(f"WebSocket connection error: {e}")
+            time.sleep(5)
 
 
 class Command(BaseCommand):
