@@ -15,8 +15,15 @@ from utils.chirp import CHIRP
 from tasks.models import StatsEntry, Agent
 from drive.management.commands.google_voice_outbound import init_driver, google_utils
 
+from urllib.parse import parse_qs
+
+from django.http import QueryDict
 
 
+from urllib.parse import parse_qs
+from django.http import QueryDict
+
+from django.http import QueryDict
 
 class ChatConsumer(AsyncWebsocketConsumer):
 
@@ -53,27 +60,38 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if str(self.user) != "AnonymousUser":
             await self.save_user_activity(entry=True)
 
-        # Retrieve contact details dynamically based on the user or room information
-        # You can replace the following line with your dynamic logic to get contact_id
-        contact_id = 232
-
+        # Extract contact ID from the room name
         try:
-            contact = Contact.objects.get(pk=contact_id)
-            contact_name = contact.name
-            contact_phone = contact.phone_number
+            contact_id = int(self.room_name)
+            print(f"Contact ID from URL: {contact_id}")
+        except ValueError:
+            contact_id = None
+            print("Error: 'room_slug' is not a valid integer.")
 
-            # Print the contact details
-            print(f"Contact ID: {contact_id}")
-            print(f"Contact Name: {contact_name}")
-            print(f"Contact Phone Number: {contact_phone}")
+        print(f"Final Contact ID: {contact_id}")
 
-            # Send the contact details to the stats agent
-            await self.send_contact_details_to_stats_agent(contact_phone)
+        # Retrieve contact details dynamically based on the user or room information
+        if contact_id is not None:
+            try:
+                contact = Contact.objects.get(pk=contact_id)
+                contact_name = contact.name
+                contact_phone = contact.phone_number
 
-        except Contact.DoesNotExist:
-            print(f"Contact with ID {contact_id} does not exist.")
+                # Print the contact details
+                print(f"Contact ID: {contact_id}")
+                print(f"Contact Name: {contact_name}")
+                print(f"Contact Phone Number: {contact_phone}")
+
+                # Send the contact details to the stats agent
+                await self.send_contact_details_to_stats_agent(contact_phone)
+
+            except Contact.DoesNotExist:
+                print(f"Contact with ID {contact_id} does not exist.")
+        else:
+            print("Error: 'contact' parameter not found in URL or is not a valid integer.")
 
         await self.accept()
+
 
     # Add this method to send contact details to the stats agent
     async def send_contact_details_to_stats_agent(self, contact_phone):
