@@ -4,11 +4,25 @@ from mailapi import models
 from utils import imap_mail
 import time
 from utils.chirp import CHIRP
+import os
+
+from mailapi.models import Account
+
+
+def create_accounts():
+    accounts = Account.objects.filter()
+    CHIRP.info("creating this amout of accouts: %s" % len(accounts))
+    for account in accounts:
+        os.system(
+            "/data/dreampotential/imap-service/docker-mailserver/setup.sh email add %s password"
+            % account.email)
+
 
 class Command(BaseCommand):
     help = 'Fetching mail from mail accounts'
 
     def handle(self, *args, **options):
+        create_accounts()
         CHIRP.info("HERE si where this is called...")
         while True:
             # XXX how to avoid fetching all the emails everytime?
