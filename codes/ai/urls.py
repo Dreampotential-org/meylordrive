@@ -14,4 +14,10 @@ urlpatterns = [
     path('generate-image/', views.generate_image),
     path('get-image/<int:seed>/', views.get_image),
     path('get-requests/', views.get_requests),
+
+
+    path('delete-faq/<int:faw_id>/', views.delete_faq),
+    path('gcreate-faw/', views.create_faw),
+
+
 ]
