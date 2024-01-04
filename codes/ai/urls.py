@@ -18,6 +18,7 @@ urlpatterns = [
 
     path('delete-faq/<int:faw_id>/', views.delete_faq),
     path('gcreate-faw/', views.create_faw),
+    path('listfa/', views.list_faw),
 
 
 ]

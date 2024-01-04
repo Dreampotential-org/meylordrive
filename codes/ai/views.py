@@ -218,6 +218,12 @@ def create_faw(request):
     return Response({"status": "okay"})
 
 @api_view(["GET"])
+def list_faw(request):
+    faws = FAW.objects.filter().values()
+    return Response(faws)
+
+
+@api_view(["DELETE"])
 def delete_faq(request, faw_id):
     FAW.objects.filter(id=faw_id).first().delete()
     return Response({"status": "okay"})
