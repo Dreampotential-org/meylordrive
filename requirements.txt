@@ -70,3 +70,4 @@ stripe
 django-phonenumber-field
 phonenumbers
 Twisted[tls,http2]
+pretty
