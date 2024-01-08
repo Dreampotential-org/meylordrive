@@ -218,6 +218,18 @@ def get_session_stats(request):
     })
 
 
+@api_view(['GET'])
+def sessions(request):
+    return Response(Session.objects.filter().values())
+
+
+@api_view(['GET'])
+def session_points(request, session_id):
+    return Response(SessionPoint.objects.filter(
+        session__id=session_id
+    ).values())
+
+
 @api_view(['POST'])
 def start(request):
     session = Session.objects.create()
