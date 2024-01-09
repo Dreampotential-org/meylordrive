@@ -49,6 +49,8 @@ class UserEventNotify(models.Model):
 
 class Device(models.Model):
     key = models.CharField(max_length=2000, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_seen = models.DateTimeField(auto_now_add=True)
 
 
 class GpsC(models.Model):

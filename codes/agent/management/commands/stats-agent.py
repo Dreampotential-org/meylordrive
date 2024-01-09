@@ -1,3 +1,5 @@
+from django.core.management.base import BaseCommand
+import requests
 import datetime
 import json
 import time
@@ -222,35 +224,28 @@ async def receive_task_data(websocket):
             contact_phone = json_data.get("message", {}).get("contact_phone", None)
 
 
+async def connect_server(uri):
+    CHIRP.info("connecting to....%s" % uri)
+    async with websockets.connect(uri) as websocket:
+        print(f"Connected Over {uri}")
 
+        # Start the tasks to send and receive data
+        tasks = [
+            send_health_data(websocket),
+            receive_task_data(websocket),
+        ]
 
-async def main():
-    SERVER = 'ws://127.0.0.1:8000'
-    api_key = '7ee9132d-c84e-449e-9f91-50997e65f6cf'
+        results = await asyncio.gather(*tasks)
+        command_data = results[1]
 
-    uri = f"{SERVER}/ws/contact/?api_key={api_key}&agent_id={uuid.getnode()}"
-    
-    try:
-        async with websockets.connect(uri) as websocket:
-            print(f"Connected Over {uri}")
+        # Start another task
+        tasks_two = [
+            main_loop(websocket, command_data),
+        ]
 
-            # Start the tasks to send and receive data
-            tasks = [
-                send_health_data(websocket),
-                receive_task_data(websocket),
-            ]
+        await asyncio.gather(*tasks_two)
 
-            results = await asyncio.gather(*tasks)
-            command_data = results[1]
-
-            # Start another task
-            tasks_two = [
-                main_loop(websocket, command_data),
-            ]
-
-            await asyncio.gather(*tasks_two)
-
-    except websockets.exceptions.WebSocketException(ConnectionRefusedError) as e:
+    except websockets.exceptions.WebSocketException as e:
         print(f"WebSocket connection error: {e}")
 
 

@@ -17,5 +17,10 @@ urlpatterns = [
     path('set-undraft/<int:email_id>/', views.set_undraft),
     path('set-unread/<int:email_id>/', views.set_unread),
     path('delete-email/<int:email_id>/', views.delete_email),
-    path('undelete-email/<int:email_id>/', views.undelete_email),
+
+
+    path('list-sites/', views.list_sites),
+    path('list-emails/', views.list_emails),
+    path('delete-site/<int:site_id>/', views.delete_site),
+    path('delete-email/<int:email_id>/', views.delete_email),
 ]

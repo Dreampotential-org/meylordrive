@@ -24,10 +24,41 @@ def add_site(request, site):
 
     return Response({"status": 'okay'})
 
+@api_view(["GET"])
+def list_sites(request, site):
+    return Response(
+        Site.objects.filter().values()
+    )
+
+@api_view(["DELETE"])
+def delete_email(request, email_id):
+    account = Account.objects.filter(
+        id=email_id
+    ).first()
+
+    if account:
+        account.delete()
+        return Response({
+            "status": 'ok'
+        })
+    return Response({"status": 'no account to delete foud'})
+
+@api_view(["DELETE"])
+def delete_site(request, site_id):
+    site = Site.objects.filter(
+        id=site_id
+    ).first()
+
+    if site:
+        site.delete()
+        return Response({
+            "status": 'ok'
+        })
+    return Response({"status": 'no sit to delete foud'})
+
 
 @api_view(["POST"])
 def add_email(request, email):
-
     account = Account.objects.filter(
         email=email
     ).first()
@@ -45,6 +76,13 @@ def add_email(request, email):
     # XXX?
 
     return Response({"status": 'okay'})
+
+@api_view(["GET"])
+def list_emails(request, site):
+    return Response(
+        Account.objects.filter().values()
+    )
+
 
 
 @api_view(["POST"])
@@ -94,16 +132,23 @@ def get_cemails(request, to_email):
     return Response(Mail.objects.filter(mail_from=to_email).values())
 
 
-@api_view(["GET"])
+@api_view(["POST"])
 def set_draft(request, email_id):
     mail = Mail.objects.filter(id=email_id).first()
-    if mail:
-        mail.draft = True
-        mail.save()
+    if not mail:
+        mail = Mail()
+        mail.id = email_id
+    mail.draft = True
+    mail.mail_from = request.data.get("mail_from")
+    mail.mail_to = request.data.get("mail_to")
+    mail.subject = request.data.get("subject")
+    mail.message = request.data.get("message_text")
+    mail.save()
+
     return Response({"status": 'okay'})
 
 
-@api_view(["GET"])
+@api_view(["POST"])
 def set_undraft(request, email_id):
     mail = Mail.objects.filter(id=email_id).first()
     if mail:
@@ -118,7 +163,7 @@ def get_accounts(request):
     return Response(accounts)
 
 
-@api_view(["GET"])
+@api_view(["POST"])
 def set_read(request, email_id):
     mail = Mail.objects.filter(id=email_id).first()
     if mail:
@@ -127,7 +172,7 @@ def set_read(request, email_id):
     return Response({"status": 'okay'})
 
 
-@api_view(["GET"])
+@api_view(["POST"])
 def set_unread(request, email_id):
     mail = Mail.objects.filter(id=email_id).first()
     if mail:
@@ -136,7 +181,7 @@ def set_unread(request, email_id):
     return Response({"status": 'okay'})
 
 
-@api_view(["GET"])
+@api_view(["DELETE"])
 def delete_email(request, email_id):
     mail = Mail.objects.filter(id=email_id).first()
     if mail:
@@ -145,7 +190,7 @@ def delete_email(request, email_id):
     return Response({"status": 'okay'})
 
 
-@api_view(["GET"])
+@api_view(["POST"])
 def undelete_email(request, email_id):
     mail = Mail.objects.filter(id=email_id).first()
     if mail:

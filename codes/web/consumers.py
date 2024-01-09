@@ -13,7 +13,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from utils.chirp import CHIRP
 
 from tasks.models import StatsEntry, Agent
-from drive.management.commands.google_voice_outbound import init_driver, google_utils
 
 from urllib.parse import parse_qs
 
