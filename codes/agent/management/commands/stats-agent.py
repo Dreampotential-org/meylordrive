@@ -225,7 +225,7 @@ async def receive_task_data(websocket):
 
 
 async def main():
-    SERVER = 'ws://127.0.0.1:8021'
+    SERVER = 'ws://127.0.0.1:8000'
     api_key = '7ee9132d-c84e-449e-9f91-50997e65f6cf'
 
     uri = f"{SERVER}/ws/contact/?api_key={api_key}&agent_id={uuid.getnode()}"
@@ -250,7 +250,7 @@ async def main():
 
             await asyncio.gather(*tasks_two)
 
-    except websockets.exceptions.WebSocketException as e:
+    except websockets.exceptions.WebSocketException(ConnectionRefusedError) as e:
         print(f"WebSocket connection error: {e}")
 
 
