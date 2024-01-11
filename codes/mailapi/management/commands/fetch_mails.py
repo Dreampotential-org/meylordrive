@@ -14,8 +14,8 @@ def create_accounts():
     CHIRP.info("creating this amout of accouts: %s" % len(accounts))
     for account in accounts:
         os.system(
-            "/data/dreampotential/imap-service/docker-mailserver/setup.sh email add %s password"
-            % account.email)
+            "/data/dreampotential/imap-service/docker-mailserver/setup.sh email add %s %s"
+            % (account.email, account.password))
 
 
 class Command(BaseCommand):
