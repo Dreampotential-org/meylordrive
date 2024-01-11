@@ -6,7 +6,7 @@ def create_email(email):
     body={
     }
     req = requests.post(
-        "https://api.dreampotential.org/mailapi/add-email/%s" % email,
+        "http://api.dreampotential.org:8833/mailapi/add-email/%s/" % email,
         headers=headers, json=body)
 
     print(req.json())

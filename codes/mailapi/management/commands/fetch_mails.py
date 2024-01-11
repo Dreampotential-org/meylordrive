@@ -13,6 +13,7 @@ def create_accounts():
     accounts = Account.objects.filter()
     CHIRP.info("creating this amout of accouts: %s" % len(accounts))
     for account in accounts:
+        CHIRP.info("doing something for %s" % account.email)
         os.system(
             "/data/dreampotential/imap-service/docker-mailserver/setup.sh email add %s %s"
             % (account.email, account.password))
