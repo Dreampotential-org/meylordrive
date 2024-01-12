@@ -64,6 +64,7 @@ sounddevice
 daphne
 playsound
 vosk
+pyautogui
 pytube
 pyvirtualdisplay
 stripe
