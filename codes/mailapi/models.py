@@ -14,7 +14,8 @@ class Account(models.Model):
     password = models.CharField(max_length=512)
     active_on_server = models.BooleanField(default=False)
     hash_password = models.CharField(max_length=512, blank=True, null=True)
-
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None)
     def __str__(self):
         return self.email
 
@@ -32,6 +33,8 @@ class Mail(models.Model):
     read = models.BooleanField(default=False)
     deleted = models.BooleanField(default=False)
     draft = models.BooleanField(default=False)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None)
 
     def gen_message_id(self):
         val = self.account.email + self.subject + '-' + self.row_date

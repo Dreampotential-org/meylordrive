@@ -25,6 +25,7 @@ def add_site(request, site):
 
     site = Site()
     site.name = site
+    site.user = request.user
     site.save()
 
     return Response({"status": 'okay'})
@@ -32,7 +33,7 @@ def add_site(request, site):
 @api_view(["GET"])
 def list_sites(request, site):
     return Response(
-        Site.objects.filter().values()
+        Site.objects.filter(user=request.user).values()
     )
 
 @api_view(["DELETE"])
@@ -74,6 +75,7 @@ def add_email(request, email):
     account = Account()
     account.email = email
     account.password = str(uuid.uuid4())
+    account.user = request.user
     account.save()
 
     return Response({"status": 'okay'})
@@ -81,7 +83,7 @@ def add_email(request, email):
 @api_view(["GET"])
 def list_emails(request, site):
     return Response(
-        Account.objects.filter().values()
+        Account.objects.filter(user=request.user).values()
     )
 
 from email.mime.multipart import MIMEMultipart
@@ -156,11 +158,13 @@ def send_email(request):
 
 @api_view(["GET"])
 def get_emails(request, to_email):
-    return Response(Mail.objects.filter(mail_to=to_email).values())
+    return Response(Mail.objects.filter(user=request.user,
+                                        mail_to=to_email).values())
 
 @api_view(["GET"])
 def get_cemails(request, to_email):
-    return Response(Mail.objects.filter(mail_from=to_email).values())
+    return Response(Mail.objects.filter(user=request.user,
+                                        mail_from=to_email).values())
 
 
 @api_view(["POST"])
@@ -174,6 +178,7 @@ def set_draft(request, email_id):
     mail.mail_to = request.data.get("mail_to")
     mail.subject = request.data.get("subject")
     mail.message = request.data.get("message_text")
+    mail.user = request.user
     mail.save()
 
     return Response({"status": 'okay'})
@@ -181,7 +186,7 @@ def set_draft(request, email_id):
 
 @api_view(["POST"])
 def set_undraft(request, email_id):
-    mail = Mail.objects.filter(id=email_id).first()
+    mail = Mail.objects.filter(id=email_id, user=request.user).first()
     if mail:
         mail.draft = False
         mail.save()
@@ -190,13 +195,13 @@ def set_undraft(request, email_id):
 
 @api_view(["GET"])
 def get_accounts(request):
-    accounts = Account.objects.filter().values("email")
+    accounts = Account.objects.filter(user=request.user).values("email")
     return Response(accounts)
 
 
 @api_view(["POST"])
 def set_read(request, email_id):
-    mail = Mail.objects.filter(id=email_id).first()
+    mail = Mail.objects.filter(id=email_id, user=request.user).first()
     if mail:
         mail.read = True
         mail.save()
@@ -205,7 +210,7 @@ def set_read(request, email_id):
 
 @api_view(["POST"])
 def set_unread(request, email_id):
-    mail = Mail.objects.filter(id=email_id).first()
+    mail = Mail.objects.filter(id=email_id, user=request.user).first()
     if mail:
         mail.read = False
         mail.save()
@@ -214,7 +219,7 @@ def set_unread(request, email_id):
 
 @api_view(["DELETE"])
 def delete_email(request, email_id):
-    mail = Mail.objects.filter(id=email_id).first()
+    mail = Mail.objects.filter(id=email_id, user=request.user).first()
     if mail:
         mail.deleted = True
         mail.save()
@@ -223,7 +228,7 @@ def delete_email(request, email_id):
 
 @api_view(["POST"])
 def undelete_email(request, email_id):
-    mail = Mail.objects.filter(id=email_id).first()
+    mail = Mail.objects.filter(id=email_id, user=request.user).first()
     if mail:
         mail.deleted = False
         mail.save()
