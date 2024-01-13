@@ -65,7 +65,7 @@ def parse_email_body(b):
 def get_mails(email_address, password, account_id):
     mail_client = connect(email_address, password)
     if not mail_client:
-        CHIRP.info("Not able to login accout")
+        CHIRP.info("Not able to login account")
         return []
 
     rv, data = mail_client.search(None, "ALL")
@@ -86,8 +86,6 @@ def get_mails(email_address, password, account_id):
             email.header.decode_header(msg['Subject'])
         )
         subject = str(hdr)
-        CHIRP.info(msg)
-        # CHIRP.info('Raw Date:', msg['Date'])
 
         # Now convert to local date-time
         date_tuple = email.utils.parsedate_tz(msg['Date'])
@@ -111,4 +109,6 @@ def get_mails(email_address, password, account_id):
         mails.append(mail)
 
     mail_client.close()
+    CHIRP.info("%s number of emails fetched: %s"
+               % (email_address, len(mails)))
     return mails

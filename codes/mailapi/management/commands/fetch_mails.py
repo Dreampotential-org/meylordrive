@@ -27,8 +27,10 @@ class Command(BaseCommand):
         CHIRP.info("HERE si where this is called...")
         while True:
             # XXX how to avoid fetching all the emails everytime?
+
             messages = imap_mail.get_all_mails()
             CHIRP.info("Number of messages %s" % len(messages))
+
             for message in messages:
                 CHIRP.info(message)
                 CHIRP.info(

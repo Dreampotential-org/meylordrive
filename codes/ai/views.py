@@ -213,7 +213,7 @@ def create_faw(request):
     faw = FAW()
     faw.input_content = request.data.get("input_content")
     faw.response_content = request.data.get("response_content")
-    faw.faw()
+    faw.save()
 
     return Response({"status": "okay"})
 
