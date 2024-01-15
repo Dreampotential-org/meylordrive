@@ -74,6 +74,8 @@ def get_distances(request):
 
 
 speedFlow = ['normal','fast','tofast','slow','toslow']
+from datetime import timedelta
+
 def get_sp_distance(session_points):
     if not session_points:
         return {'distance_miles': 0,
@@ -88,55 +90,51 @@ def get_sp_distance(session_points):
     speed_per_mile_cover_last = 0
     for i in range(0, len(session_points) - 1):
 
-        # assign it to first one at start
+        # assign it to first one at the start
         if start_session is None:
             start_session = session_points[i]
 
         distance = get_distance(
             session_points[i].latitude, session_points[i].longitude,
-            session_points[i + 1 ].latitude, session_points[i +1].longitude
+            session_points[i + 1].latitude, session_points[i + 1].longitude
         )
 
-        if(complete_one_mile == 0):
+        if complete_one_mile == 0:
             speed_cover_per_mile = session_points[i].created_at
 
         session_distance += distance
         interval_distance += distance
         complete_one_mile += distance
 
-        if (0.62137 * interval_distance >= .1):
+        if (0.62137 * interval_distance >= 0.1):
+            # Calculate time difference in seconds
+            time_difference_seconds = (start_session.created_at - session_points[i].created_at).total_seconds()
 
-            hours = float(
-                (start_session.created_at - session_points[i].created_at).seconds/
-                (60 * 60)
-            )
-            mph = (
-                (0.62137 * interval_distance) / hours
-            )
+            # Calculate speed in miles per hour
+            mph = 0 if time_difference_seconds == 0 else (0.62137 * interval_distance) / (time_difference_seconds / 3600)
 
             start_session = session_points[i]
             interval_stats.append({
                 'distance': interval_distance,
                 'mph': mph,
-                'hours': hours,
+                'hours': time_difference_seconds / 3600,
                 'speedFlow': 'none'
             })
 
             interval_distance = 0
 
         if (0.62137 * complete_one_mile >= 1):
-            hours = float(
-                (speed_cover_per_mile - session_points[i].created_at).seconds/
-                (60 * 60)
-            )
-            mph = (
-                (0.62137 * complete_one_mile) / hours
-            )
-            if(speed_per_mile_cover_last == 0):
+            # Calculate time difference in seconds
+            time_difference_seconds = (speed_cover_per_mile - session_points[i].created_at).total_seconds()
+
+            # Calculate speed in miles per hour
+            mph = 0 if time_difference_seconds == 0 else (0.62137 * complete_one_mile) / (time_difference_seconds / 3600)
+
+            if speed_per_mile_cover_last == 0:
                 speed_type = speedFlow[0]
-            elif(speed_per_mile_cover_last > mph):
+            elif speed_per_mile_cover_last > mph:
                 speed_type = speedFlow[1]
-            elif(speed_per_mile_cover_last < mph):
+            elif speed_per_mile_cover_last < mph:
                 speed_type = speedFlow[3]
 
             speed_per_mile_cover_last = mph
@@ -144,7 +142,7 @@ def get_sp_distance(session_points):
             interval_stats.append({
                 'distance': interval_distance,
                 'mph': mph,
-                'hours': hours,
+                'hours': time_difference_seconds / 3600,
                 'speedFlow': speed_type
             })
             complete_one_mile = 0
