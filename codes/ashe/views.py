@@ -1,3 +1,5 @@
+from utils.chirp import CHIRP
+
 import arrow
 from datetime import datetime
 import json

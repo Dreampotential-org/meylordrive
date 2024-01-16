@@ -1,18 +1,24 @@
 # MeylorDrive
 
-This project makes it easy to manage a single or thousands of nodes system to orchestrate  
+iTAWUL
+
+This pmakes it easy to manage a single or thousands of nodes system to orchestrate
 
 Get Instant 
 Monitor Utilization
 Infrastructure access 
-Search, Dashboard, Explorer, Services and Commands
+Search, Dashboard, Explorer, Services and Commands+_+
 
 
-## Install
+## ET DEV ev
 
 ```
 # Linux
 sudo apt-get install cmake
+
+virtualenv -p env
+source env/bin/activate
+pip install -r requirements.txt
 
 windows (Might be working on latest version of python and can be deleted)
 
@@ -22,9 +28,6 @@ Create Virtual prog
 # python -m pye
 .\pye\Scripts\activate
 
-virtualenv -p python3.10 pye
-source venv/bin/activate
-pip install -r requirements.txt
 ```
 
 ### Setup database
