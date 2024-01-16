@@ -1,5 +1,3 @@
-from utils.chirp import CHIRP
-
 import arrow
 from datetime import datetime
 import json
@@ -47,10 +45,21 @@ def devices(request):
     devices = Device.objects.filter().order_by("last_seen").values()
 
     for device in devices:
+        device['sessions'] = Session.objects.filter(
+            device=device['id']
+        ).order_by("start").values()
+
+        from ashe.models import SessionPoint
+        for i in range(len(device['sessions'])):
+            device['sessions'][i]['sps'] = SessionPoint.objects.filter(
+                session__id=device['sessions'][i]['id']).values()
+            device['sessions'][i]['sps_count'] = SessionPoint.objects.filter(
+                session__id=device['sessions'][i]['id']).count()
+
         device['last_seen_readable'] = arrow.get(
             device['last_seen']
         ).humanize()
-    print(devices)
+
     return Response(devices)
 
 
@@ -76,8 +85,6 @@ def get_distances(request):
 
 
 speedFlow = ['normal','fast','tofast','slow','toslow']
-from datetime import timedelta
-
 def get_sp_distance(session_points):
     if not session_points:
         return {'distance_miles': 0,
@@ -92,51 +99,55 @@ def get_sp_distance(session_points):
     speed_per_mile_cover_last = 0
     for i in range(0, len(session_points) - 1):
 
-        # assign it to first one at the start
+        # assign it to first one at start
         if start_session is None:
             start_session = session_points[i]
 
         distance = get_distance(
             session_points[i].latitude, session_points[i].longitude,
-            session_points[i + 1].latitude, session_points[i + 1].longitude
+            session_points[i + 1 ].latitude, session_points[i +1].longitude
         )
 
-        if complete_one_mile == 0:
+        if(complete_one_mile == 0):
             speed_cover_per_mile = session_points[i].created_at
 
         session_distance += distance
         interval_distance += distance
         complete_one_mile += distance
 
-        if (0.62137 * interval_distance >= 0.1):
-            # Calculate time difference in seconds
-            time_difference_seconds = (start_session.created_at - session_points[i].created_at).total_seconds()
+        if (0.62137 * interval_distance >= .1):
 
-            # Calculate speed in miles per hour
-            mph = 0 if time_difference_seconds == 0 else (0.62137 * interval_distance) / (time_difference_seconds / 3600)
+            hours = float(
+                (start_session.created_at - session_points[i].created_at).seconds/
+                (60 * 60)
+            )
+            mph = (
+                (0.62137 * interval_distance) / hours
+            )
 
             start_session = session_points[i]
             interval_stats.append({
                 'distance': interval_distance,
                 'mph': mph,
-                'hours': time_difference_seconds / 3600,
+                'hours': hours,
                 'speedFlow': 'none'
             })
 
             interval_distance = 0
 
         if (0.62137 * complete_one_mile >= 1):
-            # Calculate time difference in seconds
-            time_difference_seconds = (speed_cover_per_mile - session_points[i].created_at).total_seconds()
-
-            # Calculate speed in miles per hour
-            mph = 0 if time_difference_seconds == 0 else (0.62137 * complete_one_mile) / (time_difference_seconds / 3600)
-
-            if speed_per_mile_cover_last == 0:
+            hours = float(
+                (speed_cover_per_mile - session_points[i].created_at).seconds/
+                (60 * 60)
+            )
+            mph = (
+                (0.62137 * complete_one_mile) / hours
+            )
+            if(speed_per_mile_cover_last == 0):
                 speed_type = speedFlow[0]
-            elif speed_per_mile_cover_last > mph:
+            elif(speed_per_mile_cover_last > mph):
                 speed_type = speedFlow[1]
-            elif speed_per_mile_cover_last < mph:
+            elif(speed_per_mile_cover_last < mph):
                 speed_type = speedFlow[3]
 
             speed_per_mile_cover_last = mph
@@ -144,7 +155,7 @@ def get_sp_distance(session_points):
             interval_stats.append({
                 'distance': interval_distance,
                 'mph': mph,
-                'hours': time_difference_seconds / 3600,
+                'hours': hours,
                 'speedFlow': speed_type
             })
             complete_one_mile = 0
@@ -184,18 +195,33 @@ def get_miles_points(session_points):
             miles += 1
     return session_response
 
+
+
 @api_view(['GET'])
-def get_session_stats(request):
+def device_sessions(request, device_id):
+    device = Device.objects.filter(key=device_id).first()
 
-    total_session_points = SessionPoint.objects.filter().count()
+    sessions = Session.filter.filter(device=device).values()
+    for session in sessions:
 
-    device = Device.objects.filter(
-        key=request.GET.get("device_id")
-    ).first()
+        session_points = SessionPoint.objects.filter(
+            session=session
+        ).order_by("-id")
 
-    session = Session.objects.filter(
-        device=device
-    ).order_by("-id").first()
+        calcs = get_sp_distance(session_points)
+        session.update(calc)
+
+    return Response(
+        sessions
+    )
+
+
+
+@api_view(['GET'])
+def get_session_stats(request, session_id):
+    session = Session.filter.filter(session_id).first()
+    total_session_points = SessionPoint.objects.filter(
+        session=session).count()
 
     session_points = SessionPoint.objects.filter(
         session=session
@@ -212,9 +238,7 @@ def get_session_stats(request):
         'meters': calcs['distance_meters'],
         "session_id": session.id,
         "points_count": len(session_points),
-        "session_time": session.started_at,
-        "session_time": session.started_at,
-        "session_time": session.started_at,
+        "session_time": session.start,
     })
 
 
@@ -285,7 +309,7 @@ def session_point(request):
 @permission_classes([IsAuthenticated])
 def stop(request):
     session_create = Session.objects.filter().last()
-    session_create.ended_at = datetime.now()
+    session_create.ended = datetime.now()
     session_create.save()
     return Response({'status': 'k'})
 
