@@ -136,8 +136,8 @@ class UserSession(models.Model):
 
 
 class Session(models.Model):
-    started_at = models.DateTimeField(auto_now_add=True)
-    ended_at = models.DateTimeField(blank=True, null=True)
+    started = models.DateTimeField(auto_now_add=True)
+    ended = models.DateTimeField(blank=True, null=True)
     device = models.ForeignKey(Device,
                                on_delete=models.CASCADE,
                                blank=True, null=True)

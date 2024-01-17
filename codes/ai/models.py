@@ -1,6 +1,5 @@
 from django.db import models
 
-
 class ChatApiRequest(models.Model):
     input_content = models.TextField()
     response_content = models.TextField()

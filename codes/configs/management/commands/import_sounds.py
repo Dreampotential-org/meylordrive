@@ -1,3 +1,4 @@
+import os
 import uuid
 from django.core.management.base import BaseCommand
 from configs.models import MediA
@@ -6,22 +7,26 @@ from django.core.files import File
 from pytube import YouTube
 
 
-def create_sound_file():
+def create_sound_file(ui):
     directory = str(uuid.uuid4())
 
-    yt = YouTube(
-        "https://www.youtube.com/watch?v=UZKeLf14-kY"
-    )
+    yt = YouTube(ui)
     yt.streams.filter(
         progressive=True, file_extension='mp4'
     ).order_by('resolution').desc().first().download(
-        output_path="/tmp/", filename=directory
+        output_path="/data/meylordrive-youtube-videos/", filename=directory
     )
     # video = "/tmp/%s/%s" % (directory, "file")
+
+    file_name =  "/data/meylordrive-youtube-videos/%s" % directory
+
+    os.system("ffmpeg -i %s %s.mp3" % (file_name, file_name))
+
     sound = MediA()
     # sound.file = File(video)
-    sound.path = "/tmp/%s" % directory
+    sound.path = "/data/meylordrive-youtube-videos/%s.mp3" % directory
     print(sound.path)
+
     sound.name = yt.title
     sound.save()
 
@@ -33,4 +38,6 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
-        create_sound_file()
+        create_sound_file("https://www.youtube.com/watch?v=UZKeLf14-kY")
+        create_sound_file("https://www.youtube.com/watch?v=rJ5sXdtKvjM")
+        create_sound_file("https://www.youtube.com/watch?v=h3h035Eyz5A")

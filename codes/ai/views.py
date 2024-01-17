@@ -193,10 +193,7 @@ def input_chat(request):
     max_tokens=256,
     top_p=1,
     frequency_penalty=0,
-    presence_penalty=0
-    )
-
-    print(response)
+    presence_penalty=0)
 
     car.response_content = response['choices'][0]['message']['content']
     car.model = response['model']
