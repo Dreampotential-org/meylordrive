@@ -150,7 +150,6 @@ def get_sp_distance(session_points):
     return {'distance_miles': session_distance * 0.62137,
             'distance_meters': session_distance * 1000,
             'interval_stats': interval_stats}
-
 def get_miles_points(session_points):
     miles = 1
     if not session_points:
