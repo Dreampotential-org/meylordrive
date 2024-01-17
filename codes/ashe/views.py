@@ -47,7 +47,7 @@ def devices(request):
     for device in devices:
         device['sessions'] = Session.objects.filter(
             device=device['id']
-        ).order_by("start").values()
+        ).order_by("started").values()
 
         from ashe.models import SessionPoint
         for i in range(len(device['sessions'])):
@@ -256,8 +256,7 @@ def session_points(request, session_id):
 
 @api_view(['POST'])
 def start(request):
-    session = Session.objects.create()
-    session.save()
+    session = Session()
 
     # if device does not exist when session is started
     # it is created here
@@ -270,7 +269,6 @@ def start(request):
     if not device:
         device = Device()
         device.key = device_id
-
 
     device.last_seen = datetime.now()
     device.save()
