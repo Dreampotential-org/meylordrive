@@ -1,3 +1,4 @@
+from struct import calcsize
 import arrow
 from datetime import datetime
 import json
@@ -40,6 +41,7 @@ def get_distance(lat1, lon1, lat2, lon2):
     return distance
 
 
+# Assuming SessionPointSerializer is already defined in your serializers.py
 @api_view(['GET'])
 def devices(request):
     devices = Device.objects.filter().order_by("last_seen").values()
@@ -51,16 +53,27 @@ def devices(request):
 
         from ashe.models import SessionPoint
         for i in range(len(device['sessions'])):
-            device['sessions'][i]['sps'] = SessionPoint.objects.filter(
-                session__id=device['sessions'][i]['id']).values()
-            device['sessions'][i]['sps_count'] = SessionPoint.objects.filter(
-                session__id=device['sessions'][i]['id']).count()
+            session_keys = device['sessions'][i].keys()
+            print(f"Session keys for device {device['id']}, session {device['sessions'][i]['id']}: {session_keys}")
+
+            # Use get method with a default value of an empty dictionary
+            session_points_data = device['sessions'][i].get('session_points', {})
+
+            session_points = [SessionPoint(**sp_data) for sp_data in session_points_data]
+
+            device['sessions'][i]['sps'] = session_points
+            device['sessions'][i]['sps_count'] = len(session_points)
+
+            # Add the get_sp_distance result to each session
+            device['sessions'][i]['sp_distance'] = get_sp_distance(session_points)
 
         device['last_seen_readable'] = arrow.get(
             device['last_seen']
         ).humanize()
 
     return Response(devices)
+
+
 
 
 @api_view(['GET', 'POST'])
@@ -208,7 +221,7 @@ def device_sessions(request, device_id):
         ).order_by("-id")
 
         calcs = get_sp_distance(session_points)
-        session.update(calc)
+        session.update(calcsize)
 
     return Response(
         sessions
