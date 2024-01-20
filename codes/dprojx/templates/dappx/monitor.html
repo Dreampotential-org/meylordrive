@@ -1,0 +1,21 @@
+{% extends "xppda/base.html" %}
+{% block body_block %}
+<div class="mainContainer">
+  <ol class="chat">
+      <li class="other">
+          <div class="avatar"><img src="/static/pam2.png" draggable="false"></div>
+          <div class="msg" style='text-align:center'>
+				<div>You will now beable to view video submissions sent to
+					  {{ request.user.email }} after logging in</div>
+            <!--{% for user in users %}
+            <div>
+              {{ user.name }} - {{ user.user.email }}
+              <br />
+            </div>
+            {% endfor %}
+				-->
+          </div>
+      </li>
+  </ol>
+</div>
+{% endblock %}

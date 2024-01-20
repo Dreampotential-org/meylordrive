@@ -41,6 +41,8 @@ CSRF_COOKIE_HTTPONLY = False
 # Application definition
 
 INSTALLED_APPS = [
+    'xppda',
+    'dprojx',
     'channels',
     'daphne',
     'mailapi',
@@ -51,7 +53,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    
     'drf_yasg',
     'tasks',
     'agent',
@@ -72,9 +73,9 @@ INSTALLED_APPS = [
     'clickads',
     'ashe',
     'awipu',
-    'dappx',
     'configs',
 ]
+
 SITE_ID = 1  # Change this to the ID of the site you want to use
 
 
@@ -126,6 +127,11 @@ TEMPLATES = [
         },
     },
 ]
+
+# WSGI_APPLICATION = 'web.wsgi.application'
+# ASGI_APPLICATION = "server_websocket.routing.application"
+# settings.py
+ASGI_APPLICATION = 'server_websocket.routing.application'
 
 
 ROOT_URLCONF = 'web.urls'

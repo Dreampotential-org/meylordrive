@@ -1,4 +1,4 @@
-from dappx import email_utils
+from xppda import email_utils
 from django.http import JsonResponse
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
@@ -10,12 +10,12 @@ from awipu.serializers import (
     OrganizationMemberSerializer
 )
 from rest_framework import response, status
-from dappx.models import UserProfileInfo
-from dappx.models import UserMonitor
-from dappx.models import OrganizationMember, OrganizationMemberMonitor
-from dappx.models import Organization
-from dappx.notify_utils import notify_monitor
-from dappx.views import upload_org_logo
+from xppda.models import UserProfileInfo
+from xppda.models import UserMonitor
+from xppda.models import OrganizationMember, OrganizationMemberMonitor
+from xppda.models import Organization
+from xppda.notify_utils import notify_monitor
+from xppda.views import upload_org_logo
 from awipu.serializers import UserMonitorSerializer
 
 from drf_yasg import openapi

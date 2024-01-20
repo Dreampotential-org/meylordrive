@@ -14,17 +14,17 @@ from awipu.serializers import (
     UserSerializer, UserProfileSerializer, GpsCheckinSerializer,
     VideoUploadSerializer
 )
-from dappx.models import UserProfileInfo, GpsCheckin, VideoUpload
-from dappx.models import UserMonitor, SubscriptionEvent
-from dappx.models import OrganizationMember, OrganizationMemberMonitor
-from dappx.models import MonitorFeedback, Organization
-from dappx.views import _create_user
-from dappx import email_utils
-from dappx.views import convert_and_save_video, stream_video
-from dappx.notify_utils import notify_gps_checkin, notify_monitor
-from dappx.notify_utils import notify_feedback
-from dappx import constants
-from dappx import utils
+from xppda.models import UserProfileInfo, GpsCheckin, VideoUpload
+from xppda.models import UserMonitor, SubscriptionEvent
+from xppda.models import OrganizationMember, OrganizationMemberMonitor
+from xppda.models import MonitorFeedback, Organization
+from xppda.views import _create_user
+from xppda import email_utils
+from xppda.views import convert_and_save_video, stream_video
+from xppda.notify_utils import notify_gps_checkin, notify_monitor
+from xppda.notify_utils import notify_feedback
+from xppda import constants
+from xppda import utils
 from common import config
 
 # from magic_link.models import MagicLink

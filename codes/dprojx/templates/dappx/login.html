@@ -1,0 +1,20 @@
+{% extends 'xppda/base.html' %}
+{% block body_block %}
+<div class="mainContainer" style='margin-top:25px'>
+    <div class="modal-content" style="padding: 20px; background: none no-repeat scroll 0 0 #fff; position: relative;">
+      <h1>Login here</h1>
+      <form method="post" action="{% url 'xppda:user_login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}">
+          {% csrf_token %}
+          {# A more "HTML" way of creating the login form#}
+          <p>
+          <input type="text" name="email" placeholder="Email">
+          </p>
+          <p>
+          <input type="password" name="password" placeholder="Password">
+          </p>
+          <input type="submit" name="" class="btnSubmit" value="Login">
+      </form>
+    </div>
+</div>
+{% endblock %}
+

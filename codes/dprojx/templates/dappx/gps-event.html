@@ -1,0 +1,42 @@
+{% extends "xppda/base.html" %}
+{% block gps_block %}
+		<form id="upload_vid_form" method="post" style="display: inline;" enctype="multipart/form-data">
+      <input type='hidden' name='lat'>
+      <input type='hidden' name='long'>
+    <div class="mainContainer">
+        <div class="eventBox">
+						<label>Enter a note</label>
+						<textarea placeholder="Add Description of Event" name='msg'></textarea>
+        </div>
+    </div>
+
+    <div class="secAction">
+        <div class="mainContainer">
+				  <button class="actionBtn is-visible" id="locationAuth">Submit Checkin</button>
+        </div>
+    </div>
+
+		</form>
+
+
+    <div class="modal" id="LocationModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-wrapper modal-transition">
+            <div class="modal-header">
+            </div>
+            <div class="modal-body">
+                <div class="modal-content">
+                    <div class="textCenter">
+                        <img src="/static/location.png">
+                        <h3 class="locAuthTitle">Location Permission</h3>
+                        <p class="locAuthDesc">
+									Please allow permissions for accessing your location through GPS.<br><br>
+									Press allow when ready.
+								</p>
+                        <button class="btnSubmit">Allow</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

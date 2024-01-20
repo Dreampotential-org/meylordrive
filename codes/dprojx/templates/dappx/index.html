@@ -1,0 +1,135 @@
+{% extends "xppda/base.html" %}
+{% block body_block %}
+
+	{% if user.is_authenticated %}
+		<div class="mainContainer">
+        <ol class="chat">
+            <li class="other">
+                <div class="avatar"><img src="static/pam2.png" draggable="false"></div>
+                <div class="msg">
+						  <p>Hi {{name}}, What would you like to do?</p>
+                </div>
+            </li>
+        </ol>
+    </div>
+
+	<div class="secAction">
+        <div class="mainContainer">
+				<form id='upload_vid_form' method='post' style='display: inline;'
+						enctype="multipart/form-data">
+					<input type="file" accept="video/*" id='upload-vid'
+					       capture="environment" style='display:none;'>
+					<button class="actionBtn btnVideo">Take a Video</button>
+				</form>
+            <button class="actionBtn btnEvent">Attend Event<br><span>(Check-In/Check-Out)</span></button>
+        </div>
+    </div>
+
+
+    <div class="modal" id="takeavideoModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-wrapper modal-transition">
+            <div class="modal-header">
+                <h2 class="modal-heading">Take a Video</h2>
+            </div>
+            <div class="modal-body">
+                <div class="modal-content">
+            	    <h2>1) Ensure you are connected to Wifi</h2>
+							    <h2>2) When you click record:</h2>
+							    <h2>3) Show the your medicine prescription bottle to the camera</h2>
+							    <h2>4) Take your pill.</h2>
+							    <h2>5) Submit Short video.</h2>
+                  <div style='text-align:center'>
+						      <button class="actionBtn btnVideo" id="takevideobtn">Take a video</button>
+                  </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {% else %}
+	 <input type="hidden" id="user_taken" name="variable" value="{{ user_taken }}">
+    <div class="mainContainer">
+        <ol class="chat">
+            <li class="other">
+                <div class="avatar"><img src="static/pam2.png" draggable="false"/></div>
+                <div class="msg">
+                    <p>Meet IAM, your Interactive Accountability Manager.</p>
+                </div>
+            </li>
+            <li class="other">
+                <div class="avatar"><img src="static/pam2.png" draggable="false"/></div>
+                <div class="msg">
+                    <p>Are you new or would you like to sign in?</p>
+                </div>
+            </li>
+        </ol>
+    </div>
+    <div class="secAction">
+        <div class="mainContainer">
+            <button class="actionBtn" id="signin">Sign in</button>
+            <button class="actionBtn" id="signup">I am new</button>
+        </div>
+    </div>
+    <div class="modal" id="signinModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-wrapper modal-transition">
+            <div class="modal-header">
+                <!-- <img src="static/modalLogo.png" alt="Modal Logo" class="modalLogo"> -->
+                <h2 class="modal-heading">Hello, Please login</h2>
+            </div>
+            <div class="modal-body">
+                <div class="modal-content">
+                    <form class="popupForm" action="/user_login/" enctype=multipart/form-data method="POST">
+							   {% csrf_token %}
+								<p>
+									<label>Email:</label>
+									{{ user_form.email}}
+								</p>
+								<p>
+									<label>Password:</label>
+							      {{ user_form.password}}
+								</p>
+								<p>
+									<label>Notify Email</label>
+									{{ profile_form.notify_email }}
+								</p>
+                        <p class="textCenter"><a href="/password_reset">Forgot password?</a></p>
+                        <input type="submit" value="Login" class="btnSubmit">
+                    </form>
+                    <p class="textCenter signupNeed">Don’t have an account? <a href="#">Sign Up</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal" id="signupModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-wrapper modal-transition">
+            <div class="modal-header">
+                <!--<img src="static/modalLogo.png" alt="Modal Logo" class="modalLogo">-->
+                <h2 class="modal-heading">Create an account</h2>
+            </div>
+            <div class="modal-body">
+                <div class="modal-content">
+                    <form class="popupForm" enctype=multipart/form-data method="POST">
+							  {% csrf_token %}
+							  {{ user_form.as_p }}
+							  {{ profile_form.as_p }}
+                        <input type="submit" value="Sign Up" class="btnSubmit">
+								<!--
+                        <input type="text" placeholder="Full Name">
+                        <input type="Email" placeholder="Email">
+                        <input type="tel" placeholder="Phone">
+                        <input type="password" placeholder="Password">
+                        <input type="password" placeholder="Confirm Password">
+								-->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+	{% endif %}
+{% endblock %}
