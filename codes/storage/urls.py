@@ -10,4 +10,6 @@ urlpatterns = [
     path('list_files/', views.list_files, name='list_files'),
     path('list_comments/<int:upload_id>',
          views.list_comments, name='list_comments'),
+    path('get_media/', views.get_media, name="get_media"),
+    path('stream_media', views.stream_video, name="stream_video"),
 ]

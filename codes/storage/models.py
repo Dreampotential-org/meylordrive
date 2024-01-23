@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-
+import uuid
+import os
+from django.contrib.auth.models import User
 
 class Upload(models.Model):
     Url = models.CharField(max_length=500)
@@ -15,21 +17,44 @@ class Upload(models.Model):
     def __str__(self):
         return self.Url
 
-
 class Comment(models.Model):
     message = models.TextField(default="")
-    upload = models.ForeignKey(Upload(), on_delete=models.CASCADE,
+    upload = models.ForeignKey(Upload, on_delete=models.CASCADE,
                                null=True, blank=True, default=None)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
                              null=True, blank=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
-
 
 class View(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
                              null=True, blank=True, default=None)
-    upload = models.ForeignKey(Upload(), on_delete=models.CASCADE,
+    upload = models.ForeignKey(Upload, on_delete=models.CASCADE,
                                null=True, blank=True, default=None)
     exit_time = models.DateTimeField(null=True, blank=True)
 
+def uuid_file_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = "%s.%s" % (uuid.uuid4(), ext)
+    return os.path.join(filename)
+
+class MediA(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    file = models.FileField(upload_to=uuid_file_path)
+    path = models.CharField(max_length=5128, blank=True, null=True)
+    name = models.CharField(max_length=5128, blank=True, null=True)
+    user = models.ForeignKey(to=get_user_model(),
+                             on_delete=models.CASCADE,
+                             default="", blank=True, null=True)
+
+class ProfileInfo(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=17, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+class YouTubeVideo(models.Model):
+    title = models.CharField(max_length=255)
+    url = models.URLField()
+    description = models.TextField()
+
+    def __str__(self):
+        return self.title

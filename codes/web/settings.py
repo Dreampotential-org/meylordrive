@@ -73,7 +73,6 @@ INSTALLED_APPS = [
     'clickads',
     'ashe',
     'awipu',
-    'configs',
 ]
 
 SITE_ID = 1  # Change this to the ID of the site you want to use

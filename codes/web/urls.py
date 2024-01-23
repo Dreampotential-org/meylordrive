@@ -46,7 +46,7 @@ urlpatterns = [
   path("checkout/", include('checkout.urls')),
   path("awipu/", include('awipu.urls')),
   path("ashe/", include('ashe.urls')),
-  path("configs/", include('configs.urls')),
+#   path("configs/", include('configs.urls')),
   path("storage/", include('storage.urls')),
   path("mailapi/", include('mailapi.urls')),
   # path("livestats/", include('livestats.urls')),
