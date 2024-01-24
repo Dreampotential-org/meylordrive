@@ -227,11 +227,15 @@ def device_sessions(request, device_id):
         sessions
     )
 
-
+from rest_framework import status
 
 @api_view(['GET'])
 def get_session_stats(request, session_id):
-    session = Session.filter.filter(session_id).first()
+    session = Session.objects.filter(id=session_id).first()
+
+    if not session:
+        return Response({"error": "Session not found"}, status=status.HTTP_404_NOT_FOUND)
+
     total_session_points = SessionPoint.objects.filter(
         session=session).count()
 
@@ -250,7 +254,7 @@ def get_session_stats(request, session_id):
         'meters': calcs['distance_meters'],
         "session_id": session.id,
         "points_count": len(session_points),
-        "session_time": session.start,
+        "session_time": session.started,  # Access 'started' instead of 'start'
     })
 
 
