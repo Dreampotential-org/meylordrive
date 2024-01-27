@@ -51,6 +51,7 @@ class ProfileInfo(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=17, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
 class YouTubeVideo(models.Model):
     title = models.CharField(max_length=255)
     url = models.URLField()

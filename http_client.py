@@ -1,6 +1,20 @@
 import requests
 
 
+
+def create_email(email):
+    headers = {}
+    body={
+    }
+    req = requests.post(
+        "http://localhost:8000/awipu/create-user/" % email,
+        headers=headers, json=body)
+
+    print(req.json())
+
+
+
+
 def create_email(email):
     headers = {}
     body={

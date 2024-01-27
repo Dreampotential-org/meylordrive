@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'knox',
     'corsheaders',
     'usersystem',
+    'spotify',
     'project',
     'api',
     'server_websocket',
