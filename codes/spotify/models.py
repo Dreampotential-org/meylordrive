@@ -6,6 +6,7 @@ class Sog(models.Model):
     seconds = models.IntegerField(default=0)
     sog_group = models.ForeignKey(
         get_user_model(), on_delete=models.CASCADE,
+        
         null=True, blank=True, default=None
     )
 
