@@ -1,12 +1,12 @@
 from django.db import models
 
+from django.contrib.auth import get_user_model
 
 class Sog(models.Model):
     name = models.TextField()
     seconds = models.IntegerField(default=0)
     sog_group = models.ForeignKey(
         get_user_model(), on_delete=models.CASCADE,
-        
         null=True, blank=True, default=None
     )
 

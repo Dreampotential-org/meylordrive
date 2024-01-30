@@ -41,6 +41,8 @@ CSRF_COOKIE_HTTPONLY = False
 # Application definition
 
 INSTALLED_APPS = [
+    'youtube_downloader',
+    
     'xppda',
     'dprojx',
     'channels',
@@ -75,10 +77,23 @@ INSTALLED_APPS = [
     'ashe',
     'awipu',
 ]
+from pathlib import Path
 
 SITE_ID = 1  # Change this to the ID of the site you want to use
+import os
 
+BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Use os.path.join to construct the path
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = BASE_DIR / 'media'
+# STATIC_URL = '/static/'
+# STATICFILES_DIRS = [BASE_DIR / 'static']
+# STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',

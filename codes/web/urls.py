@@ -46,11 +46,12 @@ urlpatterns = [
   path("checkout/", include('checkout.urls')),
   path("awipu/", include('awipu.urls')),
   path("ashe/", include('ashe.urls')),
+path("", include("youtube_downloader.urls")),  # Include the URLs from youtube_downloader app
 #   path("configs/", include('configs.urls')),
   path("storage/", include('storage.urls')),
   path("mailapi/", include('mailapi.urls')),
   # path("livestats/", include('livestats.urls')),
-  path("", include('api.urls')),
+  path(" api", include('api.urls')),
   path('ws/', include('server_websocket.urls')),
   path('swagger<format>', schema_view.without_ui(cache_timeout=0), name='schema-json'),
   path('swagger', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
