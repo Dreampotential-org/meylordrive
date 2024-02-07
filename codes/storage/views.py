@@ -360,3 +360,7 @@ def stream_video(request):
         resp['Content-Length'] = str(size)
     resp['Accept-Ranges'] = 'bytes'
     return resp
+def list_downloaded_songs(request):
+    downloaded_songs = DownloadedSong.objects.all()
+    song_names = [f"{song.song.artist_name} - {song.song.track_title}" for song in downloaded_songs]
+    return JsonResponse({'downloaded_songs': song_names})
