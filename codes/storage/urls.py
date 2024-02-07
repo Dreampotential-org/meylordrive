@@ -11,5 +11,7 @@ urlpatterns = [
     path('list_comments/<int:upload_id>',
          views.list_comments, name='list_comments'),
     path('get_media/', views.get_media, name="get_media"),
+    path('downloaded-songs/', views.list_downloaded_songs, name='list_downloaded_songs'),
+
     path('stream_media', views.stream_video, name="stream_video"),
 ]
