@@ -37,6 +37,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
+from spotify.models import *
 
 @api_view(['GET'])
 def add_view(request, upload_id):
