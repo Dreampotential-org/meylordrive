@@ -42,7 +42,6 @@ CSRF_COOKIE_HTTPONLY = False
 
 INSTALLED_APPS = [
     'youtube_downloader',
-    
     'xppda',
     'dprojx',
     'channels',
@@ -60,6 +59,8 @@ INSTALLED_APPS = [
     'agent',
     'rest_framework',
     'django_rest_passwordreset',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
     'knox',
     'corsheaders',
     'usersystem',
@@ -76,6 +77,9 @@ INSTALLED_APPS = [
     'clickads',
     'ashe',
     'awipu',
+
+
+
 ]
 from pathlib import Path
 
@@ -176,7 +180,7 @@ CHANNEL_LAYERS = {
 
 db_password = os.environ.get('db_password', 'EhB4bINnDFmzI0Bg')
 db_user = os.environ.get('db_user', 'postgres')
-db_host = os.environ.get('db_user', '0.dreampotential.org')
+db_host = os.environ.get('db_user', 'dreampotential.org')
 # db_host = os.environ.get('db_user', 'localhost')
 
 DATABASES = {

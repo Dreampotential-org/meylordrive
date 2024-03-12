@@ -1,7 +1,7 @@
 import os
 import uuid
 from django.core.management.base import BaseCommand
-from configs.models import MediA
+from storage.models import MediA
 from django.core.files import File
 
 from pytube import YouTube
@@ -32,7 +32,7 @@ def create_sound_file(ui):
 
 
 class Command(BaseCommand):
-    help = 'fetch and parse iwlist'
+    help = 'fehdas wst'
 
     def add_arguments(self, parser):
         pass

@@ -2,12 +2,18 @@ import requests
 
 
 
-def create_email(email):
+def create_account(name, email, password):
     headers = {}
     body={
+        'name': name,
+        'email': email,
+        'password': password,
+        'source': 'py',
+        'sober_date': None,
+        'page': 'dreamoo',
     }
     req = requests.post(
-        "http://localhost:8000/awipu/create-user/" % email,
+        "http://localhost:8000/awipu/create-user/",
         headers=headers, json=body)
 
     print(req.json())
@@ -41,6 +47,6 @@ def send_email():
 
     print(req.json())
 
-create_email('aaron@agentstat.com')
+create_account('Aaro', 'a0@agentstat.com', 'uwawuw')
 
 
