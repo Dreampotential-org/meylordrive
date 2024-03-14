@@ -78,7 +78,6 @@ soundfile
 pydub
 pyttsx3
 whisper
-tensorflow
 whisper_mic
 torch
 sounddevice
