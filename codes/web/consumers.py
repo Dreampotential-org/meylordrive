@@ -6,34 +6,24 @@ from datetime import datetime, timedelta, timezone as tz
 from django.utils import timezone
 import pytz
 from drive.models import Contact
-
 from server_websocket.models import Room, Message, User, UserRoomActivity
 from channels.db import database_sync_to_async
 from django.core.exceptions import ObjectDoesNotExist
 from utils.chirp import CHIRP
-
 from tasks.models import StatsEntry, Agent
-
-from urllib.parse import parse_qs
-
-from django.http import QueryDict
-
-
 from urllib.parse import parse_qs
 from django.http import QueryDict
 
-from django.http import QueryDict
 
 class ChatConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         query_string = self.scope["query_string"].decode("utf-8")
-        if "&agent_id=" in query_string:
-            self.agent_id = query_string.split("&agent_id=")[1]
-            print(self.agent_id)
-            await self.set_agent_active(self.agent_id)
-        else:
-            self.agent_id = None  # Set a default value or handle the absence of agent_id
+        self.agent_id = self.get_agent_id_from_query_string(query_string)
+        self.room_name = self.get_room_name_from_query_string(query_string)
+
+        # Check if the room already exists
+        room = await self.get_or_create_room(self.room_name)
 
         try:
             # Try to get 'room_slug' from the URL route parameters
@@ -51,7 +41,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # Add the user to the room group
         await self.channel_layer.group_add(
-            self.room_group_name,
+            room.group_name,
             self.channel_name
         )
 
@@ -111,7 +101,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             },
         )
 
-
     async def disconnect(self, close_code):
         # Remove the user from the room group
         await self.channel_layer.group_discard(
@@ -131,7 +120,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.set_agent_not_active(self.agent_id)
 
     async def receive(self, text_data):
-        CHIRP.info("We recieved message: %s" % text_data)
+        CHIRP.info("We received message: %s" % text_data)
         data_json = json.loads(text_data)
         message_type = data_json["message_type"]
         if message_type == 'health_status':
@@ -253,7 +242,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     #         slug=room_name, defaults={'name': room_name})
     #     Message.objects.create(user=user, room=room, content=message)
 
-
     @sync_to_async
     def set_agent_active(self, agent_id):
         agent = Agent.objects.filter(id=agent_id).first()
@@ -269,10 +257,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if not agent:
             agent = Agent()
             agent.id = agent_id
-        
+
         agent.alive = False
         agent.save()
-
 
     @sync_to_async
     def save_stats_entry(self, stats_json):
@@ -303,4 +290,3 @@ class ChatConsumer(AsyncWebsocketConsumer):
             # total_read=stats_json['TotalRead'],
             # total_write=stats_json['TotalWrite'],
         )
-
