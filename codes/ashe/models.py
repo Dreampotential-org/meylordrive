@@ -49,6 +49,8 @@ class UserEventNotify(models.Model):
 
 class Device(models.Model):
     key = models.CharField(max_length=2000, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_seen = models.DateTimeField(auto_now_add=True)
 
 
 class GpsC(models.Model):
@@ -134,8 +136,8 @@ class UserSession(models.Model):
 
 
 class Session(models.Model):
-    started_at = models.DateTimeField(auto_now_add=True)
-    ended_at = models.DateTimeField(blank=True, null=True)
+    started = models.DateTimeField(auto_now_add=True)
+    ended = models.DateTimeField(blank=True, null=True)
     device = models.ForeignKey(Device,
                                on_delete=models.CASCADE,
                                blank=True, null=True)

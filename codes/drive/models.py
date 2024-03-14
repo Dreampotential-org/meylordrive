@@ -16,7 +16,6 @@ class SMS(models.Model):
 
 
 class Contact(models.Model):
-    id = models.IntegerField(primary_key=True)  # Assuming 'id' is an integer
     name = models.CharField(max_length=1000, blank=True, null=True)
     phone_number = models.CharField(max_length=100, blank=True, null=True)
     phone_other = models.CharField(max_length=100, blank=True, null=True)

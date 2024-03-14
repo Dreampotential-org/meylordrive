@@ -11,3 +11,15 @@ services:
         command: bash -c "/usr/local/bin/gunicorn --bind :8000 --timeout 999 --workers 8 --env DJANGO_SETTINGS_MODULE=web.settings  web.wsgi:application"
         environment:
             - OPEN_AI_KEY=$OPEN_AI_KEY
+    daplin:
+        build: .
+        volumes:
+            - ./codes:/home/web/codes
+            - /data:/data
+        ports:
+            - 8022:8000
+        command: bash -c "sleep 10 && daphne -u /tmp/daphne.sock web.asgi:application"
+        environment:
+            - OPEN_AI_KEY=$OPEN_AI_KEY
+        depends_on:
+            - web

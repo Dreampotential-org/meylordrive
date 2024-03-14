@@ -10,7 +10,7 @@ from rest_framework.decorators import api_view
 import openai
 from django.shortcuts import redirect
 from utils.chirp import CHIRP
-from ai.models import ChatApiRequest
+from ai.models import ChatApiRequest, FAW
 
 stability_api_key = "sk-heMfVLMb0aM0y6VVHDOZJI2nzFppBcAEEkIoHSgC3rAqXReu"
 openai.api_key = os.environ.get("OPEN_AI_KEY", "")
@@ -193,10 +193,7 @@ def input_chat(request):
     max_tokens=256,
     top_p=1,
     frequency_penalty=0,
-    presence_penalty=0
-    )
-
-    print(response)
+    presence_penalty=0)
 
     car.response_content = response['choices'][0]['message']['content']
     car.model = response['model']
@@ -207,6 +204,26 @@ def input_chat(request):
 
     return Response(response['choices'][0]['message']['content'])
 
+
+@api_view(["POST"])
+def create_faw(request):
+    faw = FAW()
+    faw.input_content = request.data.get("input_content")
+    faw.response_content = request.data.get("response_content")
+    faw.save()
+
+    return Response({"status": "okay"})
+
+@api_view(["GET"])
+def list_faw(request):
+    faws = FAW.objects.filter().values()
+    return Response(faws)
+
+
+@api_view(["DELETE"])
+def delete_faq(request, faw_id):
+    FAW.objects.filter(id=faw_id).first().delete()
+    return Response({"status": "okay"})
 
 
 @api_view(["GET"])

@@ -1,7 +1,8 @@
+from struct import calcsize
+import arrow
+from datetime import datetime
 import json
-import datetime
-from django.http import JsonResponse
-
+from rest_framework.response import Response
 from .models import Session, SessionPoint, Device, Dot
 from math import sin, cos, sqrt, atan2, radians
 
@@ -18,10 +19,10 @@ from django.http import HttpResponse
 import requests
 import json
 
+
 @api_view(['POST'])
 def set_profile_info(request):
     pass
-
 
 def get_distance(lat1, lon1, lat2, lon2):
     R = 6373.0
@@ -40,17 +41,50 @@ def get_distance(lat1, lon1, lat2, lon2):
     return distance
 
 
+# Assuming SessionPointSerializer is already defined in your serializers.py
+@api_view(['GET'])
+def devices(request):
+    devices = Device.objects.filter().order_by("last_seen").values()
+
+    for device in devices:
+        device['sessions'] = Session.objects.filter(
+            device=device['id']
+        ).order_by("started").values()
+
+        from ashe.models import SessionPoint
+        for i in range(len(device['sessions'])):
+            session_keys = device['sessions'][i].keys()
+            print(f"Session keys for device {device['id']}, session {device['sessions'][i]['id']}: {session_keys}")
+
+            # Use get method with a default value of an empty dictionary
+            session_points_data = device['sessions'][i].get('session_points', {})
+
+            session_points = [SessionPoint(**sp_data) for sp_data in session_points_data]
+
+            device['sessions'][i]['sps'] = session_points
+            device['sessions'][i]['sps_count'] = len(session_points)
+
+            # Add the get_sp_distance result to each session
+            device['sessions'][i]['sp_distance'] = get_sp_distance(session_points)
+
+        device['last_seen_readable'] = arrow.get(
+            device['last_seen']
+        ).humanize()
+
+    return Response(devices)
+
+
+
+
 @api_view(['GET', 'POST'])
-
 def get_distances(request):
-
     # here we calculate on server side..
     dots = Dot.objects.filter()
     session_point = SessionPoint.objects.filter().last()
     print("session point...%s" % session_point)
 
     if not session_point:
-        return JsonResponse({'dots': []}, safe=False)
+        return Response({'dots': []})
 
     res = []
     for dot in dots:
@@ -60,12 +94,10 @@ def get_distances(request):
                                              session_point.longitude)})
 
     print("Number of dots: %s" % len(dots))
-    return JsonResponse({'dots': res}, safe=False)
+    return Response({'dots': res})
 
 
-speedFlow =   ['normal','fast','tofast','slow','toslow']
-
-
+speedFlow = ['normal','fast','tofast','slow','toslow']
 def get_sp_distance(session_points):
     if not session_points:
         return {'distance_miles': 0,
@@ -91,11 +123,11 @@ def get_sp_distance(session_points):
 
         if(complete_one_mile == 0):
             speed_cover_per_mile = session_points[i].created_at
-        
+
         session_distance += distance
         interval_distance += distance
         complete_one_mile += distance
-        
+
         if (0.62137 * interval_distance >= .1):
 
             hours = float(
@@ -130,28 +162,26 @@ def get_sp_distance(session_points):
                 speed_type = speedFlow[1]
             elif(speed_per_mile_cover_last < mph):
                 speed_type = speedFlow[3]
-            
+
             speed_per_mile_cover_last = mph
 
             interval_stats.append({
-            'distance': interval_distance,
-            'mph': mph,
-            'hours': hours,
-            'speedFlow': speed_type
+                'distance': interval_distance,
+                'mph': mph,
+                'hours': hours,
+                'speedFlow': speed_type
             })
             complete_one_mile = 0
 
     return {'distance_miles': session_distance * 0.62137,
             'distance_meters': session_distance * 1000,
             'interval_stats': interval_stats}
-
 def get_miles_points(session_points):
     miles = 1
     if not session_points:
         return {'miles' : 0, 'time_taken': '0:00:00'}
-    
     session_response = []
-    
+
     start_lat = session_points[0].latitude
     start_long = session_points[0].longitude
     session_start_time = session_points[0].created_at
@@ -164,30 +194,50 @@ def get_miles_points(session_points):
         session_distance_per_mile = session_distance_per_km*0.62137
         if session_distance_per_mile >= 1:
             time_taken = session_points[i + 1].created_at - session_start_time
-            seconds = time_taken.total_seconds() 
+            seconds = time_taken.total_seconds()
             h = seconds//3600
             m = seconds//60
             seconds %= 60
             time_taken = "%d:%02d:%02d" % (h,m,seconds)
-            session_response.append({ 'miles' : f"{miles-1}-{miles}" , 'time_taken' : time_taken })
+            session_response.append({
+                'miles' : f"{miles-1}-{miles}",
+                'time_taken' : time_taken })
             start_lat, start_long = session_points[i + 1].latitude, session_points[i +1].longitude
             session_start_time =  session_points[i + 1].created_at
-            miles+=1
-            
+            miles += 1
     return session_response
 
+
+
 @api_view(['GET'])
-def get_session_stats(request):
+def device_sessions(request, device_id):
+    device = Device.objects.filter(key=device_id).first()
 
-    total_session_points = SessionPoint.objects.filter().count()
+    sessions = Session.filter.filter(device=device).values()
+    for session in sessions:
 
-    device = Device.objects.filter(
-        key=request.GET.get("device_id")
-    ).first()
+        session_points = SessionPoint.objects.filter(
+            session=session
+        ).order_by("-id")
 
-    session = Session.objects.filter(
-        device=device
-    ).order_by("-id").first()
+        calcs = get_sp_distance(session_points)
+        session.update(calcsize)
+
+    return Response(
+        sessions
+    )
+
+from rest_framework import status
+
+@api_view(['GET'])
+def get_session_stats(request, session_id):
+    session = Session.objects.filter(id=session_id).first()
+
+    if not session:
+        return Response({"error": "Session not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    total_session_points = SessionPoint.objects.filter(
+        session=session).count()
 
     session_points = SessionPoint.objects.filter(
         session=session
@@ -198,20 +248,31 @@ def get_session_stats(request):
     calcs = get_sp_distance(session_points)
     print(calcs)
 
-    return JsonResponse({
+    return Response({
         "interval_stats": calcs['interval_stats'],
         'miles': calcs['distance_miles'],
         'meters': calcs['distance_meters'],
         "session_id": session.id,
         "points_count": len(session_points),
-        "session_time": session.started_at
-    }, safe=False)
+        "session_time": session.started,  # Access 'started' instead of 'start'
+    })
+
+
+@api_view(['GET'])
+def sessions(request):
+    return Response(Session.objects.filter().values())
+
+
+@api_view(['GET'])
+def session_points(request, session_id):
+    return Response(SessionPoint.objects.filter(
+        session__id=session_id
+    ).values())
 
 
 @api_view(['POST'])
 def start(request):
-    session = Session.objects.create()
-    session.save()
+    session = Session()
 
     # if device does not exist when session is started
     # it is created here
@@ -219,17 +280,19 @@ def start(request):
     device_id = request.data.get("device_id")
     print(device_id)
     print(type(device_id))
+
     device = Device.objects.filter(key=device_id).first()
     if not device:
         device = Device()
         device.key = device_id
-        device.save()
 
+    device.last_seen = datetime.now()
+    device.save()
     session.device = device
     session.save()
 
-    return JsonResponse({'status': 'okay',
-                         'session_id': session.id}, safe=False)
+    return Response({'status': 'okay',
+                     'session_id': session.id})
 
 
 @api_view(['POST'])
@@ -253,16 +316,16 @@ def session_point(request):
 
     print("creating session_point %s" % session_point.id)
 
-    return JsonResponse({'status': 'okay'}, safe=False)
+    return Response({'status': 'okay'})
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def stop(request):
     session_create = Session.objects.filter().last()
-    session_create.ended_at = datetime.datetime.now()
+    session_create.ended = datetime.now()
     session_create.save()
-    return JsonResponse({'status': 'k'},  safe=False)
+    return Response({'status': 'k'})
 
 
 @api_view(['POST'])
@@ -285,32 +348,32 @@ def bulk_sync_motions(request):
             device.key = device_id
             device.save()
 
-        gxyz_point = GXYZPoint(g=int(mp['g']), x=int(mp['x']), y=int(mp['y']), z=int(mp['z']), device=device)
+        gxyz_point = GXYZPoint(
+            g=int(mp['g']), x=int(mp['x']), y=int(mp['y']), z=int(mp['z']),
+            device=device
+        )
         gxyz_point.save()
-
         print("done!!\n")
- 
-    return JsonResponse({'status': 'k'},  safe=False)
-
-from django.http import HttpResponse
-User = get_user_model()
+    return Response({'status': 'k'},  safe=False)
 
 @api_view(['POST'])
 def gsm_Add(request):
     user = User.objects.get(id= request.data['user'])
     fcm_registration_id = request.data['fcm_registration_id']
-    GCMDevice.objects.get_or_create(registration_id=fcm_registration_id, cloud_message_type="FCM", user=user)
+    GCMDevice.objects.get_or_create(
+        registration_id=fcm_registration_id,
+        cloud_message_type="FCM", user=user)
 
-    return JsonResponse({'status': 'okay'}, safe=False)
+    return Response({'status': 'okay'})
 
 def send_notification(registration_ids , message_title , message_desc):
     fcm_api = "AAAA4UE3yG0:APA91bHFb0FoLZ_oH334w2Ho5mirUlELbhHHpU16KrjIwfl4_fK-bbHcOXTSk5jw9YWIZ1ZC1u_VNaXJ54xFNHVvN4Q507ew2xQFInRMsvYCdqx8eIwO6LNIFkCcBg-k0hQbbxEYtIJx"
     url = "https://fcm.googleapis.com/fcm/send"
-    
+
     headers = {
     "Content-Type":"application/json",
     "Authorization": 'key='+fcm_api}
-    
+
     payload = {
         "registration_ids" :registration_ids,
         "priority" : "high",
@@ -319,7 +382,6 @@ def send_notification(registration_ids , message_title , message_desc):
             "title" : message_title,
             "image" : "https://i.ytimg.com/vi/m5WUPHRgdOA/hqdefault.jpg?sqp=-oaymwEXCOADEI4CSFryq4qpAwkIARUAAIhCGAE=&rs=AOn4CLDwz-yjKEdwxvKjwMANGk5BedCOXQ",
             "icon": "https://yt3.ggpht.com/ytc/AKedOLSMvoy4DeAVkMSAuiuaBdIGKC7a5Ib75bKzKO3jHg=s900-c-k-c0x00ffffff-no-rj",
-            
         }
     }
 
@@ -332,9 +394,12 @@ def gsm_send(request):
     body = f"{username} is Leading this week..."
     title = "New Lead..."
     fcm_devices = GCMDevice.objects.filter(user = 1).distinct("registration_id")
-    resp = fcm_devices.send_message(body, badge=1, sound="default", extra={"title": title,"icon": "icon","data": "data", "image": "image"})
+    resp = fcm_devices.send_message(body, badge=1, sound="default",
+                                    extra={"title": title,"icon": "icon",
+                                           "data": "data",
+                                           "image": "image"})
     print(f"Share Moment FCM: {resp}")
 
     # print(dir(fcm_devices))
     # send_notification(resgistration , 'testingg' , 'testing')
-    return HttpResponse("sent")
+    return Response("sent")

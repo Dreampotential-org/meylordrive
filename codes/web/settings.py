@@ -41,6 +41,9 @@ CSRF_COOKIE_HTTPONLY = False
 # Application definition
 
 INSTALLED_APPS = [
+    'youtube_downloader',
+    'xppda',
+    'dprojx',
     'channels',
     'daphne',
     'mailapi',
@@ -56,9 +59,12 @@ INSTALLED_APPS = [
     'agent',
     'rest_framework',
     'django_rest_passwordreset',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
     'knox',
     'corsheaders',
     'usersystem',
+    'spotify',
     'project',
     'api',
     'server_websocket',
@@ -71,10 +77,27 @@ INSTALLED_APPS = [
     'clickads',
     'ashe',
     'awipu',
-    'dappx',
-    'configs',
-]
 
+
+
+]
+from pathlib import Path
+
+SITE_ID = 1  # Change this to the ID of the site you want to use
+import os
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Use os.path.join to construct the path
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = BASE_DIR / 'media'
+# STATIC_URL = '/static/'
+# STATICFILES_DIRS = [BASE_DIR / 'static']
+# STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -124,6 +147,11 @@ TEMPLATES = [
     },
 ]
 
+# WSGI_APPLICATION = 'web.wsgi.application'
+# ASGI_APPLICATION = "server_websocket.routing.application"
+# settings.py
+ASGI_APPLICATION = 'server_websocket.routing.application'
+
 
 ROOT_URLCONF = 'web.urls'
 
@@ -152,7 +180,7 @@ CHANNEL_LAYERS = {
 
 db_password = os.environ.get('db_password', 'EhB4bINnDFmzI0Bg')
 db_user = os.environ.get('db_user', 'postgres')
-db_host = os.environ.get('db_user', '0.dreampotential.org')
+db_host = os.environ.get('db_user', 'dreampotential.org')
 # db_host = os.environ.get('db_user', 'localhost')
 
 DATABASES = {
@@ -239,13 +267,26 @@ AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 
 ALLOWED_HOSTS = ['*', "api.dreampotential.org"]
 
-# Email
+# # Email
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_USE_TLS = True
+# EMAIL_HOST = 'smtp.email.us-chicago-1.oci.oraclecloud.com'
+# EMAIL_HOST_USER = 'ocid1.user.oc1..aaaaaaaae4z6ngwxbkxg6qn6z3ogpsyt4pryvcqp4aq76tgr5b6zijkglrnq@ocid1.tenancy.oc1..aaaaaaaasq5eo5hshbwevjpvqk52wwb35l4vh4lwwp3rzuxq5f2x4m3pji6a.2j.com'
+# EMAIL_HOST_PASSWORD = '&.)S_hq6r)RSZZ<hHXI-'
+# EMAIL_PORT = 587
+
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.email.us-chicago-1.oci.oraclecloud.com'
-EMAIL_HOST_USER = 'ocid1.user.oc1..aaaaaaaae4z6ngwxbkxg6qn6z3ogpsyt4pryvcqp4aq76tgr5b6zijkglrnq@ocid1.tenancy.oc1..aaaaaaaasq5eo5hshbwevjpvqk52wwb35l4vh4lwwp3rzuxq5f2x4m3pji6a.2j.com'
-EMAIL_HOST_PASSWORD = '&.)S_hq6r)RSZZ<hHXI-'
-EMAIL_PORT = 587
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT=587
+EMAIL_HOST_USER='shaiknadeem@gmai.com'
+EMAIL_HOST_PASSWORD='vzviuawilbewzjir'
+EMAIL_USE_TLS= True
+EMAIL_USE_SSL=False
+
+
+
+
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')

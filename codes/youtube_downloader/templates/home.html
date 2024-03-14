@@ -1,0 +1,51 @@
+<!-- new_youtube/templates/home.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+</head>
+<body>
+    <h2>Welcome to the new_youtube app!</h2>
+    {% if user.is_authenticated %}
+        <p>Hello, {{ user.username }}! <a href="{% url 'logout' %}">Logout</a></p>
+
+        {% if youtube_profiles %}
+            <p>Your YouTube profiles:</p>
+            <ul>
+                {% for profile in youtube_profiles %}
+                    <li>
+                        <a href="{% url 'playlist_detail' profile.id %}">{{ profile.profile_name }}</a>
+                        <form method="post" action="{% url 'add_to_playlist' profile.id %}">
+                            {% csrf_token %}
+                            <button type="submit">Add to Playlist</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You haven't associated any YouTube profiles with your account.</p>
+        {% endif %}
+
+        <!-- Playlist Section -->
+        <div>
+            <h3>Your Playlist:</h3>
+            {% if user_playlist %}
+                <ul>
+                    {% for profile in user_playlist %}
+                        <li>{{ profile.profile_name }} - {{ profile.id }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Your playlist is empty.</p>
+            {% endif %}
+        </div>
+
+    {% else %}
+        <p>You are not logged in. <a href="{% url 'login' %}">Login</a> | <a href="{% url 'register' %}">Register</a></p>
+    {% endif %}
+    <!-- Add your welcome message here -->
+    <p>This is the welcome message for authenticated and unauthenticated users.</p>
+</body>
+</html>

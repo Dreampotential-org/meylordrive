@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale = 1.0, maximum-scale=1.0, user-scalable=no" />
+    <!--CSS -->
+    <link rel="stylesheet" href="/static/style.css?v=1.1">
+    <script src="/static/custom.js?v=1.1"></script>
+    <script src="/static/jquery-3.3.1.js"></script>
+    <script src="/static/sweetalert.min.js"></script>
+    <title>IAM</title>
+</head>
+<body>
+    <div id='overlay_loading'></div>
+    <header>
+        <div class="mainContainer">
+          {% if user.is_authenticated %}
+            <nav class="toggleBar">
+                <span class="bar bar1"></span>
+                <span class="bar bar2"></span>
+                <span class="bar bar3"></span>
+            </nav>
+          {% endif %}
+          <div class="logo">
+            <img src="/static/eye.png" alt="logo" width='100px'>
+          </div>
+        </div>
+    </header>
+      <!--
+          <li><a class="navbar-brand" href="{% url 'index' %}">DJANGO</a></li>
+          <li><a class="navbar-link" href="{% url 'admin:index' %}">Admin</a></li>
+          <li><a class="navbar-link" href="{% url 'xppda:register' %}">Register</a></li>
+          {# Some logic on what to display for last item#}
+          {% if user.is_authenticated %}
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+          {% else %}
+            <li><a class="navbar-link" href="{% url 'xppda:user_login' %}">Login</a></li>
+          {% endif %}
+    -->
+    {% block video_block %}
+    {% endblock %}
+    {% block body_block %}
+    {% endblock %}
+    {% block gps_block %}
+    {% endblock %}
+
+   {% if user.is_authenticated %}
+    <div class="slideMenu">
+        <h4 class="textCenter">Days Sober: {{sober_days}}</h4>
+        <h4 class="textCenter">Your Email: {{ request.user.email }}</h4>
+        <h4 class="textCenter">Notify Email: {{ notify_email }}</h4>
+        <h4 class="textCenter"><a href="/logout">Logout</a></h4>
+    </div>
+   {% endif %}
+
+  </body>
+</html>

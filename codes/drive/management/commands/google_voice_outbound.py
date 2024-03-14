@@ -130,6 +130,19 @@ def play_other():
     engine.save_to_file(text, "python.mp3")
     engine.runAndWait()
 
+def call_contact(contact):
+    driver = init_driver("firefox")
+
+    google_utils.init_google_voice(driver)
+    google_utils.send_sms(
+        driver, contact, get_message(contact)
+    )
+    call = google_utils.dial_number(driver, contact)
+    google_utils.monitor_call(driver, call)
+    # contact.contacted = True
+    contact.save()
+    # google_utils.answer_call(driver)
+    driver.close()
 
 def get_message(contact):
     return "Hello test"
@@ -146,14 +159,6 @@ class Command(BaseCommand):
         contacts = Contact.objects.filter()
         print("this is the number of contacts in the database %s" % len(contacts))
         for contact in contacts:
-            google_utils.init_google_voice(driver)
-            google_utils.send_sms(
-                driver, contact, get_message(contact)
-            )
-            call = google_utils.dial_number(driver, contact)
-            google_utils.monitor_call(driver, call)
-            # contact.contacted = True
-            contact.save()
-            # google_utils.answer_call(driver)
+            call_contact(contact)
 
         # while True:

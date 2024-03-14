@@ -18,7 +18,26 @@ from wsgiref.util import FileWrapper
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 
+from wsgiref.util import FileWrapper
+import mimetypes
 
+import os
+import re
+from django.conf import settings
+from django.http import JsonResponse
+
+from .models import  MediA, ProfileInfo, YouTubeVideo
+
+from rest_framework.decorators import api_view
+from rest_framework.decorators import authentication_classes
+from django.http.response import StreamingHttpResponse
+from django.core.files.storage import FileSystemStorage
+from common import config
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
+from spotify.models import *
 
 @api_view(['GET'])
 def add_view(request, upload_id):
@@ -246,3 +265,103 @@ def stream_video(request, video_id):
         resp['Content-Length'] = str(size)
     resp['Accept-Ranges'] = 'bytes'
     return resp
+
+
+
+
+from wsgiref.util import FileWrapper
+import mimetypes
+
+
+
+
+logger = config.get_logger()
+
+@csrf_exempt
+@api_view(['GET'])
+def get_media(request):
+    videos = YouTubeVideo.objects.all()
+    resp = []
+
+    for video in videos:
+        resp.append({
+            'id': video.id,
+            'title': video.title,
+            'url': video.url,
+            'description': video.description,
+        })
+
+    return JsonResponse(resp, safe=False, json_dumps_params={'indent': 2})
+
+
+def stream_mediA(request):
+    data = MediA.objects.get(id=request.GET.get("id"))
+    return stream_video(request, data.path)
+
+
+range_re = re.compile(r'bytes\s*=\s*(\d+)\s*-\s*(\d*)', re.I)
+class RangeFileWrapper(object):
+    def __init__(self, filelike, blksize=8192, offset=0, length=None):
+
+        self.filelike = filelike
+        self.filelike.seek(offset, os.SEEK_SET)
+        self.remaining = length
+        self.blksize = blksize
+
+    def close(self):
+        if hasattr(self.filelike, 'close'):
+            self.filelike.close()
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.remaining is None:
+            # If remaining is None, we're reading the entire file.
+            data = self.filelike.read(self.blksize)
+            if data:
+                return data
+            raise StopIteration()
+        else:
+            if self.remaining <= 0:
+                raise StopIteration()
+            data = self.filelike.read(min(self.remaining, self.blksize))
+            if not data:
+                raise StopIteration()
+            self.remaining -= len(data)
+            return data
+
+
+def stream_video(request):
+    print("HERE WE in are")
+    path = "%s" % MediA.objects.get(id=request.GET.get("id")).path
+    print(path)
+    range_header = request.META.get('HTTP_RANGE', '').strip()
+    range_match = range_re.match(range_header)
+    size = os.path.getsize(path)
+    content_type, encoding = mimetypes.guess_type(path)
+    content_type = content_type or 'application/octet-stream'
+    if range_match:
+        first_byte, last_byte = range_match.groups()
+        first_byte = int(first_byte) if first_byte else 0
+        last_byte = int(last_byte) if last_byte else size - 1
+        if last_byte >= size:
+            last_byte = size - 1
+        length = last_byte - first_byte + 1
+        resp = StreamingHttpResponse(RangeFileWrapper(
+            open(path, 'rb'), offset=first_byte, length=length), status=206,
+            content_type=content_type
+        )
+        resp['Content-Length'] = str(length)
+        resp['Content-Range'] = 'bytes %s-%s/%s' % (first_byte, last_byte,
+                                                    size)
+    else:
+        resp = StreamingHttpResponse(
+            FileWrapper(open(path, 'rb')), content_type=content_type)
+        resp['Content-Length'] = str(size)
+    resp['Accept-Ranges'] = 'bytes'
+    return resp
+def list_downloaded_songs(request):
+    downloaded_songs = DownloadedSong.objects.all()
+    song_names = [f"{song.song.artist_name} - {song.song.track_title}" for song in downloaded_songs]
+    return JsonResponse({'downloaded_songs': song_names})
