@@ -19,6 +19,14 @@ def create_account(name, email, password):
     print(req.json())
 
 
+def login_account(email, password):
+    headers = {}
+    body={
+        'email': email,
+        'password': password,
+    req = requests.post(
+        "http://localhost:8000/awipu/api/api-token-auth/",
+        headers=headers, json=body)
 
 
 def create_email(email):
