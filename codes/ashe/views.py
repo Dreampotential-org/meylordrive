@@ -15,9 +15,21 @@ from django.core.serializers import serialize
 from .serializer import *
 
 from django.http import HttpResponse
+from rest_framework import status
 # from push_notifications.models import GCMDevice
 import requests
 import json
+
+from ashe.models import Dot
+
+speedFlow = ['normal', 'fast', 'tofast', 'slow', 'toslow']
+
+@api_view(['POST'])
+def dot(request):
+    dot = Dot()
+    dot.latitude = request.data.get("latitude")
+    dot.longitude = request.data.get("longitude")
+    dot.save()
 
 
 @api_view(['POST'])
@@ -41,7 +53,6 @@ def get_distance(lat1, lon1, lat2, lon2):
     return distance
 
 
-# Assuming SessionPointSerializer is already defined in your serializers.py
 @api_view(['GET'])
 def devices(request):
     devices = Device.objects.filter().order_by("last_seen").values()
@@ -59,13 +70,16 @@ def devices(request):
             # Use get method with a default value of an empty dictionary
             session_points_data = device['sessions'][i].get('session_points', {})
 
-            session_points = [SessionPoint(**sp_data) for sp_data in session_points_data]
+            session_points = [
+                SessionPoint(**sp_data) for sp_data in session_points_data
+            ]
 
             device['sessions'][i]['sps'] = session_points
             device['sessions'][i]['sps_count'] = len(session_points)
 
             # Add the get_sp_distance result to each session
-            device['sessions'][i]['sp_distance'] = get_sp_distance(session_points)
+            device['sessions'][i]['sp_distance'] = get_sp_distance(
+                session_points)
 
         device['last_seen_readable'] = arrow.get(
             device['last_seen']
@@ -75,9 +89,9 @@ def devices(request):
 
 
 
-
 @api_view(['GET', 'POST'])
 def get_distances(request):
+
     # here we calculate on server side..
     dots = Dot.objects.filter()
     session_point = SessionPoint.objects.filter().last()
@@ -97,7 +111,6 @@ def get_distances(request):
     return Response({'dots': res})
 
 
-speedFlow = ['normal','fast','tofast','slow','toslow']
 def get_sp_distance(session_points):
     if not session_points:
         return {'distance_miles': 0,
@@ -176,11 +189,15 @@ def get_sp_distance(session_points):
     return {'distance_miles': session_distance * 0.62137,
             'distance_meters': session_distance * 1000,
             'interval_stats': interval_stats}
+
 def get_miles_points(session_points):
     miles = 1
-    if not session_points:
-        return {'miles' : 0, 'time_taken': '0:00:00'}
     session_response = []
+
+    if not session_points:
+        return {'miles' : 0,
+                'time_taken': '0:00:00'}
+
 
     start_lat = session_points[0].latitude
     start_long = session_points[0].longitude
@@ -191,7 +208,7 @@ def get_miles_points(session_points):
             start_lat, start_long,
             session_points[i + 1].latitude, session_points[i +1].longitude
         )
-        session_distance_per_mile = session_distance_per_km*0.62137
+        session_distance_per_mile = session_distance_per_km * 0.62137
         if session_distance_per_mile >= 1:
             time_taken = session_points[i + 1].created_at - session_start_time
             seconds = time_taken.total_seconds()
@@ -202,11 +219,14 @@ def get_miles_points(session_points):
             session_response.append({
                 'miles' : f"{miles-1}-{miles}",
                 'time_taken' : time_taken })
-            start_lat, start_long = session_points[i + 1].latitude, session_points[i +1].longitude
+
+            # XXX start_lat / start_long seems unused??
+            start_lat = session_points[i + 1].latitude
+            start_long = session_points[i +1].longitude
             session_start_time =  session_points[i + 1].created_at
             miles += 1
-    return session_response
 
+    return session_response
 
 
 @api_view(['GET'])
@@ -227,14 +247,14 @@ def device_sessions(request, device_id):
         sessions
     )
 
-from rest_framework import status
 
 @api_view(['GET'])
 def get_session_stats(request, session_id):
     session = Session.objects.filter(id=session_id).first()
 
     if not session:
-        return Response({"error": "Session not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"error": "Session not found"},
+                        status=status.HTTP_404_NOT_FOUND)
 
     total_session_points = SessionPoint.objects.filter(
         session=session).count()
@@ -355,6 +375,7 @@ def bulk_sync_motions(request):
         gxyz_point.save()
         print("done!!\n")
     return Response({'status': 'k'},  safe=False)
+
 
 @api_view(['POST'])
 def gsm_Add(request):
