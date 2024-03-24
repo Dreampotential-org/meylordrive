@@ -2,7 +2,10 @@ import requests
 
 
 
-def create_account(name, email, password):
+def createuser(user, email):
+    pass
+
+def createaccount(name, email, password):
     headers = {}
     body={
         'name': name,
@@ -12,22 +15,41 @@ def create_account(name, email, password):
         'sober_date': None,
         'page': 'dreamoo',
     }
+    print("password: %s" % password)
     req = requests.post(
-        "http://localhost:8000/awipu/create-user/",
+        "http://localhost:8000/awipu/createuser/",
         headers=headers, json=body)
 
     print(req.json())
 
 
-def login_account(email, password):
+def forgotpassword(email):
     headers = {}
     body={
         'email': email,
-        'password': password,
+    }
+
+    print("Doing account reset")
     req = requests.post(
-        "http://localhost:8000/awipu/api/api-token-auth/",
+        "http://localhost:8000/awipu/forgot-password/",
         headers=headers, json=body)
 
+    print(req.json())
+
+
+
+def loginaccount(email, password):
+    headers = {}
+    body={
+        'username': email,
+        'password': password,
+    }
+    print("Doing account login")
+    req = requests.post(
+        "http://localhost:8000/awipu/apitokenauth/",
+        headers=headers, json=body)
+
+    print(req.json())
 
 def create_email(email):
     headers = {}
@@ -55,6 +77,7 @@ def send_email():
 
     print(req.json())
 
-create_account('Aaro', 'a0@agentstat.com', 'uwawuw')
-
+createaccount('o', 'o@dreampotential.org', 'a')
+loginaccount('o', 'a')
+forgotpassword('o@dreampotential.org')
 

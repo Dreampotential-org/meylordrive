@@ -17,9 +17,9 @@ router.register(r'video', views.VideoUploadViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
+    path('apitokenauth/', obtain_auth_token, name='api_token_auth'),
     # path('login-code/', views.login_code, name='login_code'),
-    path('create-user/', views.create_user, name='create_user'),
+    path('createuser/', views.create_user, name='create_user'),
     path('set-note/', views.set_note, name='set_note'),
     path('login-user-code/', views.login_user_code, name='login_user_code'),
    # path('create-user-code/', views.create_user_code,
