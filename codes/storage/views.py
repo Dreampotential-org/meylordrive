@@ -39,6 +39,9 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from spotify.models import *
 
+from ashe.models import Device, Session
+
+
 @api_view(['GET'])
 def add_view(request, upload_id):
     view = View()
@@ -143,7 +146,17 @@ def convert_and_save_file(myfile, request):
 
     CHIRP.info("the user for this uploaded file is %s" % user)
 
+
+    # get the session and device
+    session = Session.objects.filter(
+        id=request.headers.get("Authorization")
+    ).first()
+
+    session.device
+
     # XXX TODO need to make Upload know about other metadata like video length
+
+
     upload = Upload.objects.create(
         Url=uploaded_file_url, user=user,
         source=request.data.get("source"),
@@ -361,7 +374,10 @@ def stream_video(request):
         resp['Content-Length'] = str(size)
     resp['Accept-Ranges'] = 'bytes'
     return resp
+
+
 def list_downloaded_songs(request):
     downloaded_songs = DownloadedSong.objects.all()
-    song_names = [f"{song.song.artist_name} - {song.song.track_title}" for song in downloaded_songs]
+    song_names = [f"{song.song.artist_name} - {song.song.track_title}"
+                  for song in downloaded_songs]
     return JsonResponse({'downloaded_songs': song_names})

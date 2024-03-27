@@ -4,6 +4,11 @@ from django.db import models
 from django.contrib.auth import get_user_model
 
 
+class Device(models.Model):
+    key = models.CharField(max_length=2000, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_seen = models.DateTimeField(auto_now_add=True)
+
 def uuid_file_path(instance, filename):
     ext = filename.split('.')[-1]
     filename = "%s.%s" % (uuid.uuid4(), ext)
@@ -13,7 +18,9 @@ def uuid_file_path(instance, filename):
 class Upload(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     file = models.FileField(upload_to=uuid_file_path)
-
+    device = models.ForeignKey(Device,
+                               on_delete=models.CASCADE,
+                               blank=True, null=True)
 
 class AdminFeedback(models.Model):
     user = models.ForeignKey(
@@ -46,11 +53,6 @@ class UserEventNotify(models.Model):
     notify_email = models.EmailField(
         max_length=512, blank=True, null=True)
 
-
-class Device(models.Model):
-    key = models.CharField(max_length=2000, default='')
-    created_at = models.DateTimeField(auto_now_add=True)
-    last_seen = models.DateTimeField(auto_now_add=True)
 
 
 class GpsC(models.Model):
@@ -141,7 +143,9 @@ class Session(models.Model):
     device = models.ForeignKey(Device,
                                on_delete=models.CASCADE,
                                blank=True, null=True)
-
+    token = models.ForeignKey(Token,
+                              on_delete=models.CASCADE,
+                              blank=True, null=True)
 
 class SessionPoint(models.Model):
     # user = models.ForeignKey(to=get_user_model(),
