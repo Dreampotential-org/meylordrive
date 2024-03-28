@@ -25,6 +25,11 @@ from ashe.models import Dot
 speedFlow = ['normal', 'fast', 'tofast', 'slow', 'toslow']
 
 
+@api_view(['DELETE'])
+def deletedot(request, dotid):
+    Dot().objects.filter(id=dotid).first().delete()
+    return Response({'status': 'oky'})
+
 @api_view(['POST'])
 def dot(request):
     dot = Dot()
@@ -35,9 +40,9 @@ def dot(request):
     return Response({'id': dot.id})
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 def getdots(request):
-    dots = Dot.objects.filter()
+    dots = Dot.objects.filter().values()
     return Response(dots)
 
 

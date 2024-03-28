@@ -5,8 +5,9 @@ from . import views
 # XXX rename to routes
 
 urlpatterns = [
-    path('dot', views.dot, name="dot"),
     path('getdots', views.getdots, name="getdots"),
+    path('deletedot', views.deletedot, name="deletedot"),
+    path('dot', views.dot, name="dot"),
     path('start', views.start, name="start"),
     path('stop', views.stop, name="stop"),
     path('devices', views.devices, name="devices"),
