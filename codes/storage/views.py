@@ -245,8 +245,8 @@ def file_upload(request):
 
 
 @api_view(['GET'])
-def stream_video(request, video_id):
-    upload = Upload.objects.filter(id=int(video_id)).first()
+def stream(request):
+    upload = Upload.objects.filter(id=int(request.GET.get("id"))).first()
     if not upload:
         return Response("Not Found")
 

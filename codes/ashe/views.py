@@ -24,12 +24,21 @@ from ashe.models import Dot
 
 speedFlow = ['normal', 'fast', 'tofast', 'slow', 'toslow']
 
+
 @api_view(['POST'])
 def dot(request):
     dot = Dot()
     dot.latitude = request.data.get("latitude")
     dot.longitude = request.data.get("longitude")
     dot.save()
+
+    return Response({'id': dot.id})
+
+
+@api_view(['POST'])
+def getdots(request):
+    dots = Dot.objects.filter()
+    return Response(dots)
 
 
 @api_view(['POST'])

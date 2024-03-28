@@ -6,6 +6,7 @@ from . import views
 
 urlpatterns = [
     path('dot', views.dot, name="dot"),
+    path('getdots', views.getdots, name="getdots"),
     path('start', views.start, name="start"),
     path('stop', views.stop, name="stop"),
     path('devices', views.devices, name="devices"),
