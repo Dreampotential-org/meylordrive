@@ -154,11 +154,12 @@ def convert_and_save_file(myfile, request):
 
     session.device
 
-    # XXX TODO need to make Upload know about other metadata like video length
-
+    # XXX other metadata like video length
 
     upload = Upload.objects.create(
-        Url=uploaded_file_url, user=user,
+        device=session.device,
+        Url=uploaded_file_url,
+        user=user,
         source=request.data.get("source"),
         filename=myfile.name,
         file_type=myfile.name.split(".")[-1])
@@ -188,28 +189,31 @@ def convert_and_save_file(myfile, request):
 from django.db.models import Count
 
 @api_view(['GET'])
-def list_files(request):
-    try:
-        key = request.user.email
-        user = User.objects.get(id=request.user.id)
-    except AttributeError:
-        user = None
+def getfiles(request):
 
-    CHIRP.info("listing files as %s" % user)
+    # get the session and device
+    session = Session.objects.filter(
+        id=request.headers.get("Authorization")
+    ).first()
+    CHIRP.info(session)
+    CHIRP.info(request.headers.get("Authorization"))
+    session.device
 
+    CHIRP.info("device getfiles%s" % session.device)
     # Annotate each upload with the count of associated comments
     uploads_with_comments_count = Upload.objects.filter(
-        user=user,
+        device=session.device
+        # user=user,
     ).annotate(comments_count=Count('comment')).values()
 
     paginator = PageNumberPagination()
     paginator.page_size = 25
 
-    page = paginator.paginate_queryset(uploads_with_comments_count, request)
+    page = paginator.paginate_queryset(
+        uploads_with_comments_count, request
+    )
     if page is not None:
         return paginator.get_paginated_response(page)
-
-
 
 
 @api_view(['GET'])
@@ -230,7 +234,7 @@ def get_activity(request):
 
 @api_view(['POST'])
 @csrf_exempt
-def file_upload(request):
+def fileupload(request):
     CHIRP.error(request.FILES)
     CHIRP.error(request.data)
     file = request.data.get('file')

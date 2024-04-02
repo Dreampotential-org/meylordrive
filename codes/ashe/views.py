@@ -244,8 +244,8 @@ def get_miles_points(session_points):
 
 
 @api_view(['GET'])
-def device_sessions(request, device_id):
-    device = Device.objects.filter(key=device_id).first()
+def device_sessions(request, deviceid):
+    device = Device.objects.filter(key=deviceid).first()
 
     sessions = Session.filter.filter(device=device).values()
     for session in sessions:
@@ -311,14 +311,14 @@ def start(request):
     # if device does not exist when session is started
     # it is created here
     print(request.data)
-    device_id = request.data.get("device_id")
-    print(device_id)
-    print(type(device_id))
+    deviceid = request.data.get("deviceid")
+    print(deviceid)
+    print(type(deviceid))
 
-    device = Device.objects.filter(key=device_id).first()
+    device = Device.objects.filter(key=deviceid).first()
     if not device:
         device = Device()
-        device.key = device_id
+        device.key = deviceid
 
     device.last_seen = datetime.now()
     device.save()
@@ -337,7 +337,7 @@ def session_point(request):
     session = Session.objects.get(id=request.data.get("session_id"))
     # print("found session %s" % session)
     device = Device.objects.filter(
-       key=request.data.get("device_id"))[0]
+       key=request.data.get("deviceid"))[0]
 
     session_point = SessionPoint()
     session_point.session = session
@@ -364,7 +364,7 @@ def stop(request):
 
 @api_view(['POST'])
 def bulk_sync_motions(request):
-    device_id = request.data.get("device_id")
+    deviceid = request.data.get("deviceid")
     source = request.data.get("source")
     motions_points = request.data.get("motions_points")
     print("motions_points:", motions_points)
@@ -373,13 +373,13 @@ def bulk_sync_motions(request):
 
     for mp in motions_points:
         print("source:", source)
-        print("device_id:", device_id)
+        print("deviceid:", deviceid)
         print("motions_point:", mp)
 
-        device = Device.objects.filter(key=device_id).first()
+        device = Device.objects.filter(key=deviceid).first()
         if not device:
             device = Device()
-            device.key = device_id
+            device.key = deviceid
             device.save()
 
         gxyz_point = GXYZPoint(

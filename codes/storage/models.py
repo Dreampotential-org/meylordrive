@@ -3,19 +3,9 @@ from django.contrib.auth import get_user_model
 import uuid
 import os
 from django.contrib.auth.models import User
+from ashe.models import Device, Upload
 
-class Upload(models.Model):
-    Url = models.CharField(max_length=500)
-    file_type = models.CharField(max_length=500, default="")
-    filename = models.CharField(max_length=4000, default="")
-    path = models.CharField(max_length=500)
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
-                             null=True, blank=True, default=None)
-    created_at = models.DateTimeField(auto_now_add=True)
-    source = models.CharField(max_length=500, default="")
 
-    def __str__(self):
-        return self.Url
 
 class Comment(models.Model):
     message = models.TextField(default="")

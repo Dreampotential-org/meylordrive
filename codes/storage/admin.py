@@ -1,10 +1,11 @@
 # admin.py
 from django.contrib import admin
-from .models import Upload, Comment, View, MediA, ProfileInfo, YouTubeVideo
+from .models import Comment, View, MediA, ProfileInfo, YouTubeVideo
+from ashe.models import Upload
 
 @admin.register(Upload)
 class UploadAdmin(admin.ModelAdmin):
-    list_display = ['Url', 'file_type', 'filename', 'path', 'user', 'created_at', 'source']
+    list_display = ['Url', 'file_type', 'filename', 'path', 'user', 'uploaded_at', 'source']
     search_fields = ['Url', 'filename', 'user__username']
 
 @admin.register(Comment)

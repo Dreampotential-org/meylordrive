@@ -16,8 +16,16 @@ def uuid_file_path(instance, filename):
 
 
 class Upload(models.Model):
-    uploaded_at = models.DateTimeField(auto_now_add=True)
     file = models.FileField(upload_to=uuid_file_path)
+
+    Url = models.CharField(max_length=500, default="")
+    file_type = models.CharField(max_length=500, default="")
+    filename = models.CharField(max_length=4000, default="")
+    path = models.CharField(max_length=500, default="")
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,
+                             null=True, blank=True, default=None)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    source = models.CharField(max_length=500, default="")
     device = models.ForeignKey(Device,
                                on_delete=models.CASCADE,
                                blank=True, null=True)
