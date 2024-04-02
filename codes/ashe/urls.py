@@ -2,7 +2,6 @@ from django.urls import path
 
 from . import views
 
-# XXX rename to routes
 
 urlpatterns = [
     path('getdots', views.getdots, name="getdots"),
