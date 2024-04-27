@@ -178,9 +178,10 @@ CHANNEL_LAYERS = {
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-dbpassword = os.environ.get('dbpassword', 'EhB4bINnDFmzI0Bg')
+dbpassword = os.environ.get('dbpassword', 'postgres')
 dbuser = os.environ.get('dbuser', 'postgres')
 dbhost = os.environ.get('dbhost', 'dreampotential.org')
+dbport = os.environ.get('dbport', '5775')
 
 DATABASES = {
     'default': {
@@ -188,7 +189,7 @@ DATABASES = {
         'NAME': 'postgres',
         'USER': dbuser,
         'HOST': dbhost,
-        'PORT': '5775',
+        'PORT': dbport,
         'PASSWORD': dbpassword,
     }
 }

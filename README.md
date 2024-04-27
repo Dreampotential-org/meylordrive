@@ -1,17 +1,30 @@
 # MeylorDriveOS
 
 ```
-# Linux
-virtualenv -p env
-source env/bin/activate
+# Python
+wget https://www.python.org/ftp/python/3.11.0/Python-3.11.0.tgz
+tgz Python-3.11.0.tgz
+cd Python-3.11.0
+./configure --enable-optimizations
+make
+sudo make install 
+python -m venv venv
+. venv/bin/activate
 pip install -r requirements.txt
 
 ```
-
 ### Setup database
 ```
-./scripts/startdb.sh
+
+sudo apt install postgresql postgresql-contrib
+sudo -u postgres psql
+CREATE DATABASE postgres;
+\password postgres
+
+# ./scripts/startdb.sh
+
 python codes/manage.py  migrate
+
 
 ```
 

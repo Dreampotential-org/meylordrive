@@ -27,10 +27,10 @@ imageio-ffmpeg==0.4.7
 moviepy==1.0.3
 mutagen==1.46.0
 mypy-extensions==0.4.3
-numpy==1.23.4
+numpy
 phonenumbers==8.13.26
 jmespath==1.0.0
-parallel-ssh==2.10.0
+#parallel-ssh==2.10.0
 paramiko==2.11.0
 psycopg2-binary
 pycparser==2.21
@@ -83,7 +83,7 @@ whisper_mic
 torch
 sounddevice
 daphne
-playsound
+# playsound
 vosk
 pyautogui
 stripe
@@ -94,4 +94,4 @@ arrow
 tqdm==4.64.1
 urllib3==1.26.12
 wrapt==1.14.1
-django-rest-auth
+# django-rest-auth
