@@ -151,9 +151,8 @@ class Session(models.Model):
     device = models.ForeignKey(Device,
                                on_delete=models.CASCADE,
                                blank=True, null=True)
-    token = models.ForeignKey(Token,
-                              on_delete=models.CASCADE,
-                              blank=True, null=True)
+    token = models.CharField(max_length=256,
+                             blank=True, null=True)
 
 class SessionPoint(models.Model):
     # user = models.ForeignKey(to=get_user_model(),

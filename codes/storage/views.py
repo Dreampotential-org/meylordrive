@@ -149,7 +149,7 @@ def convert_and_save_file(myfile, request):
 
     # get the session and device
     session = Session.objects.filter(
-        id=request.headers.get("Authorization")
+        token=request.headers.get("Authorization")
     ).first()
 
     session.device
@@ -193,7 +193,7 @@ def getfiles(request):
 
     # get the session and device
     session = Session.objects.filter(
-        id=request.headers.get("Authorization")
+        token=request.headers.get("Authorization")
     ).first()
     CHIRP.info(session)
     CHIRP.info(request.headers.get("Authorization"))

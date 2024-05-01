@@ -308,6 +308,8 @@ def session_points(request, session_id):
 def start(request):
     session = Session()
 
+    session.token = str(uuid.uuid4())
+
     # if device does not exist when session is started
     # it is created here
     print(request.data)
@@ -325,8 +327,9 @@ def start(request):
     session.device = device
     session.save()
 
+
     return Response({'status': 'okay',
-                     'session_id': session.id})
+                     'session_id': session.token})
 
 
 @api_view(['POST'])
