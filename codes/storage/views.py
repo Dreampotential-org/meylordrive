@@ -92,10 +92,12 @@ def list_comments(request, upload_id):
 
 def convert_file(uploaded_file_url):
     outfile = "%s.mp4" % uploaded_file_url.rsplit(".", 1)[0]
+
     command = (
-        'avconv -i ./%s -codec copy ./%s' % (uploaded_file_url,
-                                             outfile)
+        'ffmpeg -i %s -vcodec h264 -acodec aac %s' % (
+            uploaded_file_url, outfile)
     )
+
     print(command)
     os.system(command)
     return outfile
