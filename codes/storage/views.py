@@ -94,9 +94,8 @@ def convert_file(uploaded_file_url):
     outfile = "%s.mp4" % uploaded_file_url.rsplit(".", 1)[0]
 
     command = (
-        'ffmpeg -i %s -vcodec h264 -acodec aac %s' % (
-            uploaded_file_url, outfile)
-    )
+        'ffmpeg -i /data%s -vcodec h264 -acodec aac /data%s'
+        % (uploaded_file_url, outfile))
 
     print(command)
     os.system(command)
@@ -244,7 +243,9 @@ def fileupload(request):
     # XXX should not be called video
     if not file:
         CHIRP.error("no file found")
-        return Response({'message': 'file is required'}, 400)
+        return Response({
+            'message': 'file is required'},
+            400)
 
     file = convert_and_save_file(file, request)
     return Response({'id': file.id})
@@ -252,7 +253,9 @@ def fileupload(request):
 
 @api_view(['GET'])
 def stream(request):
-    upload = Upload.objects.filter(id=int(request.GET.get("id"))).first()
+    upload = Upload.objects.filter(
+        id=int(request.GET.get("id"))
+    ).first()
     if not upload:
         return Response("Not Found")
 
@@ -271,13 +274,14 @@ def stream(request):
         if last_byte >= size:
             last_byte = size - 1
         length = last_byte - first_byte + 1
-        resp = StreamingHttpResponse(video_utils.RangeFileWrapper(
-            open(path, 'rb'), offset=first_byte, length=length), status=206,
-            content_type=content_type
-        )
+        resp = StreamingHttpResponse(
+            video_utils.RangeFileWrapper(
+                open(path, 'rb'), offset=first_byte,
+                length=length), status=206, 
+                content_type=content_type)
         resp['Content-Length'] = str(length)
-        resp['Content-Range'] = 'bytes %s-%s/%s' % (first_byte, last_byte,
-                                                    size)
+        resp['Content-Range'] = 'bytes %s-%s/%s' % (
+                first_byte, last_byte, size)
     else:
         resp = StreamingHttpResponse(
             FileWrapper(open(path, 'rb')), content_type=content_type)
