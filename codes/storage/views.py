@@ -94,7 +94,7 @@ def convert_file(uploaded_file_url):
     outfile = "%s.mp4" % uploaded_file_url.rsplit(".", 1)[0]
 
     command = (
-        'ffmpeg -i /data%s -vcodec h264 -acodec aac /data%s'
+        'ffmpeg -i /data%s -vcodec libx264 -preset veryslow -crf 30 /data%s'
         % (uploaded_file_url, outfile))
 
     print(command)
