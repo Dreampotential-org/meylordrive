@@ -93,6 +93,7 @@ def list_comments(request, upload_id):
 def convert_file(uploaded_file_url):
     outfile = "%s.mp4" % uploaded_file_url.rsplit(".", 1)[0]
 
+    os.system("rm %s" % outfile)
     command = (
         'ffmpeg -i /data%s -vcodec libx264 -preset veryslow -crf 30 /data%s'
         % (uploaded_file_url, outfile))
@@ -133,9 +134,9 @@ def convert_and_save_file(myfile, request):
     filename = fs.save(uploaded_name, myfile)
     uploaded_file_url = fs.url(filename)
 
-    if uploaded_name[-4:] == '.mov':
-        # ffmpeg!
-        uploaded_file_url = convert_file(uploaded_file_url)
+    # if uploaded_name[-4:] == '.mov':
+    #    # ffmpeg!
+    #    uploaded_file_url = convert_file(uploaded_file_url)
     # XXX resize video for android need to implement async processing
 
     CHIRP.info("Uploaded video file: %s" % uploaded_file_url)
