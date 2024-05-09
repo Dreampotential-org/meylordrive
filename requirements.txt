@@ -44,7 +44,7 @@ platformdirs==2.5.2
 proglog==0.1.10
 Pygments==2.13.0
 pyparsing==3.0.9
-pytube==12.1.0
+pytube
 redis==4.3.4
 requests==2.28.1
 rich==12.6.0
@@ -69,7 +69,7 @@ channels-redis
 social-auth-app-django
 openai
 ray[data,train,tune,serve,default]
-selenium
+selenium==4.2.0
 xvfbwrapper
 webdriver-manager
 transformers

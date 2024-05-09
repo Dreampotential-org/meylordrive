@@ -62,6 +62,7 @@ class Command(BaseCommand):
                         url=f"https://www.youtube.com/watch?v={video_url}",
                         description=description_element.text
                     )
+                    video.save()
 
                     # Associate the video with the YouTube profile
                     youtube_profile.videos.add(video)

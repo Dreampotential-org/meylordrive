@@ -134,6 +134,21 @@ def get_driver_firefox(platform=None, proxy=None):
         return driver
 
     else:
+        from selenium.webdriver.firefox.service import Service
+        # geckodriver_path = '/snap/bin/geckodriver'
+        # firefox_path = '/snap/bin/firefox'
+        driver_service = Service(
+        #        executable_path=geckodriver_path
+        )
+
+        options = Options()
+        # options.binary_location = firefox_path
+
+        return webdriver.Firefox(service=driver_service, options=options)
+
+        options.binary_location = "/usr/bin/firefox"
+        return webdriver.Firefox(options=options)
+
         options.binary_location = (
             "/data/mozilla-unified/obj-x86_64-pc-linux-gnu/dist/bin/firefox"
         )
