@@ -58,5 +58,10 @@ class YouTubeVideo(models.Model):
     url = models.URLField()
     description = models.TextField()
 
+    mediA = models.ForeignKey(to=MediA,
+                             on_delete=models.CASCADE,
+                             default=None, blank=True, null=True)
+
+
     def __str__(self):
         return self.title

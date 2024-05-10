@@ -7,7 +7,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import re
 
-from storage.models import YouTubeVideo
+from storage.models import YouTubeVideo, MediA
+
+
 import uuid
 from pytube import YouTube
 from utils.browser import init_driver
@@ -24,20 +26,19 @@ def get_content(ui):
     ).order_by('resolution').desc().first().download(
         output_path="/data/meylordrive-youtube-videos/", filename=directory
     )
-    # video = "/tmp/%s/%s" % (directory, "file")
 
     file_name =  "/data/meylordrive-youtube-videos/%s" % directory
 
     print("file_name %s" % file_name)
     # os.system("ffmpeg -i %s %s.mp3" % (file_name, file_name))
+    mediA = MediA()
+    mediA.path = "/data/meylordrive-youtube-videos/%s.mp4" % directory
+    print(mediA.path)
 
-    sound = MediA()
-    # sound.file = File(video)
-    sound.path = "/data/meylordrive-youtube-videos/%s.mp4" % directory
-    print(sound.path)
+    mediA.name = yt.title
 
-    sound.name = yt.title
-    sound.save()
+    mediA.save()
+    return mediA
 
 
 def parse_video_url(driver, video_url):
@@ -58,18 +59,19 @@ def parse_video_url(driver, video_url):
     )
 
     # Save video data to the database
-    YouTubeVideo.objects.create(
-        title=title_element.text,
-        url=f"https://www.youtube.com/watch?v={video_url}",
-        description=description_element.text
-    )
+    ytv = YouTubeVideo()
+    ytv.title = title_element.text
+    ytv.url = f"https://www.youtube.com/watch?v={video_url}"
+    ytv.description = description_element.text
+    ytv.save()
+
     CHIRP.info("creating %s %s"
                % (title_element.text, description_element.text))
 
-    get_content(
+    ytv.mediA = get_content(
         f"https://www.youtube.com/watch?v={video_url}"
     )
-
+    ytv.save()
 
 
 class Command(BaseCommand):

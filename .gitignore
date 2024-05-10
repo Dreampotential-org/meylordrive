@@ -6,3 +6,4 @@ logs
 demofile
 id_rsa
 .env
+geckodriver.log
