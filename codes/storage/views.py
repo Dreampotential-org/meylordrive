@@ -126,9 +126,9 @@ def convert_and_save_file(myfile, request):
     except FileExistsError:
         pass
     uploaded_name = (
-        "/data/meylor-uploads/%s/%s.%s" % (user_hash,
-                                           uuid.uuid4(),
-                                           myfile.name.split(".")[-1])
+        "/data/meylor-uploads/%s/%s.%s" % (
+            user_hash, uuid.uuid4(),
+            myfile.name.split(".")[-1])
     ).lower()
 
     filename = fs.save(uploaded_name, myfile)
