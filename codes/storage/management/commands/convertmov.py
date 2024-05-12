@@ -23,3 +23,4 @@ class Command(BaseCommand):
                 print(converted)
                 upload.Url = converted
                 upload.save()
+            print(upload.id, upload.file)
