@@ -190,9 +190,30 @@ def convert_and_save_file(myfile, request):
 
 from django.db.models import Count
 
+@api_view(['DELETE'])
+def deletefile(request, fileid):
+    # get the session and device
+    session = Session.objects.filter(
+        token=request.headers.get("Authorization")
+    ).first()
+    CHIRP.info(session)
+    CHIRP.info(request.headers.get("Authorization"))
+    session.device
+
+    CHIRP.info("device getfiles%s" % session.device)
+
+    # only allow device to delete its own file
+    Upload.objects.filter(
+        device=session.device,
+        id=fileid
+    ).delete()
+
+    # XXX return status if file was deleted or not.
+
+
+
 @api_view(['GET'])
 def getfiles(request):
-
     # get the session and device
     session = Session.objects.filter(
         token=request.headers.get("Authorization")

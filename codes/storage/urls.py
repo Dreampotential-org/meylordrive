@@ -2,6 +2,7 @@ from django.urls import include, path
 from storage import views
 
 urlpatterns = [
+    path('deletefile/<int:fileid>', views.deletefile, name='deletefile'),
     path('fileupload/', views.fileupload, name='file_upload'),
     path('add_view/<int:upload_id>', views.add_view, name='add-view'),
     path('stream', views.stream, name='stream'),
