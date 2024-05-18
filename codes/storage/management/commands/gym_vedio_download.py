@@ -1,3 +1,4 @@
+import time
 from utils.chirp import CHIRP
 from django.core.management.base import BaseCommand
 from django.utils import timezone
@@ -81,13 +82,19 @@ class Command(BaseCommand):
         driver = init_driver("firefox")
         youtube_url = 'https://www.youtube.com/@TheSourceChiropractic/videos'
         driver.get(youtube_url)
-        page_source = driver.page_source
 
         # Use regular expressions to find all video URLs
-        video_urls = re.findall(r'href="/watch\?v=([a-zA-Z0-9_-]+)"',
-                                page_source)
+        while True:
+            page_source = driver.page_source
+            video_urls = re.findall(r'href="/watch\?v=([a-zA-Z0-9_-]+)"',
+                                    page_source)
 
-        print("Video urls: %s" % video_urls)
+            print("Video urls: %s" % video_urls)
+            if video_urls:
+                break
+            else:
+                print("waiting to find videos")
+                time.sleep(2)
         # Loop through each video URL
         for video_url in video_urls[:10]:
             parse_video_url(driver, video_url)
