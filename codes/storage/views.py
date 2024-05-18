@@ -272,6 +272,34 @@ def fileupload(request):
     file = convert_and_save_file(file, request)
     return Response({'id': file.id})
 
+@api_view(['PUT'])
+@csrf_exempt
+def update_file_upload(request, media_id):
+    try:
+        media_to_update = MediA.objects.get(id=media_id)
+    except MediA.DoesNotExist:
+        return Response({'message': 'Media not found'}, status=404)
+
+    file = request.data.get('file')
+    if not file:
+        return Response({'message': 'File is required'}, status=400)
+
+    media_to_update.file = file
+    media_to_update.save()
+
+    return Response({'message': 'Media updated successfully'})
+@api_view(['DELETE'])
+@csrf_exempt
+def delete_file_upload(request, media_id):
+    try:
+        media_to_delete = MediA.objects.get(id=media_id)
+    except MediA.DoesNotExist:
+        return Response({'message': 'Media not found'}, status=404)
+
+    media_to_delete.delete()
+
+    return Response({'message': 'Media deleted successfully'})
+
 
 @api_view(['GET'])
 def stream(request):

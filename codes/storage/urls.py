@@ -4,6 +4,10 @@ from storage import views
 urlpatterns = [
     path('deletefile/<int:fileid>', views.deletefile, name='deletefile'),
     path('fileupload/', views.fileupload, name='file_upload'),
+    path('api/media/<int:media_id>/update/', update_file_upload, name='update_file_upload'),
+    path('api/media/<int:media_id>/delete/', delete_file_upload, name='delete_file_upload'),
+
+
     path('add_view/<int:upload_id>', views.add_view, name='add-view'),
     path('stream', views.stream, name='stream'),
     path('add_comment/', views.add_comment, name='add_comment'),

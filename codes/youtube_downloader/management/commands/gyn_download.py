@@ -20,7 +20,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             # Create a new instance of the Chrome driver
-            driver = webdriver.Chrome()
+            # driver = webdriver.Chrome()
+            chromedriver_path = r"C:\Users\shaik\Downloads\chromedriver-win64 (3)\chromedriver-win64\chromedriver.exe"
+            driver = webdriver.Chrome(executable_path=chromedriver_path)
 
             # Get the YouTube profile name from command-line arguments
             youtube_profile_name = options['youtube_profile']
