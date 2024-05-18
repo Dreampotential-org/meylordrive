@@ -9,6 +9,7 @@ urlpatterns = [
 
 
     path('add_view/<int:upload_id>', views.add_view, name='add-view'),
+    
     path('stream', views.stream, name='stream'),
     path('add_comment/', views.add_comment, name='add_comment'),
     path('get-activity/', views.get_activity, name='get_activity'),
