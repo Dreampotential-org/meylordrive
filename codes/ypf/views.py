@@ -31,10 +31,16 @@ def createartic(request):
 
 @api_view(['GET'])
 def getartic(request, articid):
-
     # here we calculate on server side..
     artic = Artic.objects.filter(id=articid).first()
     return Response(artic)
+
+
+@api_view(['GET'])
+def getartics(request):
+    # XXX add pagination
+    artics = Artic.objects.filter().values()
+    return Response(artics)
 
 
 @api_view(['DELETE'])

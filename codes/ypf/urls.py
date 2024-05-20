@@ -5,6 +5,7 @@ from . import views
 
 urlpatterns = [
     path('createartic', views.createartic, name="createartic"),
+    path('getartics', views.getartics, name="getartics"),
     path('getartic/<int:articid>',
          views.getartic, name="getartic"),
     path('deleteartic/<int:getartic>', views.deleteartic,

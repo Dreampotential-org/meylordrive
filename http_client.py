@@ -1,5 +1,17 @@
 import requests
 
+def createartic(title, message):
+    headers = {}
+    body={
+        'title': title,
+        'message': message,
+    }
+    req = requests.post(
+        "http://localhost:8000/ypf/createartic",
+        headers=headers, json=body)
+
+    print(req.json())
+
 
 
 def createuser(user, email):
@@ -77,7 +89,10 @@ def send_email():
 
     print(req.json())
 
-createaccount('o', 'o@dreampotential.org', 'a')
-loginaccount('o', 'a')
-forgotpassword('o@dreampotential.org')
+# createaccount('o', 'o@dreampotential.org', 'a')
+# loginaccount('o', 'a')
+# forgotpassword('o@dreampotential.org')
+
+createartic("Test1", "here is a test")
+createartic("Test2", "here is a test")
 
