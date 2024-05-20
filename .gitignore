@@ -7,3 +7,6 @@ demofile
 id_rsa
 .env
 geckodriver.log
+Cache/
+TransportSecurity
+User/
