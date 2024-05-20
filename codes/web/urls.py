@@ -46,6 +46,7 @@ urlpatterns = [
   path("checkout/", include('checkout.urls')),
   path("awipu/", include('awipu.urls')),
   path("ashe/", include('ashe.urls')),
+  path("ypf/", include('ypf.urls')),
 path("", include("youtube_downloader.urls")),  # Include the URLs from youtube_downloader app
 #   path("configs/", include('configs.urls')),
   path("storage/", include('storage.urls')),

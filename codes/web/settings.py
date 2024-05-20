@@ -78,10 +78,9 @@ INSTALLED_APPS = [
     'clickads',
     'ashe',
     'awipu',
-
-
-
+    'ypf',
 ]
+
 from pathlib import Path
 
 SITE_ID = 1  # Change this to the ID of the site you want to use
