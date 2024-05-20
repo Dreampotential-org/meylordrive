@@ -75,6 +75,46 @@ def parse_video_url(driver, video_url, channel):
     ytv.save()
 
 
+
+def get_channel(driver, channel):
+    youtube_url = 'https://www.youtube.com/' + channel.name + '/videos'
+    driver.get(youtube_url)
+
+    # XXX
+    # channel.title = 
+    channel.url = youtube_url
+    # channel.desciption = 
+    # number of vidoes
+    # channel.videos = 
+
+    channel.save()
+
+    # Use regular expressions to find all video URLs
+    while True:
+        page_source = driver.page_source
+        video_urls = re.findall(r'href="/watch\?v=([a-zA-Z0-9_-]+)"',
+                                page_source)
+
+
+        # XXX Fixme we need to keep paging down getting more videos
+        # not all the videos load right away...
+
+        print("Video urls: %s" % video_urls)
+        if video_urls:
+            break
+        else:
+            print("waiting to find videos")
+            time.sleep(2)
+
+    # Loop through each video URL
+    for video_url in video_urls:
+        parse_video_url(driver, video_url, channel)
+
+    self.stdout.write(
+        self.style.SUCCESS('YouTube video scraping task completed.'))
+
+
+
 class Command(BaseCommand):
     help = 'Run the YouTube video scraping task'
 
@@ -88,40 +128,5 @@ class Command(BaseCommand):
             channel = Channel()
             channel.name = name
 
+        get_channel(driver, channel)
 
-        youtube_url = 'https://www.youtube.com/' + name + '/videos'
-        driver.get(youtube_url)
-
-        # XXX
-        # channel.title = 
-        channel.url = youtube_url
-        # channel.desciption = 
-        # number of vidoes
-        # channel.videos = 
-
-        channel.save()
-
-
-        # Use regular expressions to find all video URLs
-        while True:
-            page_source = driver.page_source
-            video_urls = re.findall(r'href="/watch\?v=([a-zA-Z0-9_-]+)"',
-                                    page_source)
-
-
-            # XXX Fixme we need to keep paging down getting more videos
-            # not all the videos load right away...
-
-            print("Video urls: %s" % video_urls)
-            if video_urls:
-                break
-            else:
-                print("waiting to find videos")
-                time.sleep(2)
-
-        # Loop through each video URL
-        for video_url in video_urls:
-            parse_video_url(driver, video_url, channel)
-
-        self.stdout.write(
-            self.style.SUCCESS('YouTube video scraping task completed.'))
