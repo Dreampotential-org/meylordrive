@@ -26,7 +26,7 @@ import re
 from django.conf import settings
 from django.http import JsonResponse
 
-from .models import  MediA, ProfileInfo, YouTubeVideo
+from .models import  MediA, ProfileInfo, YouTubeVideo, Channel
 
 from rest_framework.decorators import api_view
 from rest_framework.decorators import authentication_classes
@@ -40,6 +40,11 @@ from rest_framework.authtoken.models import Token
 from spotify.models import *
 
 from ashe.models import Device, Session
+
+
+@api_view(['GET'])
+def getprofiles(request):
+    return Response(Channel.objects.filter().values())
 
 
 @api_view(['GET'])

@@ -42,7 +42,6 @@ CSRF_COOKIE_HTTPONLY = False
 # Application definition
 
 INSTALLED_APPS = [
-    'youtube_downloader',
     'xppda',
     'dprojx',
     'channels',

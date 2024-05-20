@@ -53,10 +53,24 @@ class ProfileInfo(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
+class Channel(models.Model):
+    name = models.CharField(max_length=255)
+    title = models.CharField(max_length=255)
+    url = models.URLField()
+    description = models.TextField(default="")
+    subscribers = models.IntegerField(default=0)
+    videos = models.IntegerField(default=0)
+
+
 class YouTubeVideo(models.Model):
     title = models.CharField(max_length=255)
     url = models.URLField()
     description = models.TextField()
+
+
+    channel = models.ForeignKey(
+        to=Channel, on_delete=models.CASCADE,
+        default=None, blank=True, null=True)
 
     mediA = models.ForeignKey(to=MediA,
                              on_delete=models.CASCADE,
