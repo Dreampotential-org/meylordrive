@@ -420,7 +420,13 @@ def stream_video(request):
     print(path)
     range_header = request.META.get('HTTP_RANGE', '').strip()
     range_match = range_re.match(range_header)
-    size = os.path.getsize(path)
+    try:
+        size = os.path.getsize(path)
+    except FileNotFoundError:
+        size = os.path.getsize(path.split(".")[0])
+        path = path.split(".")[0]
+
+
     content_type, encoding = mimetypes.guess_type(path)
     content_type = content_type or 'application/octet-stream'
     if range_match:
@@ -440,6 +446,7 @@ def stream_video(request):
     else:
         resp = StreamingHttpResponse(
             FileWrapper(open(path, 'rb')), content_type=content_type)
+
         resp['Content-Length'] = str(size)
     resp['Accept-Ranges'] = 'bytes'
     return resp
