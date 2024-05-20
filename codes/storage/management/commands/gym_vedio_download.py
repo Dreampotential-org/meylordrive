@@ -110,10 +110,6 @@ def get_channel(driver, channel):
     for video_url in video_urls:
         parse_video_url(driver, video_url, channel)
 
-    self.stdout.write(
-        self.style.SUCCESS('YouTube video scraping task completed.'))
-
-
 
 class Command(BaseCommand):
     help = 'Run the YouTube video scraping task'

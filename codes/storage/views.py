@@ -46,6 +46,10 @@ from ashe.models import Device, Session
 def getprofiles(request):
     return Response(Channel.objects.filter().values())
 
+@api_view(['GET'])
+def getprofilefiles(request, profileid):
+    channel = Channel.objects.filter(id=profileid).first()
+    return Response(YouTubeVideo.objects.filter(channel=channel).values())
 
 @api_view(['GET'])
 def add_view(request, upload_id):
