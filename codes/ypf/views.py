@@ -39,6 +39,12 @@ def getartic(request, articid):
 
 @api_view(['DELETE'])
 def deleteartic(request, articid):
-    # here we calculate on server side..
     artic = Artic.objects.filter(id=articid).delete()
     return Response(artic)
+@api_view(['GET'])
+def listartic(request):
+    articles = Artic.objects.all()
+
+    data = [{"id": article.id, "title": article.title, "created_at": article.created_at, "message": article.message} for article in articles]
+
+    return Response(data)

@@ -9,4 +9,6 @@ urlpatterns = [
          views.getartic, name="getartic"),
     path('deleteartic/<int:getartic>', views.deleteartic,
           name="deleteartic"),
+     path('articles/', views.listartic, name='list_articles'),  # Map the listartic view function to the 'articles/' endpoint
+
 ]
