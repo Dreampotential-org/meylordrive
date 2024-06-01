@@ -359,6 +359,12 @@ import mimetypes
 
 logger = config.get_logger()
 
+
+@csrf_exempt
+@api_view(['GET'])
+def getmedias(request):
+    return Response(MediA.objects.filter(soundfile=True).values())
+
 @csrf_exempt
 @api_view(['GET'])
 def get_media(request):

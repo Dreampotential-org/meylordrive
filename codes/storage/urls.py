@@ -17,6 +17,7 @@ urlpatterns = [
     path('list_comments/<int:upload_id>',
          views.list_comments, name='list_comments'),
     path('get_media/', views.get_media, name="get_media"),
+    path('getmedias/', views.getmedias, name="getmedias"),
     path('getprofiles/', views.getprofiles, name="getprofiles"),
     path('getprofilefiles/<int:profileid>', views.getprofilefiles, name="getprofilefiles"),
     path('downloaded-songs/', views.list_downloaded_songs,

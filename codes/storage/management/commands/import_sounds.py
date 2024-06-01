@@ -27,6 +27,7 @@ def create_sound_file(ui):
     sound.path = "/data/meylordrive-youtube-videos/%s.mp3" % directory
     print(sound.path)
 
+    sound.soundfile = True
     sound.name = yt.title
     sound.save()
 
@@ -38,6 +39,6 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
-        create_sound_file("https://www.youtube.com/watch?v=UZKeLf14-kY")
-        create_sound_file("https://www.youtube.com/watch?v=rJ5sXdtKvjM")
+        # create_sound_file("https://www.youtube.com/watch?v=UZKeLf14-kY")
+        # create_sound_file("https://www.youtube.com/watch?v=rJ5sXdtKvjM")
         create_sound_file("https://www.youtube.com/watch?v=h3h035Eyz5A")

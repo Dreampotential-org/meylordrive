@@ -35,8 +35,10 @@ def uuid_file_path(instance, filename):
 
 
 class MediA(models.Model):
+    soundfile = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     file = models.FileField(upload_to=uuid_file_path)
+
     path = models.CharField(max_length=5128,
                             blank=True, null=True)
     name = models.CharField(max_length=5128,
