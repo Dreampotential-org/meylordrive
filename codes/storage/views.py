@@ -44,7 +44,11 @@ from ashe.models import Device, Session
 
 @api_view(['GET'])
 def getprofiles(request):
-    return Response(Channel.objects.filter().values())
+    channels = Channel.objects.filter().values()
+    for channel in channels:
+        channel['numvidoes'] = YouTubeVideo.objects.filter(channel__id=channel['id']).count()
+
+    return Response(channels)
 
 @api_view(['GET'])
 def getprofilefiles(request, profileid):

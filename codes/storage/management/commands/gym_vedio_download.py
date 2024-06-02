@@ -1,4 +1,5 @@
 import time
+from selenium.webdriver.common.keys import Keys
 from utils.chirp import CHIRP
 from django.core.management.base import BaseCommand
 from django.utils import timezone
@@ -75,6 +76,25 @@ def parse_video_url(driver, video_url, channel):
     ytv.save()
 
 
+def getpagevideos(driver):
+    # Use regular expressions to find all video URLs
+    while True:
+        page_source = driver.page_source
+        video_urls = re.findall(r'href="/watch\?v=([a-zA-Z0-9_-]+)"',
+                                page_source)
+
+
+        driver.find_element_by_tag_name('body').send_keys(K)eys.PAGE_DOWN)
+
+        print("Video urls: %s" % video_urls)
+        if video_urls:
+            break
+        else:
+            print("waiting to find videos")
+            time.sleep(2)
+
+    return video_urls
+
 
 def get_channel(driver, channel):
     youtube_url = 'https://www.youtube.com/' + channel.name + '/videos'
@@ -89,22 +109,7 @@ def get_channel(driver, channel):
 
     channel.save()
 
-    # Use regular expressions to find all video URLs
-    while True:
-        page_source = driver.page_source
-        video_urls = re.findall(r'href="/watch\?v=([a-zA-Z0-9_-]+)"',
-                                page_source)
-
-
-        # XXX Fixme we need to keep paging down getting more videos
-        # not all the videos load right away...
-
-        print("Video urls: %s" % video_urls)
-        if video_urls:
-            break
-        else:
-            print("waiting to find videos")
-            time.sleep(2)
+    getpagevideos(driver)
 
     # Loop through each video URL
     for video_url in video_urls:
