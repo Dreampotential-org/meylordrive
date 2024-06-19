@@ -124,7 +124,6 @@ def get_distances(request):
     print("Number of dots: %s" % len(dots))
     return Response({'dots': res})
 
-
 def get_sp_distance(session_points):
     if not session_points:
         return {'distance_miles': 0,
@@ -330,6 +329,26 @@ def start(request):
 
     return Response({'status': 'okay',
                      'session_id': session.token})
+
+
+@api_view(['POST'])
+def dotsbu(request):
+    session = Session.objects.get(token=request.data.get("session_id"))
+    # print("found session %s" % session)
+    device = Device.objects.filter(
+       key=request.data.get("deviceid"))[0]
+
+    for sessionpoint in request.data.get("dots"):
+
+        sp = SessionPoint()
+        sp.session = session
+        sp.device = device
+
+        sp.latitude = sessionpoint.get("latitude")
+        sp.longitude = sessionpoint.get("longitude")
+        sp.save()
+
+    return Response({'status': 'okay'})
 
 
 @api_view(['POST'])

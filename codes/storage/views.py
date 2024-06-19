@@ -359,8 +359,6 @@ from wsgiref.util import FileWrapper
 import mimetypes
 
 
-
-
 logger = config.get_logger()
 
 

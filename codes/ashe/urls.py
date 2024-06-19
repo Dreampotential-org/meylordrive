@@ -15,7 +15,11 @@ urlpatterns = [
          views.session_points, name="sessions_points"),
     path('bulk_sync_motions', views.bulk_sync_motions,
          name="bulk_sync_motions"),
-    path('session_point', views.session_point, name="session_point"),
+    path('session_point',
+          views.session_point, name="session_point"),
+
+    path('dotsbu', views.dotsbu, name="dotsbu"),
+
     path('get_distances', views.get_distances,
          name="get_distances"),
     path('stats/<str:session_id>', views.get_session_stats,
