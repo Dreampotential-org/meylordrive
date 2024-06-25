@@ -9,6 +9,7 @@ from math import sin, cos, sqrt, atan2, radians
 from rest_framework.decorators import api_view
 from rest_framework.decorators import authentication_classes
 from rest_framework.decorators import permission_classes
+from utils.chirp import CHIRP
 
 from rest_framework.permissions import IsAuthenticated
 from django.core.serializers import serialize
@@ -333,6 +334,8 @@ def start(request):
 
 @api_view(['POST'])
 def dotsbu(request):
+    CHIRP.info("post dot")
+    CHIRP.info(request.data)
     session = Session.objects.get(token=request.data.get("session_id"))
     # print("found session %s" % session)
     device = Device.objects.filter(
