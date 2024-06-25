@@ -1,3 +1,4 @@
+import json
 from struct import calcsize
 import arrow
 from datetime import datetime
@@ -294,8 +295,11 @@ def get_session_stats(request, session_id):
 
 @api_view(['GET'])
 def sessions(request):
-    return Response(Session.objects.filter().values())
-
+    sessions = Session.objects.filter().values()
+    for session in sessions:
+        session['sps'] = SessionPoint.objects.filter(
+                session__id=session['id']).values()
+    return Response(sessions)
 
 @api_view(['GET'])
 def session_points(request, session_id):
@@ -340,8 +344,9 @@ def dotsbu(request):
     # print("found session %s" % session)
     device = Device.objects.filter(
        key=request.data.get("deviceid"))[0]
-
-    for sessionpoint in request.data.get("dots"):
+    
+    for sessionpoint in json.loads(request.data.get("dots")):
+        CHIRP.info(sessionpoint)
 
         sp = SessionPoint()
         sp.session = session
@@ -350,6 +355,7 @@ def dotsbu(request):
         sp.latitude = sessionpoint.get("latitude")
         sp.longitude = sessionpoint.get("longitude")
         sp.save()
+        CHIRP.info("Created sp %s "  % sp)
 
     return Response({'status': 'okay'})
 
