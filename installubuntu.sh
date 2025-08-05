@@ -1,3 +1,12 @@
+
+sudo groupadd docker
+sudo usermod -aG docker $USER
+sudo groupadd docker
+sudo usermod -aG docker $USER
+
+sudo apt install libjpeg8-dev zlib1g-dev
+
+
 sudo apt-get update && sudo apt-get install -y python3-virtualenv python3-pip libpq-dev  postgresql-common gdal-bin postgis postgresql-server-dev-all postgresql-postgis --fix-missing
 
 sudo apt-get install -y wget libpq-dev mtools unzip
