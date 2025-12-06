@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Integration Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .success {
+            background: #28a745;
+        }
+        .danger {
+            background: #dc3545;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .status.connected {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        #messages {
+            height: 400px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        .message.incoming {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+        .message.outgoing {
+            background: #f3e5f5;
+            border-left: 4px solid #9c27b0;
+        }
+        .message.system {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔌 WebSocket Integration Tester</h1>
+    
+    <div class="container">
+        <!-- WebSocket Connection Panel -->
+        <div class="panel">
+            <h2>WebSocket Connection</h2>
+            
+            <div class="form-group">
+                <label for="wsUrl">WebSocket URL:</label>
+                <input type="text" id="wsUrl" value="ws://localhost:8022/ws/test/">
+            </div>
+            
+            <button id="connectBtn" onclick="connectWebSocket()">Connect</button>
+            <button id="disconnectBtn" onclick="disconnectWebSocket()" disabled>Disconnect</button>
+            
+            <div id="connectionStatus" class="status disconnected">
+                Disconnected
+            </div>
+            
+            <div class="form-group">
+                <label for="messageToSend">Send Message:</label>
+                <textarea id="messageToSend" rows="3" placeholder='{"type": "ping", "message": "Hello"}'></textarea>
+            </div>
+            <button onclick="sendMessage()" id="sendBtn" disabled>Send Message</button>
+        </div>
+
+        <!-- REST API Panel -->
+        <div class="panel">
+            <h2>REST API Testing</h2>
+            
+            <div class="form-group">
+                <label for="apiUrl">API Base URL:</label>
+                <input type="text" id="apiUrl" value="http://localhost:8021">
+            </div>            {
+              "agent_id": "agent_001",
+              "command": "restart",
+              "data": {"param1": "test_value"}
+            }
+            
+            <div class="form-group">
+                <label for="endpoint">Endpoint:</label>
+                <select id="endpoint">
+                    <option value="ashe/websocket-status/">WebSocket Status (GET)</option>
+                    <option value="ashe/agent-command/" data-method="POST">Agent Command (POST)</option>
+                    <option value="ashe/notify-user/" data-method="POST">User Notification (POST)</option>
+                    <option value="ashe/broadcast/" data-method="POST">Broadcast Message (POST)</option>
+                    <option value="ashe/test-websocket/" data-method="POST">Test WebSocket (POST)</option>
+                    <option value="ashe/enhanced-dot/" data-method="POST">Enhanced Dot (POST)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="apiData">Request Data (JSON):</label>
+                <textarea id="apiData" rows="6" placeholder='{"key": "value"}'></textarea>
+            </div>
+            
+            <button onclick="sendAPIRequest()">Send API Request</button>
+            <button onclick="loadExampleData()">Load Example</button>
+        </div>
+
+        <!-- Messages Panel -->
+        <div class="panel full-width">
+            <h2>Messages & Responses</h2>
+            <button onclick="clearMessages()">Clear Messages</button>
+            <div id="messages"></div>
+        </div>
+    </div>
+
+    <script>
+        let websocket = null;
+        let isConnected = false;
+
+        // WebSocket Functions
+        function connectWebSocket() {
+            const url = document.getElementById('wsUrl').value;
+            
+            try {
+                websocket = new WebSocket(url);
+                
+                websocket.onopen = function() {
+                    isConnected = true;
+                    updateConnectionStatus(true);
+                    addMessage('system', `Connected to ${url}`);
+                };
+                
+                websocket.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    addMessage('incoming', `Received: ${JSON.stringify(data, null, 2)}`);
+                };
+                
+                websocket.onclose = function() {
+                    isConnected = false;
+                    updateConnectionStatus(false);
+                    addMessage('system', 'WebSocket connection closed');
+                };
+                
+                websocket.onerror = function(error) {
+                    addMessage('system', `WebSocket error: ${error}`);
+                };
+                
+            } catch (error) {
+                addMessage('system', `Connection failed: ${error}`);
+            }
+        }
+
+        function disconnectWebSocket() {
+            if (websocket) {
+                websocket.close();
+            }
+        }
+
+        function sendMessage() {
+            if (!isConnected) {
+                alert('Not connected to WebSocket');
+                return;
+            }
+            
+            const message = document.getElementById('messageToSend').value;
+            try {
+                const data = JSON.parse(message);
+                websocket.send(JSON.stringify(data));
+                addMessage('outgoing', `Sent: ${JSON.stringify(data, null, 2)}`);
+            } catch (error) {
+                alert('Invalid JSON: ' + error);
+            }
+        }
+
+        function updateConnectionStatus(connected) {
+            const status = document.getElementById('connectionStatus');
+            const connectBtn = document.getElementById('connectBtn');
+            const disconnectBtn = document.getElementById('disconnectBtn');
+            const sendBtn = document.getElementById('sendBtn');
+            
+            if (connected) {
+                status.textContent = 'Connected';
+                status.className = 'status connected';
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+                sendBtn.disabled = false;
+            } else {
+                status.textContent = 'Disconnected';
+                status.className = 'status disconnected';
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+                sendBtn.disabled = true;
+            }
+        }
+
+        // API Functions
+        async function sendAPIRequest() {
+            const baseUrl = document.getElementById('apiUrl').value;
+            const endpointSelect = document.getElementById('endpoint');
+            const endpoint = endpointSelect.value;
+            const selectedOption = endpointSelect.options[endpointSelect.selectedIndex];
+            const dataText = document.getElementById('apiData').value;
+            
+            const url = `${baseUrl}/${endpoint}`;
+            
+            try {
+                // Define endpoints that should always use GET
+                const getOnlyEndpoints = ['websocket-status'];
+                const isGetOnly = getOnlyEndpoints.some(ep => endpoint.includes(ep));
+                
+                // Check if option has data-method="POST" attribute
+                const requiresPost = selectedOption.getAttribute('data-method') === 'POST';
+                
+                let requestConfig = {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+
+                // Use POST if: 1) has data AND not GET-only, OR 2) endpoint requires POST
+                if ((dataText.trim() && !isGetOnly) || requiresPost) {
+                    requestConfig.method = 'POST';
+                    if (dataText.trim()) {
+                        requestConfig.body = dataText;
+                    } else {
+                        // Send empty JSON for POST endpoints without data
+                        requestConfig.body = '{}';
+                    }
+                }
+
+                addMessage('outgoing', `API Request: ${requestConfig.method} ${url}\nData: ${dataText || 'None'}`);
+                
+                const response = await fetch(url, requestConfig);
+                const responseData = await response.json();
+                
+                addMessage('incoming', `API Response (${response.status}):\n${JSON.stringify(responseData, null, 2)}`);
+                
+            } catch (error) {
+                addMessage('system', `API Request failed: ${error}`);
+            }
+        }
+
+        function loadExampleData() {
+            const endpoint = document.getElementById('endpoint').value;
+            const dataField = document.getElementById('apiData');
+            
+            const examples = {
+                'ashe/agent-command/': {
+                    "agent_id": "agent_001",
+                    "command": "restart",
+                    "data": {"param1": "test_value"}
+                },
+                'ashe/notify-user/': {
+                    "username": "test_user",
+                    "title": "Test Notification",
+                    "message": "This is a test notification",
+                    "data": {"key": "value"}
+                },
+                'ashe/broadcast/': {
+                    "message": "System maintenance starting soon",
+                    "type": "system_alert",
+                    "data": {"severity": "warning"}
+                },
+                'ashe/test-websocket/': {
+                    "target_type": "agent",
+                    "target": "agent_001",
+                    "test_message": "Hello from REST API!"
+                },
+                'ashe/enhanced-dot/': {
+                    "latitude": 40.7128,
+                    "longitude": -74.0060,
+                    "notify_user": "test_user"
+                }
+            };
+            
+            const example = examples[endpoint];
+            if (example) {
+                dataField.value = JSON.stringify(example, null, 2);
+            } else {
+                dataField.value = '';
+            }
+        }
+
+        // Message Functions
+        function addMessage(type, content) {
+            const messages = document.getElementById('messages');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = `[${timestamp}] ${content}`;
+            
+            messages.appendChild(messageDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function clearMessages() {
+            document.getElementById('messages').innerHTML = '';
+        }
+
+        // Load default WebSocket message example
+        document.getElementById('messageToSend').value = JSON.stringify({
+            "type": "ping",
+            "message": "Hello from browser"
+        }, null, 2);
+
+        // Load default API data on page load
+        loadExampleData();
+    </script>
+</body>
+</html>

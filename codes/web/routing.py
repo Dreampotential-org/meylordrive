@@ -1,22 +1,7 @@
 from django.urls import path, re_path
-from .consumers import ChatConsumer
+from .simple_consumers import SimpleTestConsumer
 
 websocket_urlpatterns = [
-    re_path(r'^ws/(?P<room_slug>[\w-]+)/$', ChatConsumer.as_asgi()),
-    # re_path(r'^ws/contact/$', ChatConsumer.as_asgi()),
-
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  #    path("<room_slug>", ChatConsumer.as_asgi()),
-#    re_path(r'^ws/(?P<room_slug>[^/]+)/$', ChatConsumer.as_asgi()),
+    # Simple test consumer (no dependencies)
+    re_path(r'^ws/(?P<room_slug>[\w-]+)/$', SimpleTestConsumer.as_asgi()),
 ]

@@ -32,7 +32,7 @@ RUN apt-get install -y ffmpeg
 
 COPY ./requirements.txt /tmp/requirements.txt
 
-RUN pip3 install -r /tmp/requirements.txt
+RUN pip3 install -r /tmp/requirements.txt --break-system-packages
 RUN apt install portaudio19-dev python3-pyaudio
 
 COPY entrypoint.sh /entrypoint.sh

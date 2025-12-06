@@ -182,16 +182,25 @@ dbuser = os.environ.get('dbuser', 'postgres')
 dbhost = os.environ.get('dbhost', 'dreampotential.org')
 dbport = os.environ.get('dbport', '5775')
 
+# Use SQLite for local development/testing
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
-        'USER': dbuser,
-        'HOST': dbhost,
-        'PORT': dbport,
-        'PASSWORD': dbpassword,
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+# Uncomment below for PostgreSQL production
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'postgres',
+#         'USER': dbuser,
+#         'HOST': dbhost,
+#         'PORT': dbport,
+#         'PASSWORD': dbpassword,
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
