@@ -28,6 +28,12 @@ urlpatterns = [
     path('gsm_Add', views.gsm_Add, name="gsm_Add"),
     path('gsm_send', views.gsm_send, name="gsm_send"),
     
+    # WebSocket messaging from REST API endpoints
+    path('send-websocket/', views.send_to_websocket, name="send_websocket"),
+    path('push-location/', views.push_location_update, name="push_location"),
+    path('start-live-push/', views.start_live_push, name="start_live_push"),
+    path('stop-live-push/', views.stop_live_push, name="stop_live_push"),
+    
     # WebSocket integration endpoints
     path('notify-user/', websocket_views.send_notification_to_user, name="notify_user"),
     path('agent-command/', websocket_views.send_agent_command, name="agent_command"),

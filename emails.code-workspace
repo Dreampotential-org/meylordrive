@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		}
+	],
+	"settings": {
+		"powerquery.client.additionalSymbolsDirectories": [
+			"c:/Users/user/techzone/emails/.vscode/excel-pq-symbols"
+		]
+	}
+}

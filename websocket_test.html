@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket REST API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .message {
+            background: #e8f5e8;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+        .error {
+            background: #ffe8e8;
+            border-left-color: #f44336;
+        }
+        .system {
+            background: #e8f4fd;
+            border-left-color: #2196F3;
+        }
+        .location {
+            background: #fff3e0;
+            border-left-color: #ff9800;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button.stop {
+            background: #f44336;
+        }
+        button.stop:hover {
+            background: #da190b;
+        }
+        input, select {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .status {
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .connected {
+            background: #d4edda;
+            color: #155724;
+        }
+        .disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .messages {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background: #fafafa;
+        }
+    </style>
+</head>
+<body>
+    <h1>WebSocket REST API Test</h1>
+    
+    <!-- Connection Status -->
+    <div class="container">
+        <h2>Connection Status</h2>
+        <div id="status" class="status disconnected">Disconnected</div>
+        <button onclick="connectWebSocket()">Connect</button>
+        <button onclick="disconnectWebSocket()" class="stop">Disconnect</button>
+    </div>
+    
+    <!-- Send Messages via REST API -->
+    <div class="container">
+        <h2>Send Messages via REST API</h2>
+        <div>
+            <input type="text" id="apiToken" placeholder="Your API Token" style="width: 300px;">
+            <button onclick="setToken()">Set Token</button>
+        </div>
+        <div>
+            <input type="text" id="messageRoom" placeholder="Room name" value="general">
+            <input type="text" id="messageContent" placeholder="Message content" style="width: 300px;">
+            <button onclick="sendRestMessage()">Send via REST</button>
+        </div>
+        <div>
+            <input type="number" id="latitude" placeholder="Latitude" step="0.000001" value="40.7128">
+            <input type="number" id="longitude" placeholder="Longitude" step="0.000001" value="-74.0060">
+            <input type="text" id="deviceId" placeholder="Device ID" value="test_device">
+            <button onclick="sendLocation()">Send Location</button>
+        </div>
+        <div>
+            <button onclick="startLivePush()">Start Live Push</button>
+            <button onclick="stopLivePush()" class="stop">Stop Live Push</button>
+        </div>
+    </div>
+    
+    <!-- WebSocket Messages -->
+    <div class="container">
+        <h2>WebSocket Messages</h2>
+        <div id="messages" class="messages"></div>
+        <button onclick="clearMessages()" class="stop">Clear Messages</button>
+    </div>
+
+    <script>
+        let ws = null;
+        let apiToken = '';
+        const baseUrl = 'http://localhost:8021'; // Django server URL
+        
+        function connectWebSocket() {
+            const room = document.getElementById('messageRoom').value || 'general';
+            const wsUrl = `ws://localhost:8022/ws/test/${room}/`; // Your WebSocket URL
+            
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = function(event) {
+                updateStatus('Connected', true);
+                addMessage('Connected to WebSocket', 'system');
+            };
+            
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                console.log('WebSocket message:', data);
+                
+                if (data.message) {
+                    let messageClass = 'message';
+                    if (data.message.type === 'location_update') {
+                        messageClass = 'location';
+                    } else if (data.message.type === 'live_stats') {
+                        messageClass = 'system';
+                    }
+                    
+                    const content = data.message.content || JSON.stringify(data.message);
+                    addMessage(content, messageClass, data.message);
+                }
+            };
+            
+            ws.onclose = function(event) {
+                updateStatus('Disconnected', false);
+                addMessage('Disconnected from WebSocket', 'error');
+            };
+            
+            ws.onerror = function(error) {
+                console.error('WebSocket error:', error);
+                addMessage('WebSocket error occurred', 'error');
+            };
+        }
+        
+        function disconnectWebSocket() {
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+        }
+        
+        function updateStatus(text, connected) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = text;
+            statusEl.className = `status ${connected ? 'connected' : 'disconnected'}`;
+        }
+        
+        function addMessage(content, className = 'message', fullData = null) {
+            const messagesEl = document.getElementById('messages');
+            const messageEl = document.createElement('div');
+            messageEl.className = className;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            let displayContent = `[${timestamp}] ${content}`;
+            
+            if (fullData) {
+                displayContent += `\n${JSON.stringify(fullData, null, 2)}`;
+            }
+            
+            messageEl.textContent = displayContent;
+            messagesEl.appendChild(messageEl);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+        
+        function setToken() {
+            apiToken = document.getElementById('apiToken').value;
+            if (apiToken) {
+                addMessage('API Token set successfully', 'system');
+            } else {
+                addMessage('Please enter a valid token', 'error');
+            }
+        }
+        
+        async function sendRestMessage() {
+            if (!apiToken) {
+                addMessage('Please set API token first', 'error');
+                return;
+            }
+            
+            const room = document.getElementById('messageRoom').value;
+            const content = document.getElementById('messageContent').value;
+            
+            if (!content) {
+                addMessage('Please enter message content', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${baseUrl}/ashe/send-websocket/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Token ${apiToken}`
+                    },
+                    body: JSON.stringify({
+                        room: room,
+                        message: content,
+                        data: { source: 'web_interface' }
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.status === 'success') {
+                    addMessage(`REST API: Message sent successfully`, 'system');
+                } else {
+                    addMessage(`REST API Error: ${result.message}`, 'error');
+                }
+                
+                // Clear the input
+                document.getElementById('messageContent').value = '';
+                
+            } catch (error) {
+                addMessage(`REST API Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function sendLocation() {
+            if (!apiToken) {
+                addMessage('Please set API token first', 'error');
+                return;
+            }
+            
+            const latitude = parseFloat(document.getElementById('latitude').value);
+            const longitude = parseFloat(document.getElementById('longitude').value);
+            const deviceId = document.getElementById('deviceId').value;
+            
+            try {
+                const response = await fetch(`${baseUrl}/ashe/push-location/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Token ${apiToken}`
+                    },
+                    body: JSON.stringify({
+                        latitude: latitude,
+                        longitude: longitude,
+                        device_id: deviceId
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.status === 'success') {
+                    addMessage(`Location pushed: ${latitude}, ${longitude}`, 'system');
+                } else {
+                    addMessage(`Location Error: ${result.message}`, 'error');
+                }
+                
+            } catch (error) {
+                addMessage(`Location Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function startLivePush() {
+            if (!apiToken) {
+                addMessage('Please set API token first', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${baseUrl}/ashe/start-live-push/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Token ${apiToken}`
+                    },
+                    body: JSON.stringify({
+                        room: 'live_updates',
+                        interval: 3
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.status === 'success') {
+                    addMessage('Live push started', 'system');
+                } else {
+                    addMessage(`Live Push Error: ${result.message}`, 'error');
+                }
+                
+            } catch (error) {
+                addMessage(`Live Push Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function stopLivePush() {
+            if (!apiToken) {
+                addMessage('Please set API token first', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${baseUrl}/ashe/stop-live-push/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Token ${apiToken}`
+                    }
+                });
+                
+                const result = await response.json();
+                if (result.status === 'success') {
+                    addMessage('Live push stopped', 'system');
+                } else {
+                    addMessage(`Stop Error: ${result.message}`, 'error');
+                }
+                
+            } catch (error) {
+                addMessage(`Stop Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function clearMessages() {
+            document.getElementById('messages').innerHTML = '';
+        }
+        
+        // Auto-connect when page loads
+        window.onload = function() {
+            addMessage('Page loaded. Click Connect to start WebSocket connection.', 'system');
+        };
+    </script>
+</body>
+</html>

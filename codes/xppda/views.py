@@ -39,7 +39,27 @@ logger = config.get_logger()
 
 
 def register(request):
-    return render(request, 'xppda/index.html')
+    registered = False
+    user_taken = False
+    name = ''
+    if request.method == 'POST':
+        data = {k: v for k, v in request.POST.items()}
+        data['request'] = request
+        user = _create_user(**data)
+        if user == 'error':
+            user_taken = True
+        elif user == 'success':
+            # User was created and logged in successfully, redirect to home
+            return HttpResponseRedirect('/')
+
+    user_form = UserForm()
+    profile_form = UserProfileInfoForm()
+    
+    return render(request, 'dappx/registration.html',
+                  {'user_form': user_form,
+                   'profile_form': profile_form,
+                   'user_taken': user_taken,
+                   'registered': registered})
 
 
 @superuser_only
@@ -331,7 +351,8 @@ def _create_user(**data):
 
         if user and request:
             login(request, user)
-            return HttpResponseRedirect(reverse('index'))
+            # Instead of redirecting to 'index', return success indicator
+            return 'success'
 
     elif (user_form.errors):
         return 'error'

@@ -15,6 +15,17 @@
         </a>
       </div>
       
+      <!-- Create New Room Section -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <h6 class="card-title">Create a New Chat Room</h6>
+          <form method="post" action="/ws/create_room/">
+            {% csrf_token %}
+            <input type="text" name="room_name" class="form-control mb-2" placeholder="Enter room name..." required>
+            <button type="submit" class="btn btn-success">Create Room</button>
+          </form>
+        </div>
+      </div>
       
       {% if rooms %}
         <div class="row equal">
@@ -35,7 +46,10 @@
             
         </div>
     {% else %}
-            No Rooms Available!
+        <div class="alert alert-warning text-center">
+          <h5>No Rooms Available!</h5>
+          <p>Be the first to create a chat room using the form above.</p>
+        </div>
     {% endif %}
 </div>
 
@@ -45,8 +59,8 @@
 <div class="container">
     <div class="alert alert-info d-flex justify-content-between" role="alert">
         <h5>You are not logged in</h5>
-        <a href="/accounts/logout/">
-          <button type="button" class="btn btn-light"><a href="{% url 'login' %}">Log In</a></button>
+        <a href="/accounts/login/">
+          <button type="button" class="btn btn-light">Log In</button>
         </a>
       </div>
 </div>  

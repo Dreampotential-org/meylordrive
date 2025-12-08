@@ -1,22 +1,40 @@
-{% extends "xppda/base.html" %}
-{% load staticfiles %}
-{% block body_block %}
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+
   <div class="container">
-    <div class="jumbotron">
-      {% if registered %}
-        <h1>Thank you for registering!</h1>
-      {% else %}
-        <h1>Register Here</h1>
-        <h3>Just fill out the form.</h3>
-<form enctype="multipart/form-data" method="POST">
+    {% if registered %}
+      <h5 class="alert alert-success">Thank you for registering!</h5>
+      <div class="text-center mt-3">
+        <p><a href="/accounts/login/" class="btn btn-primary btn-lg">Go to Login</a></p>
+      </div>
+    {% else %}
+      <h5 class="alert alert-info">Register Here</h5>
+      
+      {% if user_taken %}
+        <div class="alert alert-warning">
+          <strong>Error:</strong> A user with that email already exists. Please try logging in instead or use a different email address.
+        </div>
+      {% endif %}
+      
+      <div class="btn btn-light d-flex justify-content-between" style="padding: 34px 30%;">
+        
+        <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
           {{ user_form.as_p }}
           {{ profile_form.as_p }}
-          <input type="submit" name="" value="Register">
+          <button type="submit" class="btn btn-primary btn-lg btn-block">Register</button>
         </form>
-
-      {% endif %}
-    </div>
+      </div>
+      
+      <div class="text-center mt-3">
+        <p>Already have an account? <a href="/accounts/login/" class="btn btn-outline-secondary">Login Here</a></p>
+      </div>
+    {% endif %}
   </div>
+
 {% endblock %}
 

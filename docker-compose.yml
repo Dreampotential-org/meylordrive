@@ -8,18 +8,20 @@ services:
             - /data:/data
         ports:
             - 8021:8000
-        command: bash -c "/usr/local/bin/gunicorn --bind :8000 --timeout 999 --workers 8 --env DJANGO_SETTINGS_MODULE=web.settings  web.wsgi:application"
+        command: bash -c "cd /home/web/codes && python3 manage.py migrate && /usr/local/bin/gunicorn --bind :8000 --timeout 999 --workers 4 --env DJANGO_SETTINGS_MODULE=web.settings  web.wsgi:application"
         environment:
             - OPEN_AI_KEY=$OPEN_AI_KEY
+            - DJANGO_SETTINGS_MODULE=web.settings
     daplin:
         build: .
         volumes:
             - ./codes:/home/web/codes
             - /data:/data
         ports:
-            - 8022:8000
-        command: bash -c "sleep 10 && daphne -u /tmp/daphne.sock web.asgi:application"
+            - 8022:8022
+        command: bash -c "cd /home/web/codes && sleep 15 && daphne -b 0.0.0.0 -p 8022 web.asgi:application"
         environment:
             - OPEN_AI_KEY=$OPEN_AI_KEY
+            - DJANGO_SETTINGS_MODULE=web.settings
         depends_on:
             - web

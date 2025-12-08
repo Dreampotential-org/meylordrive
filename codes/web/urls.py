@@ -39,9 +39,9 @@ schema_view = get_schema_view(
 urlpatterns = [
   path('admin/', admin.site.urls),
   path("ai/", include('ai.urls')),
-  # path("", include("server_websocket.urls")),
+  path("", include("server_websocket.urls")),
   path("accounts/", include("django.contrib.auth.urls")),
-  # path('',include('server_websocket.urls')),
+  path("xppda/", include('xppda.urls')),
   path("usersystem/", include('usersystem.urls')),
   path("checkout/", include('checkout.urls')),
   path("awipu/", include('awipu.urls')),

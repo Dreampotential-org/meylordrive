@@ -24,6 +24,12 @@ import json
 
 from ashe.models import Dot
 
+# WebSocket imports for sending messages from REST API
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+import threading
+import time
+
 speedFlow = ['normal', 'fast', 'tofast', 'slow', 'toslow']
 
 
@@ -464,6 +470,262 @@ def gsm_send(request):
                                     extra={"title": title,"icon": "icon",
                                            "data": "data",
                                            "image": "image"})
+
+
+# ============================================================================
+# WebSocket Messaging Functions - Send from REST API to WebSocket
+# ============================================================================
+
+def send_websocket_message(room_name, message_data, user_id=None):
+    """
+    Send message to WebSocket from REST API
+    
+    Args:
+        room_name: The WebSocket room to send message to
+        message_data: Dictionary with message data
+        user_id: Optional specific user ID to target
+    """
+    channel_layer = get_channel_layer()
+    group_name = f"room_{room_name}"
+    
+    # Add timestamp to message
+    message_data['timestamp'] = datetime.now().isoformat()
+    
+    try:
+        # Send to WebSocket group
+        async_to_sync(channel_layer.group_send)(
+            group_name,
+            {
+                'type': 'chat_message',
+                'message': message_data,
+                'user_id': user_id
+            }
+        )
+        return True
+    except Exception as e:
+        print(f"Error sending WebSocket message: {e}")
+        return False
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def send_to_websocket(request):
+    """
+    REST API endpoint to send messages to WebSocket
+    
+    POST data:
+    {
+        "room": "room_name",
+        "message": "Your message here",
+        "target_user": "optional_user_id",
+        "data": {"any": "additional data"}
+    }
+    """
+    try:
+        room_name = request.data.get('room', 'general')
+        message = request.data.get('message', '')
+        target_user = request.data.get('target_user')
+        additional_data = request.data.get('data', {})
+        
+        # Prepare message data
+        message_data = {
+            'content': message,
+            'sender': request.user.username,
+            'sender_id': request.user.id,
+            'type': 'api_message',
+            **additional_data
+        }
+        
+        # Send to WebSocket
+        success = send_websocket_message(room_name, message_data, target_user)
+        
+        if success:
+            return Response({
+                'status': 'success',
+                'message': 'Message sent to WebSocket',
+                'room': room_name,
+                'sent_at': datetime.now().isoformat()
+            })
+        else:
+            return Response({
+                'status': 'error',
+                'message': 'Failed to send message to WebSocket'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+    except Exception as e:
+        return Response({
+            'status': 'error',
+            'message': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def push_location_update(request):
+    """
+    Push location updates to connected WebSocket clients
+    Specific for your location tracking functionality
+    """
+    try:
+        latitude = request.data.get('latitude')
+        longitude = request.data.get('longitude')
+        device_id = request.data.get('device_id')
+        
+        if not latitude or not longitude:
+            return Response({
+                'status': 'error',
+                'message': 'Latitude and longitude required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Prepare location update message
+        location_data = {
+            'content': f"Location update from device {device_id}",
+            'latitude': float(latitude),
+            'longitude': float(longitude),
+            'device_id': device_id,
+            'sender': request.user.username,
+            'sender_id': request.user.id,
+            'type': 'location_update',
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        # Send to location tracking room
+        room_name = f"location_tracking"
+        success = send_websocket_message(room_name, location_data)
+        
+        if success:
+            return Response({
+                'status': 'success',
+                'message': 'Location update pushed to WebSocket',
+                'location': {'lat': latitude, 'lng': longitude}
+            })
+        else:
+            return Response({
+                'status': 'error',
+                'message': 'Failed to push location update'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+    except Exception as e:
+        return Response({
+            'status': 'error',
+            'message': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class WebSocketPusher:
+    """
+    Background service to continuously push data to WebSocket
+    This is the "server keep doing push" functionality your client requested
+    """
+    
+    def __init__(self, room_name="live_updates", interval=5):
+        self.room_name = room_name
+        self.interval = interval
+        self.running = False
+        self.thread = None
+    
+    def start_pushing(self):
+        """Start background thread for continuous pushing"""
+        if not self.running:
+            self.running = True
+            self.thread = threading.Thread(target=self._push_loop, daemon=True)
+            self.thread.start()
+            print(f"WebSocket pusher started for room: {self.room_name}")
+    
+    def stop_pushing(self):
+        """Stop background pushing"""
+        self.running = False
+        if self.thread:
+            self.thread.join()
+        print("WebSocket pusher stopped")
+    
+    def _push_loop(self):
+        """Background loop that continuously pushes data"""
+        while self.running:
+            try:
+                # Example: Push live statistics
+                current_time = datetime.now()
+                
+                # Get some live data (example with your models)
+                device_count = Device.objects.count()
+                session_count = Session.objects.count()
+                dot_count = Dot.objects.count()
+                
+                push_data = {
+                    'content': 'Live system update',
+                    'type': 'live_stats',
+                    'stats': {
+                        'devices': device_count,
+                        'sessions': session_count,
+                        'dots': dot_count,
+                        'timestamp': current_time.isoformat(),
+                        'formatted_time': current_time.strftime('%H:%M:%S')
+                    }
+                }
+                
+                # Push to WebSocket
+                send_websocket_message(self.room_name, push_data)
+                
+                # Wait for next interval
+                time.sleep(self.interval)
+                
+            except Exception as e:
+                print(f"Error in WebSocket push loop: {e}")
+                time.sleep(self.interval)
+
+
+# Global pusher instance
+websocket_pusher = WebSocketPusher()
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def start_live_push(request):
+    """
+    Start continuous WebSocket pushing
+    POST data: {"room": "room_name", "interval": 5}
+    """
+    global websocket_pusher
+    
+    try:
+        room_name = request.data.get('room', 'live_updates')
+        interval = int(request.data.get('interval', 5))
+        
+        # Stop existing pusher if running
+        websocket_pusher.stop_pushing()
+        
+        # Create new pusher with settings
+        websocket_pusher = WebSocketPusher(room_name, interval)
+        websocket_pusher.start_pushing()
+        
+        return Response({
+            'status': 'success',
+            'message': f'Live push started for room: {room_name}',
+            'interval': interval
+        })
+        
+    except Exception as e:
+        return Response({
+            'status': 'error',
+            'message': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def stop_live_push(request):
+    """Stop continuous WebSocket pushing"""
+    try:
+        websocket_pusher.stop_pushing()
+        return Response({
+            'status': 'success',
+            'message': 'Live push stopped'
+        })
+    except Exception as e:
+        return Response({
+            'status': 'error',
+            'message': str(e)
+        }, status=status.HTTP_400_BAD_REQUEST)
     print(f"Share Moment FCM: {resp}")
 
     # print(dir(fcm_devices))

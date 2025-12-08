@@ -233,9 +233,9 @@ USE_L10N = True
 
 USE_TZ = True
 
-# Make knox’s Token Authentication default
+# Use standard Django REST Framework Token Authentication
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',),
+    'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework.authentication.TokenAuthentication',),
 }
 
 # CHANNEL_LAYERS = {

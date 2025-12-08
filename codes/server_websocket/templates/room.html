@@ -3,6 +3,171 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
+<style>
+.custom-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #ffc107;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s ease-in-out infinite;
+  margin-left: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Modern Chat Styling */
+.chat-container {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.chat-header {
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.chat-header h5 {
+  color: white;
+  margin: 0;
+  font-weight: 600;
+}
+
+#chatbox {
+  background: rgba(255,255,255,0.95);
+  border-radius: 12px;
+  padding: 20px;
+  max-height: 400px;
+  min-height: 300px;
+  overflow-y: auto;
+  border: none;
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.chat-message {
+  margin-bottom: 15px;
+  padding: 12px 15px;
+  border-radius: 20px;
+  max-width: 70%;
+  word-wrap: break-word;
+  position: relative;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.chat-message.text-right {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  margin-left: auto;
+  margin-right: 0;
+  border-bottom-right-radius: 5px;
+}
+
+.chat-message.text-left {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  color: #333;
+  margin-left: 0;
+  margin-right: auto;
+  border-bottom-left-radius: 5px;
+}
+
+.chat-message b {
+  font-size: 0.85em;
+  opacity: 0.8;
+  display: block;
+  margin-bottom: 3px;
+}
+
+.chat-message.text-right b {
+  color: rgba(255,255,255,0.9);
+}
+
+.chat-input-group {
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 15px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.chat-input {
+  border: none;
+  border-radius: 25px;
+  padding: 12px 20px;
+  background: rgba(255,255,255,0.9);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.chat-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  background: white;
+}
+
+.chat-send-btn {
+  border-radius: 25px;
+  padding: 12px 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.chat-send-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+}
+
+.chat-send-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.no-messages {
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  padding: 40px;
+}
+
+/* Scrollbar Styling */
+#chatbox::-webkit-scrollbar {
+  width: 6px;
+}
+
+#chatbox::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+#chatbox::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10px;
+}
+
+#chatbox::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+}
+</style>
+
 {% if user.is_authenticated %}
 
   
@@ -10,41 +175,51 @@
 
   <div class="container">
     <div class="row d-flex justify-content-center">
-        <div class="col-12">
-            <div class="alert alert-info d-flex justify-content-between" role="alert">
-              <h5>ROOM :- {{room_name}}</h5>
+        <div class="col-12 col-lg-8">
+          <div class="chat-container">
+            <div class="chat-header d-flex justify-content-between align-items-center">
+              <h5><i class="fas fa-comments mr-2"></i>Chat Room: {{room_name}}</h5>
               <a href="/accounts/logout/">
-                <button type="button" class="btn btn-light">Click to Log Out</button>
+                <button type="button" class="btn btn-outline-light btn-sm">Logout</button>
               </a>
             </div>
-            <form>
-                <div class="form-group">
-                  {% if messages %}
-                  <div class="jumbotron" id="chatbox" style="padding: 4px 2px;max-height: 300px;  /* Adjust the max-height as needed */
-                  overflow-y: scroll;
-                "">
-                    
-                      {% for message in messages %}
-                        <div class="chat-message {% if message.user == request.user %}text-right{% else %}text-left{% endif %}">
-                          <b>{{ message.user.username }}</b> : {{ message.content }}<br>
-                        </div>
-                        {% endfor %}
-                    
-                    
+            
+            <!-- Connection Status -->
+            <div id="connection-status" class="alert alert-warning" style="display: none;">
+              <span id="status-text">Connecting...</span>
+              <span id="status-spinner" class="ml-2" style="display: inline-block;">
+                <div class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></div>
+                <div class="custom-spinner"></div>
+              </span>
+            </div>
+            
+            {% if messages %}
+              <div id="chatbox">
+                {% for message in messages %}
+                  <div class="chat-message {% if message.user == request.user %}text-right{% else %}text-left{% endif %}">
+                    <b>{{ message.user.username }}</b>
+                    <div>{{ message.content }}</div>
                   </div>
-                  {% else %}
-                  <div class="jumbotron" id="chatbox" style="padding: 4px 2px;"></div>
-                  <b>No Messages in this Room.</b>
-                    {% endif %}
+                {% endfor %}
+              </div>
+            {% else %}
+              <div id="chatbox">
+                <div class="no-messages">
+                  <i class="fas fa-comment-slash fa-2x mb-3"></i>
+                  <br>No messages in this room yet. Start the conversation!
+                </div>
+              </div>
+            {% endif %}
 
+            <form>
+                <div class="chat-input-group">
+                    <div class="form-group mb-0">
+                        <input class="form-control chat-input" placeholder="Type your message here..." id="my_input" type="text" required disabled>
+                    </div>
+                    <input class="btn btn-primary btn-block chat-send-btn" id="submit_button" type="button" value="Send Message" disabled>
                 </div>
-                <br/>
-                <div class="form-group" style="width: 100%;">
-                    <input class="form-control" placeholder="Enter text here" id="my_input" type="text" required></br>
-                </div>
-                <br/>
-                <input class="btn btn-primary btn-lg btn-block" id="submit_button" type="button" value="Send">
             </form>
+          </div>
         </div>
     </div>
 </div>
@@ -52,67 +227,158 @@
 <script>
 
 const chatbox = document.querySelector("#chatbox");
+const connectionStatus = document.querySelector("#connection-status");
+const statusText = document.querySelector("#status-text");
+const statusSpinner = document.querySelector("#status-spinner");
+const submitButton = document.querySelector("#submit_button");
+const messageInput = document.querySelector("#my_input");
 
   // Function to scroll to the bottom of the chatbox
   function scrollToBottom() {
     chatbox.scrollTop = chatbox.scrollHeight;
   }
 
+  // Function to update connection status
+  function updateConnectionStatus(status, message) {
+    connectionStatus.style.display = "block";
+    statusText.textContent = message;
+    
+    switch(status) {
+      case 'connecting':
+        connectionStatus.className = "alert alert-warning";
+        statusSpinner.style.display = "inline-block";
+        submitButton.disabled = true;
+        messageInput.disabled = true;
+        messageInput.placeholder = "Connecting to chat...";
+        break;
+      case 'connected':
+        connectionStatus.className = "alert alert-success";
+        statusSpinner.style.display = "none";
+        submitButton.disabled = false;
+        messageInput.disabled = false;
+        messageInput.placeholder = "Enter text here";
+        messageInput.focus();
+        setTimeout(() => {
+          connectionStatus.style.display = "none";
+        }, 3000); // Hide after 3 seconds
+        break;
+      case 'disconnected':
+        connectionStatus.className = "alert alert-danger";
+        statusSpinner.style.display = "none";
+        submitButton.disabled = true;
+        messageInput.disabled = true;
+        messageInput.placeholder = "Disconnected from chat";
+        break;
+      case 'error':
+        connectionStatus.className = "alert alert-danger";
+        statusSpinner.style.display = "none";
+        submitButton.disabled = true;
+        messageInput.disabled = true;
+        messageInput.placeholder = "Connection error";
+        break;
+    }
+  }
+
   // Scroll to bottom when the page is loaded
   scrollToBottom();
 
+  // Show connecting status initially
+  updateConnectionStatus('connecting', 'Connecting to chat room...');
+
  
     const roomName= JSON.parse(document.getElementById('room_slug').textContent);
-    const chatSocket = new WebSocket("wss://" + window.location.host + "/ws/"+ roomName +"/");
-    // const chatSocket = new WebSocket("ws://127.0.0.1:8000/ws/"+ roomName +"/");
-    // alert(chatSocket);
+    const chatSocket = new WebSocket("ws://127.0.0.1:8022/ws/"+ roomName +"/");
+    // const chatSocket = new WebSocket("wss://127.0.0.1:8022/ws/"+ roomName +"/");
+    
     chatSocket.onopen = function (e) {
       console.log("The connection was setup successfully !");
+      updateConnectionStatus('connected', 'Connected successfully!');
     };
+    
     chatSocket.onclose = function (e) {
       console.log("Something unexpected happened !");
+      updateConnectionStatus('disconnected', 'Connection lost. Please refresh the page.');
+    };
+    
+    chatSocket.onerror = function (e) {
+      console.log("WebSocket error: ", e);
+      updateConnectionStatus('error', 'Connection error. Please refresh the page.');
     };
 
-    document.querySelector("#my_input").focus();
-    document.querySelector("#my_input").onkeyup = function (e) {
+    messageInput.onkeyup = function (e) {
       if (e.keyCode == 13) {
         e.preventDefault();
-        document.querySelector("#submit_button").click();
+        if (!submitButton.disabled) {
+          submitButton.click();
+        }
       }
     };
-    document.querySelector("#submit_button").onclick = function (e) {
-      var messageInput = document.querySelector(
-        "#my_input"
-      ).value;
-
-      if(messageInput.length == 0)
-        {
-            alert("Add some Input First Or Press Send Button!")
-        }
-        else
-        {
-          chatSocket.send(JSON.stringify({ message: messageInput, username : "{{request.user.username}}",room_name:"{{room_name}}"}));
-          
-         
-        }
+    
+    submitButton.onclick = function (e) {
+      // Check if WebSocket is ready
+      if (chatSocket.readyState !== WebSocket.OPEN) {
+        updateConnectionStatus('error', 'Connection not ready. Please wait or refresh the page.');
+        return;
+      }
       
+      var messageInputValue = messageInput.value.trim();
+
+      if(messageInputValue.length == 0) {
+        alert("Please enter a message first!");
+        return;
+      }
+      
+      try {
+        chatSocket.send(JSON.stringify({ 
+          message_type: 'chat',
+          message: messageInputValue, 
+          username: "{{request.user.username}}", 
+          room_name: "{{room_name}}" 
+        }));
+        messageInput.value = "";
+      } catch (error) {
+        console.error("Error sending message:", error);
+        updateConnectionStatus('error', 'Failed to send message. Please try again.');
+      }
     };
 
     chatSocket.onmessage = function (e) {
       const data = JSON.parse(e.data);
-      var div = document.createElement("div");
-      div.innerHTML = "<b>" + data.username + "</b> : " + data.message;
+      
+      // Handle different message types
+      if (data.type === 'connection_status') {
+        // Handle connection status messages (welcome, etc.)
+        console.log('Connection status:', data.message);
+        return; // Don't display in chat
+      } else if (data.type === 'chat_message') {
+        // Handle regular chat messages
+        var div = document.createElement("div");
+        div.className = "chat-message " + (data.username === "{{ request.user.username }}" ? "text-right" : "text-left");
+        
+        div.innerHTML = `
+          <b>${data.username}</b>
+          <div>${data.message}</div>
+        `;
 
-      // Add class based on user authentication
-      if (data.username === "{{ request.user.username }}") {
-        div.classList.add("chat-message", "text-right");
+        chatbox.appendChild(div);
+        scrollToBottom();
       } else {
-        div.classList.add("chat-message", "text-left");
-      }
+        // Handle legacy format or other message types
+        if (data.username && data.message) {
+          var div = document.createElement("div");
+          div.className = "chat-message " + (data.username === "{{ request.user.username }}" ? "text-right" : "text-left");
+          
+          div.innerHTML = `
+            <b>${data.username}</b>
+            <div>${data.message}</div>
+          `;
 
-      document.querySelector("#my_input").value = "";
-      document.querySelector("#chatbox").appendChild(div);
-      scrollToBottom();
+          chatbox.appendChild(div);
+          scrollToBottom();
+        } else {
+          console.log('Received message:', data);
+        }
+      }
     };
   </script>
 
@@ -122,8 +388,8 @@ const chatbox = document.querySelector("#chatbox");
 <div class="container">
     <div class="alert alert-info d-flex justify-content-between" role="alert">
         <h5>You are not logged in</h5>
-        <a href="/accounts/logout/">
-          <button type="button" class="btn btn-light"><a href="{% url 'login' %}">Log In</a></button>
+        <a href="/accounts/login/">
+          <button type="button" class="btn btn-light">Log In</button>
         </a>
       </div>
 </div>  
