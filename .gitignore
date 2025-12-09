@@ -2,6 +2,7 @@ cookies.txt
 *.pyc
 *.sw?
 venv
+vev
 logs
 demofile
 id_rsa
@@ -10,3 +11,4 @@ geckodriver.log
 Cache/
 TransportSecurity
 User/
+
