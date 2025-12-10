@@ -134,7 +134,7 @@
         
         function connectWebSocket() {
             const room = document.getElementById('messageRoom').value || 'general';
-            const wsUrl = `ws://localhost:8022/ws/test/${room}/`; // Your WebSocket URL
+            const wsUrl = `ws://localhost:8022/ws/${room}/`; // Correct WebSocket URL
             
             ws = new WebSocket(wsUrl);
             

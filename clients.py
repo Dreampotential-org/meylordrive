@@ -3,7 +3,7 @@ import websockets
 
 
 async def main():
-    uri = "ws://127.0.0.1:8000/ws/chat/"
+    uri = "ws://127.0.0.1:8022/ws/general/"  # Updated to correct URL
     async with websockets.connect(uri) as websocket:
         # WebSocket connection is open
         print("WebSocket connection opened")
